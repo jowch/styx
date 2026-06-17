@@ -2,17 +2,18 @@
 
 Bridge Pluto.jl notebooks to Cursor agent workflows via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) and browser click context.
 
-## What this is
+## Planning (read before building)
 
-Users click code or output in a Pluto notebook; the bridge resolves `cell_id`, packages context, and hands it to a Cursor agent that reads/edits/runs cells through MCP.
+| Doc | Purpose |
+|-----|---------|
+| **[PLAN.md](docs/PLAN.md)** | Integrated phase map, architecture, build sequence |
+| **[DECISIONS.md](docs/DECISIONS.md)** | Running decision log (what we decided and why) |
+| **[specs/](docs/specs/)** | Detailed specs per phase |
 
-## Docs
-
-- **[Decision record](docs/DECISIONS.md)** — running log of what we decided and why
-- **PlutoMCP fork `AGENTS.md`** — MCP tool semantics (stage-first, projections, naming)
+Fork MCP semantics: PlutoMCP.jl `AGENTS.md`.
 
 ## Quick reference
 
 - MCP endpoint: `http://localhost:2346/sse`
-- DOM resolution: `event.target.closest("pluto-cell")`
-- Plugin install target: `~/.cursor/plugins/local/pluto-cursor-bridge/`
+- DOM resolution: `composedPath()` → `PLUTO-CELL`
+- Plugin install: `~/.cursor/plugins/local/pluto-cursor-bridge/`

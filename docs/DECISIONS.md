@@ -1,140 +1,98 @@
 # Decision Record
 
-Running log of architectural and workflow decisions for the Pluto ↔ Cursor integration.
-This is **not** a task list — it records *what we decided, what we target, and what exists today*.
+Running log of architectural and workflow decisions. **Planning details:** [PLAN.md](./PLAN.md) and [specs/](./specs/).
 
 | Repo | Role |
 |------|------|
 | **pluto-cursor-bridge** (this repo) | Cursor plugin, DOM click bridge, integration planning |
-| **[PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl)** fork | MCP tool surface, server-side notebook mutation (may upstream) |
+| **[PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl)** fork | MCP tool surface (may upstream) |
 
-**Doc split (D1):** MCP tool semantics and implementation details live in the fork's `AGENTS.md`. This doc covers cross-repo integration only; fork decisions are summarized here for context.
+**Doc split (D1):** Planning docs live here unless purely MCP-server internals. Fork `AGENTS.md` holds canonical MCP agent semantics.
 
 ---
 
 ## D1 — Repo split
 
-**Decision:** Keep planning docs here unless they are purely MCP-server internals.
-
-**Why:** The fork may upstream; plugin and bridge work stay portable.
+Planning and integration specs in this repo. Fork implements MCP; may upstream generic tools.
 
 ---
 
 ## D2 — Identity primitives
 
-**Decision:** `notebook_id` + `cell_id` everywhere — MCP tools, DOM bridge, plugin context.
-
-**Why:** Pluto sets `<pluto-cell id="{cell_id}">` and `<pluto-notebook id="{notebook_id}">` from Julia UUIDs (confirmed in Pluto frontend `Cell.js` / `Notebook.js`).
+`notebook_id` + `cell_id` everywhere. Matches `<pluto-cell id="…">` and `<pluto-notebook id="…">` in Pluto frontend.
 
 ---
 
-## D3 — MCP tool surface *(target; fork work)*
+## D3 — MCP tool surface *(target)*
 
-**Decision:** One canonical name per operation; no parallel aliases. Full inventory:
+One canonical name per operation. Full catalog: [specs/mcp-phase-1.md](./specs/mcp-phase-1.md).
 
-| Operation | Target name | Today (upstream) | Stage-first? |
-|-----------|-------------|------------------|--------------|
-| List notebooks | `list_notebooks` | `list_notebooks` | — |
-| Read one cell | `read_cell` | `get_cell` | — |
-| Edit code | `edit_cell` | `set_cell_code` | yes; `run_after=false` default |
-| Run one cell | `execute_cell` | `run_cell` | — |
-| Batch run staged | `submit_changes` | — (not `run_all_cells`) | — |
-| Notebook code view | `read_notebook_code` | — | replaces `get_notebook_state` |
-| Add cell | `add_cell` | `add_cell` | yes; `run_after=false` default |
-| Delete cell | `delete_cell` | `delete_cell` | immediate run (reactive cleanup) |
-| Move cell | `move_cell` | `move_cell` | — |
-
-**Remove from agent surface:** `get_notebook_state`, `run_all_cells` (unless explicitly kept as escape hatch).
-
-**Response fields (new tools):** `pending_run`, `stale_cell_ids` on server — do not rely on agent instructions alone.
-
-**Interim workflow (until fork Phase 1 ships):** use `set_cell_code(..., run_after=false)` + manual `run_cell`/`run_all_cells` with documented limitations. Do not treat rename as current policy for agents.
-
-Details: fork `AGENTS.md`.
+**Interim (today):** upstream names (`get_cell`, `set_cell_code`, `run_cell`); use `run_after=false` explicitly until Phase 1 ships.
 
 ---
 
-## D4 — Stage-first agent workflow *(target)*
+## D4 — Stage-first workflow *(target)*
 
-**Decision:** Agents edit with `run_after=false`, then call `submit_changes` once.
-
-**Why:** Matches Pluto save/run UX; avoids partial reactive runs mid-edit.
-
-**Blocked on:** dirty tracking + `submit_changes` implementation in fork. Today `run_after` defaults to `true` in code.
+Edit with `run_after=false` → `submit_changes` once. Server tracks `pending_run` / `stale_cell_ids`.
 
 ---
 
-## D5 — Click-to-context bridge
+## D5 — Click-to-context bridge *(target)*
 
-**Decision:** Resolve IDs from click events on the live hydrated Pluto DOM.
-
-**Primary resolution** (prefer `composedPath()` over bare `closest()` for shadow-DOM widget output):
-
-```javascript
-const path = event.composedPath();
-const cell = path.find(el => el.tagName === "PLUTO-CELL" && el.id);
-const notebook = path.find(el => el.tagName === "PLUTO-NOTEBOOK" && el.id);
-```
-
-**Context packet:**
-
-```json
-{
-  "cell_id": "uuid",
-  "notebook_id": "uuid",
-  "in_output": true,
-  "in_input": false,
-  "inside_iframe": false,
-  "target_tag": "IMG",
-  "text_snippet": "…",
-  "intent": "read|edit|explain|refactor"
-}
-```
-
-**Fallbacks:**
-- No `pluto-cell` in path → reject; prompt user
-- Click inside iframe contentDocument → reject or screenshot/advisory mode
-- MCP read fails → verify `notebook_id` via URL `?id=` or `list_notebooks`
-- Rich output (plots/HTML): MCP returns opaque placeholders today — see O5
-
-**Status:** Spec only. No injected script or bridge server yet.
+`composedPath()` resolution; iframe interior rejected. Spec: [specs/dom-bridge.md](./specs/dom-bridge.md).
 
 ---
 
-## D6 — Cursor plugin scope
+## D6 — Cursor plugin *(target)*
 
-**Decision:** Full plugin — commands, rules, optional hooks — not rules-only.
+Full plugin; commands deliver click context (no native browser hook). Spec: [specs/cursor-plugin.md](./specs/cursor-plugin.md).
 
-**Phased delivery:**
-1. **MVP** — workflow rule + commands (`pluto-select-cell`) + `mcp.json` pointer to `:2346/sse`
-2. **Later** — injected `dom-resolver.js` + local click queue + command reads queue into `@pluto-context` chat block
-
-There is no native Cursor "browser hook" component; click capture requires injected DOM script + local bridge (superpowers-style pattern).
-
-**Install path:** `~/.cursor/plugins/local/pluto-cursor-bridge/`
-
-**Status:** Docs only; no plugin scaffold.
+Phased: 4a manual cell_id → 4b click queue → 4c production inject.
 
 ---
 
 ## D7 — Parallel tracks after Phase 1 gate
 
-**Decision:** Layer 2 graph/validation MCP tools (fork) and DOM bridge + plugin (here) proceed **only after** Phase 1 gate passes.
+Layer 2 graph tools (fork) ∥ DOM bridge (here). Plugin Phase 4 after Phase 3.
 
-**Phase 1 gate:** agent can stage edits and run via target tool surface on a live notebook with verifiable output.
+**Phase 1 gate:** `read_notebook_code` → stage → `submit_changes` → verifiable output in Cursor against `serve()`.
 
 ---
 
-## Open questions
+## D8 — Hard rename, no aliases
 
-| # | Question | Blocks |
-|---|----------|--------|
-| O1 | `submit_changes` exact Pluto API mapping (dirty subset vs full re-run)? | D4, fork Phase 1 |
-| O2 | Draft-buffer conflict policy when user edits browser while agent writes MCP? | D5 edit workflow |
-| O3 | Click packet → agent delivery: command vs `beforeSubmitPrompt` hook vs paste? | D6 MVP |
-| O4 | Upstream PR: hard rename vs alias period? | D3 rollout |
-| O5 | Rich output strategy (plots, HTML, `@bind`) — MCP read path vs screenshot-only? | D5 explain/refactor |
-| O6 | Who sets `intent` — modifier key, menu, command? | D6 UX |
+Remove old tool names from MCP schema when Phase 1 ships. No parallel `get_cell`/`read_cell` registrations. Upstream PRs are clean breaks.
+
+---
+
+## D9 — Draft-buffer policy
+
+MCP tracks server-side dirty only. Agent reads before edit. Server wins on conflict. Document in plugin rule; no OT in Phase 1. Details: [specs/mcp-phase-1.md §1E](./specs/mcp-phase-1.md).
+
+---
+
+## D10 — Rich output deferred
+
+MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides `cell_id`; explain/refactor on plots is advisory until plugin screenshots (Phase 4c+).
+
+---
+
+## D11 — Intent via commands
+
+`pluto-select-cell` / `pluto-edit-cell` / `pluto-explain-cell` set intent — not modifier keys.
+
+---
+
+## Resolved questions (formerly open)
+
+| Was | Resolution |
+|-----|------------|
+| O1 `submit_changes` API | Dirty set → `update_save_run!` on subset + deps; see [mcp-phase-1 §1B](./specs/mcp-phase-1.md) |
+| O2 Draft buffer | D9 |
+| O3 Context delivery | Commands (MVP); see [cursor-plugin](./specs/cursor-plugin.md) |
+| O4 Upstream rename | D8 hard break |
+| O5 Rich output | D10 |
+| O6 Intent UX | D11 |
 
 ---
 
@@ -142,17 +100,7 @@ There is no native Cursor "browser hook" component; click capture requires injec
 
 | Component | State |
 |-----------|-------|
-| PlutoMCP fork — basic tools (old names) | ✅ Works |
-| PlutoMCP fork — dirty tracking | ❌ Not started |
-| PlutoMCP fork — rename + `submit_changes` + `read_notebook_code` | ❌ Not started |
-| Browser → cell_id bridge | ❌ Spec only |
-| Cursor plugin | ❌ Docs only |
-| This repo | ✅ Decision record |
-
-### Fork Phase 1 implementation order
-
-1. Dirty tracking (`pending_run`, `stale_cell_ids`)
-2. Rename tools; flip `run_after` default
-3. `submit_changes`
-4. `read_notebook_code`; remove `get_notebook_state`
-5. Tests + `reference/` fixtures
+| Planning docs | ✅ [PLAN.md](./PLAN.md) + specs |
+| PlutoMCP fork — Phase 1 | 📋 Spec ready; not implemented |
+| DOM bridge | 📋 Spec ready |
+| Cursor plugin | 📋 Spec ready |
