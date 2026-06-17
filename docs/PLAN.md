@@ -72,6 +72,7 @@ flowchart TB
 Phases **2 and 3 run in parallel** after Phase 1 gate. Phase 4 needs Phase 3. Phase 5 can start lightly after Phase 1.
 
 **Spec links:**
+- [PlutoMCP architecture](./specs/plutomcp-architecture.md)
 - [MCP Phase 1](./specs/mcp-phase-1.md)
 - [MCP Phase 2](./specs/mcp-phase-2.md)
 - [DOM bridge](./specs/dom-bridge.md)

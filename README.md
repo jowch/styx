@@ -9,6 +9,7 @@ Bridge Pluto.jl notebooks to Cursor agent workflows via [PlutoMCP.jl](https://gi
 | **[PLAN.md](docs/PLAN.md)** | Integrated phase map, architecture, build sequence |
 | **[DECISIONS.md](docs/DECISIONS.md)** | Running decision log (what we decided and why) |
 | **[specs/](docs/specs/)** | Detailed specs per phase |
+| **[PlutoMCP architecture](docs/specs/plutomcp-architecture.md)** | How serve/connect works; full frontend; session model |
 
 Fork MCP semantics: PlutoMCP.jl `AGENTS.md`.
 

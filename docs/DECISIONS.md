@@ -51,6 +51,18 @@ Phased: 4a manual cell_id → 4b click queue → 4c production inject.
 
 ---
 
+## D12 — MCP lifecycle via `mcp.json`, not plugin commands
+
+**Decision:** Plugin declares MCP in bundled `mcp.json`; **Cursor** spawns the entrypoint; **PlutoMCP** owns `serve()` / `connect()`; plugin rules/commands **do not** supervise Julia processes.
+
+**Primary entry:** stdio launcher script → ensure bridge (`serve()`) → `connect()` proxy to shared session.
+
+**Alternative:** HTTP URL to `:2346/sse` for users who run `serve()` manually.
+
+**Why:** Matches Browse/Context7 plugin patterns; keeps click-bridge session aligned with MCP session. Details: [specs/plutomcp-architecture.md](./specs/plutomcp-architecture.md), [specs/cursor-plugin.md § MCP lifecycle](./specs/cursor-plugin.md#mcp-lifecycle-d12).
+
+---
+
 ## D7 — Parallel tracks after Phase 1 gate
 
 Layer 2 graph tools (fork) ∥ DOM bridge (here). Plugin Phase 4 after Phase 3.

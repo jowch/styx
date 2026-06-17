@@ -8,7 +8,8 @@
 ## Learned Workspace Facts
 
 - This repo holds the Cursor plugin and DOM click bridge; MCP tools live in PlutoMCP.jl.
-- **PLAN.md** — phase map and build sequence; **DECISIONS.md** — decision log; **docs/specs/** — detailed specs.
+- **PLAN.md** — phase map; **DECISIONS.md** — decision log; **docs/specs/** — detailed specs including plutomcp-architecture.md.
+- MCP lifecycle: bundled `mcp.json` + launcher; Cursor spawns; plugin does not supervise Julia (D12).
 - Click context: `composedPath()` → `PLUTO-CELL` (not bare `closest()`).
 - Plugin install path: `~/.cursor/plugins/local/pluto-cursor-bridge/`.
 - MCP client: `http://localhost:2346/sse` (`PlutoMCP.serve()`).
