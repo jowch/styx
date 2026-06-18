@@ -18,10 +18,16 @@ import { tmpdir } from "node:os";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
+import dotenv from "dotenv";
 import { Agent, CursorAgentError } from "@cursor/sdk";
 
 const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/** Load eval/.env; existing shell exports win (dotenv default). */
+function loadEvalEnv() {
+  dotenv.config({ path: join(__dirname, ".env") });
+}
 
 interface Scenario {
   id: string;
@@ -84,7 +90,7 @@ async function freePort(): Promise<number> {
   });
 }
 
-async function waitHealth(mcpUrl: string, timeoutMs = 60_000): Promise<void> {
+async function waitHealth(mcpUrl: string, timeoutMs = 120_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
@@ -173,15 +179,15 @@ using PlutoMCP
 PlutoMCP.serve(
     pluto_port = ${opts.plutoPort},
     mcp_port = ${opts.mcpPort},
-    notebook = $(JSON.stringify(opts.fixturePath)),
+    notebook = ${JSON.stringify(opts.fixturePath)},
     launch_browser = ${launchBrowser},
     require_secret_for_access = ${reqSecret},
-    eval_log = $(JSON.stringify(opts.evalLog)),
-    eval_run_id = $(JSON.stringify(opts.runId)),
+    eval_log = ${JSON.stringify(opts.evalLog)},
+    eval_run_id = ${JSON.stringify(opts.runId)},
 )
 `;
   return spawn("julia", ["--project=" + plutomcp, "-e", code], {
-    stdio: "ignore",
+    stdio: ["ignore", "pipe", "pipe"],
     detached: true,
   });
 }
@@ -244,8 +250,17 @@ async function runScenario(scenarioPath: string): Promise<boolean> {
     setup: scenario.setup,
   });
 
+  const stderrChunks: Buffer[] = [];
+  proc.stderr?.on("data", (chunk: Buffer) => stderrChunks.push(chunk));
+
   try {
-    await waitHealth(mcpUrl);
+    try {
+      await waitHealth(mcpUrl);
+    } catch (err) {
+      const stderr = Buffer.concat(stderrChunks).toString("utf8").trim();
+      if (stderr) console.error("PlutoMCP serve stderr:\n", stderr);
+      throw err;
+    }
     const notebookId = await waitReadiness(mcpUrl, scenario);
 
     const prefixPath = join(plutomcp, "eval", "PLUTO_WORKFLOW_PREFIX.md");
@@ -321,6 +336,7 @@ async function runScenario(scenarioPath: string): Promise<boolean> {
 }
 
 async function main() {
+  loadEvalEnv();
   const opts = parseArgs(process.argv.slice(2));
   if (opts.all) {
     let passed = 0;

@@ -7,7 +7,10 @@
     "eval:stage": "tsx run.ts --scenario stage_and_run"
   },
   "dependencies": {
-    "@cursor/sdk": "^1.0.0"
+    "@connectrpc/connect": "^2.1.2",
+    "@connectrpc/connect-node": "^2.1.2",
+    "@cursor/sdk": "^1.0.0",
+    "dotenv": "^17.4.2"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

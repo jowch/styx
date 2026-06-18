@@ -6,5 +6,6 @@ Manifest.toml
 .env.dev
 eval/node_modules/
 eval/results/
+eval/.env
 *.jsonl
 pluto-click-queue.json

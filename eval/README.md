@@ -13,11 +13,20 @@ Runs Cursor SDK agents against live `PlutoMCP.serve()` sessions and scores outco
 ```bash
 cd eval
 npm install
+cp .env.example .env          # set CURSOR_API_KEY
 ```
+
+`run.ts` loads `eval/.env` via [dotenv](https://www.npmjs.com/package/dotenv) on startup. Shell exports already set in the environment take precedence.
+
+Project hooks block agents from reading `.env`, `.envrc`, and `~/.ssh` (`.example` templates are allowed).
 
 ## Run
 
 ```bash
+# From eval/ after .env is configured:
+npm run eval:stage
+
+# Or export manually (no .env file):
 export CURSOR_API_KEY="cursor_..."
 export PLUTOMCP_ROOT="/path/to/PlutoMCP.jl"   # optional
 
