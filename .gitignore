@@ -1,6 +1,8 @@
 .cursor/
 hooks/state/*.json
 hooks/__pycache__/
+@pluto-mcp/Manifest.toml
+@pluto-mcp/.instantiated
 eval/node_modules/
 eval/results/
 *.jsonl

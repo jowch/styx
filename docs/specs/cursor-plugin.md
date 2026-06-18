@@ -14,7 +14,10 @@ First-class Cursor integration: workflow rules, commands, click context delivery
 pluto-cursor-bridge/
   .cursor-plugin/plugin.json
   mcp.json                          # Cursor-managed MCP entrypoint
+  @pluto-mcp/                       # Plugin-owned Julia env (Pkg workspace)
+    Project.toml
   scripts/
+    ensure-julia-env.sh             # bootstrap @pluto-mcp on first launch
     pluto-mcp-launcher.sh           # ensure bridge + stdio proxy (primary)
   commands/
     pluto-select-cell.md            # parse dom_path or @pluto-context fallback (intent=read)
@@ -44,7 +47,7 @@ pluto-cursor-bridge/
 | `commands/pluto-*-cell` | Format `@pluto-context` from parsed IDs or manual fallback |
 | `hooks/sessionStart` | Optional: inject static workflow via `additional_context` |
 | `mcp.json` | Declares MCP entrypoint; **Cursor spawns it** (see MCP lifecycle) |
-| `scripts/pluto-mcp-launcher.sh` | Ensures bridge healthy, then exec stdio proxy |
+| `scripts/pluto-mcp-launcher.sh` | Bootstraps `@pluto-mcp` env, ensures bridge healthy, then exec stdio proxy |
 | `src/dom-resolver.js` | **`parseDomPath`** (Path A), `formatPlutoContext`, packet builders |
 | `src/inject.js` + `bridge/server.js` | **Dev/fallback only** (Path C) — not production click UX |
 
@@ -88,10 +91,11 @@ This matches other plugins (e.g. Browse): plugin ships `mcp.json`, Cursor starts
 }
 ```
 
-**Launcher behavior (planned):**
+**Launcher behavior:**
+0. Run `ensure-julia-env.sh` — bootstrap `@pluto-mcp/` (local `Pkg.develop` or git add on first run)
 1. `GET http://127.0.0.1:2346/health` — if OK, skip to step 3
-2. If down: spawn `julia -e 'using PlutoMCP; PlutoMCP.serve(launch_browser=true, require_secret_for_access=false)'` in background; poll `/health` until ready
-3. `exec julia -e 'using PlutoMCP; PlutoMCP.connect()'` — stdio proxy to live bridge
+2. If down: spawn `julia --project=@pluto-mcp -e 'using PlutoMCP; PlutoMCP.serve(...)'` in background; poll `/health` until ready
+3. `exec julia --project=@pluto-mcp -e 'using PlutoMCP; PlutoMCP.connect()'` — stdio proxy to live bridge
 
 Cursor spawns the launcher; launcher delegates to PlutoMCP; plugin commands do not.
 

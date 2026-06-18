@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
-# Cursor spawns this via mcp.json. Ensures PlutoMCP bridge is up, then stdio-proxies to it.
+# Cursor spawns this via mcp.json. Ensures Julia env + PlutoMCP bridge, then stdio-proxies.
 set -euo pipefail
 
+PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+ENV_DIR="${PLUGIN_ROOT}/@pluto-mcp"
 MCP_PORT="${PLUTOMCP_MCP_PORT:-2346}"
 PLUTO_PORT="${PLUTOMCP_PLUTO_PORT:-1234}"
 JULIA="${JULIA:-julia}"
-PROJECT="${PLUTOMCP_PROJECT:-}"
+
+"${PLUGIN_ROOT}/scripts/ensure-julia-env.sh"
 
 health_ok() {
   curl -sf --max-time 2 "http://127.0.0.1:${MCP_PORT}/health" >/dev/null 2>&1
 }
 
 julia_cmd() {
-  if [[ -n "$PROJECT" ]]; then
-    "$JULIA" --project="$PROJECT" "$@"
-  else
-    "$JULIA" "$@"
-  fi
+  "$JULIA" --project="$ENV_DIR" "$@"
 }
 
 if ! health_ok; then
