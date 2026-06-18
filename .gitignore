@@ -1,5 +1,6 @@
 .cursor/
 hooks/state/*.json
+hooks/__pycache__/
 eval/node_modules/
 eval/results/
 *.jsonl
