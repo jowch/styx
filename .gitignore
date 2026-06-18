@@ -1,4 +1,5 @@
 .cursor/
+hooks/state/*.json
 eval/node_modules/
 eval/results/
 *.jsonl

@@ -143,7 +143,7 @@ See [specs/safety.md](./specs/safety.md).
 | PlutoMCP fork — agent eval harness | ✅ Reference runner + score.jl ([eval README](../../PlutoMCP.jl/eval/README.md)) |
 | Bridge — SDK eval orchestrator | ✅ [`eval/`](../eval/README.md) (manual, `CURSOR_API_KEY`) |
 | Bridge — DOM resolver utilities (Phase 3) | ✅ `parseDomPath`, `formatPlutoContext` + dev inject harness ([spec](./specs/dom-bridge.md)) |
-| Bridge — Design Mode plugin wiring (Phase 4) | 📋 Path A hooks/commands ([spec](./specs/cursor-plugin.md)) |
+| Bridge — Design Mode plugin wiring (Phase 4) | ✅ Plugin scaffold: `mcp.json`, rules, commands, hooks ([spec](./specs/cursor-plugin.md)) |
 
 ---
 
