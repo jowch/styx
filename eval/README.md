@@ -1,65 +1,78 @@
-# Pluto MCP SDK Agent Eval
+# Pluto MCP Agent Eval
 
-Runs Cursor SDK agents against live `PlutoMCP.serve()` sessions and scores outcome + trace.
+Evaluation harness for Pluto MCP agent workflows: deterministic reference runner (CI), Cursor SDK orchestration (manual), and shared scoring.
+
+## Layout
+
+```
+eval/
+  SDK_WORKFLOW_PREFIX.md     # minimal MCP workflow for SDK runs (no plugin rules)
+  PLUTO_WORKFLOW_PREFIX.md   # plugin session-start prefix (Design Mode / Styx)
+  fixtures/                  # notebooks with stable cell UUIDs
+  scenarios/                 # task specs + rubrics
+  lib/EvalShared.jl          # HTTP client, outcome + trace scoring
+  run_reference.jl           # golden-path runner (no agent, CI gate)
+  score.jl                   # re-score an existing trace
+  run.ts                     # Cursor SDK orchestrator
+  results/                   # gitignored run artifacts
+```
 
 ## Prerequisites
 
-- Julia with [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) at `PLUTOMCP_ROOT` (default: sibling `../PlutoMCP.jl`)
-- Node.js 20+
-- `CURSOR_API_KEY` from [Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations)
+- Julia with [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) at `PLUTOMCP_ROOT` (default: sibling `../../PlutoMCP.jl`)
+- Node.js 20+ (SDK eval only)
+- `CURSOR_API_KEY` for SDK runs ([Cursor Dashboard → Integrations](https://cursor.com/dashboard/integrations))
 
-## Setup
+## Reference runner (CI)
+
+Deterministic golden-path tool sequences via HTTP `/call` — no agent, no API key:
+
+```bash
+cd eval
+julia run_reference.jl --all --strict-trace
+julia run_reference.jl --scenario stage_and_run
+```
+
+Or via npm:
+
+```bash
+npm run eval:reference
+```
+
+## SDK agent eval (manual)
 
 ```bash
 cd eval
 npm install
 cp .env.example .env          # set CURSOR_API_KEY
-```
-
-`run.ts` loads `eval/.env` via [dotenv](https://www.npmjs.com/package/dotenv) on startup. Shell exports already set in the environment take precedence.
-
-Project hooks block agents from reading `.env`, `.envrc`, and `~/.ssh` (`.example` templates are allowed).
-
-## Run
-
-```bash
-# From eval/ after .env is configured:
-npm run eval:stage
-
-# Or export manually (no .env file):
-export CURSOR_API_KEY="cursor_..."
-export PLUTOMCP_ROOT="/path/to/PlutoMCP.jl"   # optional
-
-# Phase 1 gate scenario
-npm run eval:stage
-
-# Single scenario
+npm run eval:stage              # Phase 1 gate scenario
 npm run eval -- --scenario batch_edit
-
-# All scenarios (outcome strict per run)
 npm run eval -- --all
 ```
+
+SDK runs use `settingSources: []` + `SDK_WORKFLOW_PREFIX.md` — not plugin rules.
 
 ## What gets measured
 
 | Layer | Source | Gate |
 |-------|--------|------|
-| Outcome | `score.jl` on notebook server state | Strict |
-| Trace | Server-side `trace.jsonl` from `eval_log` | Advisory (warnings only) |
+| Outcome | `EvalShared.run_score` on live notebook state | Strict |
+| Trace | Server-side `trace.jsonl` from `eval_log` | Advisory (`--strict-trace` to gate CI) |
 
-SDK runs use `settingSources: []` + [`PLUTO_WORKFLOW_PREFIX.md`](../PlutoMCP.jl/eval/PLUTO_WORKFLOW_PREFIX.md) — not plugin rules. See PlutoMCP [`eval/README.md`](../PlutoMCP.jl/eval/README.md) for the full harness.
+PlutoMCP provides the optional `EvalLog.jl` hook (`serve(eval_log=...)`). This repo owns scenarios, fixtures, runners, and scoring.
 
-## Non-determinism policy
+## Phase 1 gate
 
-- Phase 1 gate: **pass@1** on `stage_and_run` outcome
-- Optional calibration: run `--scenario stage_and_run` multiple times manually
-- CI gates on the deterministic reference runner in PlutoMCP (`run_reference.jl --all`), not SDK runs
+| Tier | Criterion |
+|------|-----------|
+| CI | `run_reference.jl --all --strict-trace` |
+| Manual | SDK `stage_and_run` outcome pass@1 |
 
 ## Data handling
 
 - `results/` and `*.jsonl` may contain notebook code — **do not commit**
-- Logs are written under `eval/results/<run_id>/`
+- Use `eval_redact_code=true` / `PLUTOMCP_EVAL_REDACT_CODE=true` when sharing logs
 
 ## mcp.json
 
-Reference-only for IDE/manual MCP setup. **`run.ts` uses inline MCP** (`mcpServers.pluto.url`) because `settingSources: []` does not load project config.
+Reference-only for IDE/manual MCP setup. **`run.ts` uses inline MCP** because `settingSources: []` does not load project config.

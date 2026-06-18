@@ -26,4 +26,4 @@
 - Plugin install path: `~/.cursor/plugins/local/styx/`.
 - MCP client: `http://localhost:2346/sse` (`PlutoMCP.serve()`); MCP server key in `mcp.json` is **`pluto`**.
 - Phases 1–4 complete; Styx plugin validated through 4c (`resolve_pluto_context`, `pending_run` `stop` hook).
-- **SDK eval** (`eval/`): headless `serve()`, no Glass/plugin; `CURSOR_API_KEY` via gitignored `eval/.env` (dotenv); `stage_and_run` pass@1 locally.
+- **Eval harness** (`eval/`): scenarios, fixtures, reference runner, SDK orchestrator; CI gate via `run_reference.jl --all --strict-trace`. PlutoMCP keeps optional `EvalLog.jl` hook only.

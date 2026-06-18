@@ -108,7 +108,7 @@ Ground projection rules: cell types, manifest blobs, `@bind` shims, markdown cel
 
 See [specs/mcp-phase-1.md](./specs/mcp-phase-1.md).
 
-**Gate:** See eval harness — CI runs [`run_reference.jl --all`](../../PlutoMCP.jl/eval/README.md) (deterministic); manual SDK `stage_and_run` outcome pass@1 via [`eval/`](../eval/README.md).
+**Gate:** See eval harness — CI runs [`run_reference.jl --all`](../eval/README.md) (deterministic); manual SDK `stage_and_run` outcome pass@1 via [`eval/`](../eval/README.md).
 
 ### Phase 2 — Graph / validation
 
@@ -140,7 +140,7 @@ See [specs/safety.md](./specs/safety.md).
 |-----------|-------|
 | PlutoMCP fork — Phase 1 MCP tools | ✅ Implemented |
 | PlutoMCP fork — Phase 2 graph/validation tools | ✅ `Graph.jl` — 6 tools ([spec](./specs/mcp-phase-2.md)) |
-| PlutoMCP fork — agent eval harness | ✅ Reference runner + score.jl — 4/4 scenarios pass |
+| Bridge — eval harness + reference runner | ✅ `eval/run_reference.jl --all` — 4/4 scenarios pass |
 | Bridge — SDK eval orchestrator | ✅ [`eval/`](../eval/README.md) — `stage_and_run` pass@1 via SDK |
 | Bridge — DOM resolver utilities (Phase 3) | ✅ **Gated** — `parseDomPath` + `@pluto-context` → MCP `read_cell` |
 | Styx plugin Phase 4a | ✅ **Gated** — MCP auto-wires via `mcp.json`; stage-first workflow |
