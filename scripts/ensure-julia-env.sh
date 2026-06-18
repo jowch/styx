@@ -3,6 +3,10 @@
 set -euo pipefail
 
 PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+# shellcheck source=load-env-dev.sh
+source "$(dirname "$0")/load-env-dev.sh"
+load_env_dev "$PLUGIN_ROOT"
+
 JULIA="${JULIA:-julia}"
 MARKER="${PLUGIN_ROOT}/.julia-env-instantiated"
 

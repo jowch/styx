@@ -3,6 +3,7 @@ hooks/state/*.json
 hooks/__pycache__/
 Manifest.toml
 .julia-env-instantiated
+.env.dev
 eval/node_modules/
 eval/results/
 *.jsonl

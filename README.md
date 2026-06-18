@@ -24,14 +24,17 @@ Fork MCP semantics: PlutoMCP.jl `AGENTS.md`.
 
 ## Cursor plugin (Phase 4)
 
-Install for local development:
+Install for local development (Cursor 3.x):
 
 ```bash
-mkdir -p ~/.cursor/plugins/local
-ln -sfn "$(pwd)" ~/.cursor/plugins/local/pluto-cursor-bridge
+./scripts/sync-local-plugin.sh   # copies into ~/.cursor/plugins/local/
 ```
 
-Then enable the **Pluto Cursor Bridge** plugin in Cursor settings.
+Then **Developer: Reload Window** (`Cmd+Shift+P`).
+
+**Cursor 3 note:** External symlinks into `~/.cursor/plugins/local/` are **rejected** (security). Use `sync-local-plugin.sh` after each change, or copy manually — do not `ln -s` from `~/projects/...`.
+
+Verify under **Cursor Settings (`Cmd+Shift+J`) → Plugins → Installed**. Toggle MCP under **Features → Model Context Protocol** if needed.
 
 ### What ships
 
@@ -42,7 +45,7 @@ Then enable the **Pluto Cursor Bridge** plugin in Cursor settings.
 | `commands/pluto-*-cell` | Read / edit / explain intent commands (manual ID fallback) |
 | `hooks/` | Design Mode selection tracking, bridge health check, read-before-edit guard (H4) |
 
-Set `PLUTOMCP_SOURCE=/path/to/PlutoMCP.jl` to develop a local fork instead of the git default on first run. Set `PLUTOMCP_ENV_FORCE=1` to re-run `Pkg.instantiate()`.
+Dev env: copy `.env.dev.example` → `.env.dev` (gitignored), set `PLUTOMCP_SOURCE`, then `./scripts/sync-local-plugin.sh` and reload Cursor. The launcher loads `.env.dev` automatically.
 
 ### End-to-end (Path A)
 
