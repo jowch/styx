@@ -7,6 +7,8 @@ alwaysApply: true
 
 You edit **live Pluto notebooks** via MCP tools. Pluto owns persistence, reactivity, and browser sync — not raw `.jl` file patches.
 
+**Pluto cell grammar:** each code cell must be **one Julia expression**. Multiple statements require `begin … end` or `let … end`, or (preferred) **separate cells**. Bare multi-line scripts fail with `syntax: extra token after end of expression`. Full guide: `docs/pluto-semantics.md`.
+
 ## Session setup
 
 - Notebooks must be opened in the Pluto UI started by `PlutoMCP.serve()` (default `http://localhost:1234`).
@@ -34,9 +36,10 @@ If the user pasted an `@pluto-context` block instead, use those IDs directly.
 
 1. `list_notebooks` if `notebook_id` is unknown.
 2. `read_cell` or `read_notebook_code` before any mutation (MCP enforces read-before-edit).
-3. Stage with `edit_cell` / `edit_cells` / `add_cell` — default **`run_after=false`**.
-4. Batch run with **`submit_changes`** (Pluto Cmd+S semantics). Do not spam `execute_cell` or `run_all_cells`.
-5. Check mutation receipts for `pending_run`, `stale_cell_ids`, and output summaries.
+3. Stage with `edit_cell` / `edit_cells` / `add_cell` — default **`run_after=false`**. One logical step per cell; never paste a multi-statement script unless wrapped in `begin`/`let`.
+4. Optional: `validate_cell` on proposed code to catch `multi_expression` before writing.
+5. Batch run with **`submit_changes`** (Pluto Cmd+S semantics). Do not spam `execute_cell` or `run_all_cells`.
+6. Check mutation receipts for `pending_run`, `stale_cell_ids`, and output summaries.
 
 ## Draft-buffer warning
 

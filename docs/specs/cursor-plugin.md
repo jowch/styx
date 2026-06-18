@@ -24,7 +24,9 @@ pluto-cursor-bridge/
     pluto-edit-cell.md              # intent=edit
     pluto-explain-cell.md           # intent=explain
   rules/
-    pluto-notebook-workflow.mdc     # stage → submit_changes
+    pluto-notebook-workflow.mdc     # stage → submit_changes; one-expression cells
+  docs/
+    pluto-semantics.md              # Pluto cell grammar for agents
   hooks/
     hooks.json                      # Design Mode dom_path parse; edit guard (H4)
     session-start.sh                # static MCP workflow context
@@ -42,7 +44,7 @@ pluto-cursor-bridge/
 
 | Component | Role |
 |-----------|------|
-| `rules/pluto-notebook-workflow.mdc` | Always-on: stage-first, `submit_changes`, read before edit, draft-buffer warning |
+| `rules/pluto-notebook-workflow.mdc` | Always-on: stage-first, `submit_changes`, read before edit, one-expression cell grammar |
 | `hooks/` (Path A) | Parse Design Mode `dom_path` from hook `prompt`; `preToolUse` / `beforeMCPExecution` edit guard (H4) |
 | `commands/pluto-*-cell` | Format `@pluto-context` from parsed IDs or manual fallback |
 | `hooks/sessionStart` | Optional: inject static workflow via `additional_context` |
