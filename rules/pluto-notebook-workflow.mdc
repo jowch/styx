@@ -13,12 +13,16 @@ You edit **live Pluto notebooks** via MCP. Pluto owns persistence, reactivity, a
 
 Resolve `notebook_id` before calling MCP write tools. **Prefer browser context over `list_notebooks`.**
 
-1. **Design Mode click** — regex `pluto-notebook#([0-9a-f-]+)` and `pluto-cell#([0-9a-f-]+)` from `browser_element` / `dom_path` (including `jlerror` clicks).
+1. **Design Mode click** — **Cmd+Shift+D** in Glass to toggle Design Mode, then click an element. Regex `pluto-notebook#([0-9a-f-]+)` and `pluto-cell#([0-9a-f-]+)` from `browser_element` / `dom_path`.
 2. **Glass browser URL** — `http://127.0.0.1:1234/<notebook_id>` on the active Pluto tab.
 3. **`@pluto-context`** block in the prompt.
 4. **`list_notebooks`** — only when no browser/context ids are available.
 
-If `pluto-cell#` is missing from a click, ask the user to re-click inside a cell (code or output).
+If `pluto-cell#` is missing from a click, ask the user to enable Design Mode (**Cmd+Shift+D**) and re-click inside a cell (code or output).
+
+## Design Mode (Glass)
+
+Toggle with **Cmd+Shift+D** (`⌘⇧D`) in the Agents Glass browser panel — not Option/Alt+click. Once Design Mode is active, **click** the target cell, code line, output, or error; the blue outline confirms selection. Then send your prompt.
 
 ## Design Mode click context (Path A, D13)
 

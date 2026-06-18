@@ -33,7 +33,7 @@ Phase 4 wires Path A into plugin hooks/commands. Phase 3 ships the shared parser
 
 ## Path A — Design Mode (primary)
 
-Validated in spike H1. User ⌥+clicks a cell in **Agents Glass** (Design Mode). Hook stdin includes `browser_element` / `dom_path`:
+Validated in spike H1. User toggles Design Mode (**Cmd+Shift+D**) in **Agents Glass**, clicks a cell. Hook stdin includes `browser_element` / `dom_path`:
 
 ```text
 … > pluto-notebook#836a54be-… > pluto-cell#98b9ea94-… > pluto-output… > bond > input

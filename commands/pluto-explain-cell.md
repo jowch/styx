@@ -12,7 +12,7 @@ The user wants an **explanation** of a Pluto notebook cell (code, output, or plo
 2. **Glass browser URL:** `http://127.0.0.1:1234/<notebook_id>`.
 3. **Manual fallback:** Use `$ARGUMENTS` or `@pluto-context` for IDs.
 4. **`list_notebooks`** only if no browser/context ids are available.
-5. If missing, ask the user to ⌥+click the cell or provide IDs.
+5. If missing, ask the user to enable Design Mode (**Cmd+Shift+D**) in Glass, click the cell, or provide IDs.
 
 ## Agent actions
 

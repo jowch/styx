@@ -18,8 +18,8 @@
 - This repo holds the Cursor plugin and DOM click bridge; MCP tools live in PlutoMCP.jl.
 - **PLAN.md** — phase map; **DECISIONS.md** — decision log; **docs/specs/** — detailed specs including plutomcp-architecture.md.
 - MCP lifecycle: bundled `mcp.json` + launcher; Cursor spawns; plugin-root `Project.toml`/`Manifest.toml` Julia env (not user's default project).
-- **D13 Path A (spike):** Design Mode `browser_element` in hook `prompt` includes `pluto-cell#<uuid>` in `dom_path` for in-cell clicks (code lines, output, plot, bind widgets).
-- Ambiguous Design Mode clicks (no `pluto-cell#` in `dom_path`, e.g. bare `main`) — re-click a cell or use `@pluto-context`.
+- **D13 Path A (spike):** Design Mode (**Cmd+Shift+D**, then click) — `browser_element` in hook `prompt` includes `pluto-cell#<uuid>` in `dom_path` for in-cell clicks (code lines, output, plot, bind widgets).
+- Ambiguous Design Mode clicks (no `pluto-cell#` in `dom_path`, e.g. bare `main`) — enable Design Mode (Cmd+Shift+D) and re-click a cell, or use `@pluto-context`.
 - Design Mode drawing/annotations: screenshot to model only; no structured `browser_element` / `dom_path`.
 - Spike H2/H3 falsified: `alwaysApply` rules session-cached; `beforeSubmitPrompt` block-only (no context injection).
 - Click context (Path C dev fallback): `composedPath()` → `PLUTO-CELL` via inject.js; production uses `parseDomPath` on Design Mode `dom_path`.

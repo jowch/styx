@@ -10,9 +10,9 @@ Two paths — **Path A is primary** (D13); Path C is dev/fallback only.
 
 - [ ] `PlutoMCP.serve(require_secret_for_access=false)` — notebook in **Agents Glass** at `http://localhost:1234`
 - [ ] MCP at `:2346` on same session
-- [ ] Design Mode active (⌥+click in Glass)
+- [ ] Design Mode active in Glass (**Cmd+Shift+D** — not Option/Alt+click)
 
-**After each ⌥+click on a cell target:**
+**After each Design Mode click on a cell target:**
 
 1. Confirm hook `prompt` includes `dom_path` with `pluto-cell#<uuid>`
 2. Run parser (Node or pasted in devtools):

@@ -120,7 +120,7 @@ Make scripts executable: `chmod +x hooks/*.sh`
 
 1. Open notebook in **Glass** at `localhost:1234` (from `serve()` session).
 2. Enable Design Mode (⌘⇧D).
-3. ⌥+click a **known** `pluto-cell` (note `id` from devtools).
+3. Click a **known** `pluto-cell` (note `id` from devtools). *(Earlier drafts said ⌥+click; Cursor 3.x uses ⌘⇧D to toggle Design Mode, then a normal click.)*
 4. Type short prompt: `SPIKE_A: explain this cell`
 5. Send.
 6. Open `hooks/spike-submit.log`.

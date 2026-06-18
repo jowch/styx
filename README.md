@@ -18,7 +18,7 @@ Fork MCP semantics: PlutoMCP.jl `AGENTS.md`.
 ## Quick reference
 
 - MCP endpoint: `http://localhost:2346/sse` (wired by plugin `mcp.json` + launcher)
-- Click context: **Glass Design Mode** (⌥+click) → `pluto-cell#` in hook `prompt` (D13 Path A)
+- Click context: **Glass Design Mode** (`Cmd+Shift+D`, then click) → `pluto-cell#` in hook `prompt` (D13 Path A)
 - Dev fallback: inject + queue at `http://127.0.0.1:3457` (`npm run bridge`) — not production UX
 - Plugin install: `~/.cursor/plugins/local/pluto-cursor-bridge/` (symlink to this repo for dev)
 
@@ -53,7 +53,7 @@ Dev env: copy `.env.dev.example` → `.env.dev` (gitignored), set `PLUTOMCP_SOUR
 
 1. Enable plugin → Cursor starts `pluto` MCP via launcher (Pluto UI at `http://localhost:1234`).
 2. Open a notebook in **Agents Glass**.
-3. ⌥+click a cell in Design Mode → send a prompt.
+3. In Glass: **Cmd+Shift+D** to toggle Design Mode, click a cell, then send a prompt.
 4. Agent parses `pluto-cell#` from the `browser_element` block → `read_cell` → staged edits → `submit_changes`.
 
 See [docs/specs/cursor-plugin.md](docs/specs/cursor-plugin.md) for full spec.
@@ -62,7 +62,7 @@ See [docs/specs/cursor-plugin.md](docs/specs/cursor-plugin.md) for full spec.
 
 ## Click context — Path A (primary)
 
-**Production flow (D13):** Open Pluto in **Agents Glass** (`PlutoMCP.serve(require_secret_for_access=false)` on loopback). User ⌥+clicks a cell in Design Mode. Hook `prompt` includes `dom_path` with `pluto-notebook#…` and `pluto-cell#…`. Plugin parses IDs and the agent calls MCP `read_cell`.
+**Production flow (D13):** Open Pluto in **Agents Glass** (`PlutoMCP.serve(require_secret_for_access=false)` on loopback). User toggles Design Mode (**Cmd+Shift+D**), clicks a cell, and sends a prompt. Hook `prompt` includes `dom_path` with `pluto-notebook#…` and `pluto-cell#…`. Plugin parses IDs and the agent calls MCP `read_cell`.
 
 Spike evidence: [docs/spikes/spike-results.md](docs/spikes/spike-results.md).
 

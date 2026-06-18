@@ -29,10 +29,11 @@ Your job: use MCP tools to read, stage, and run cells — never edit the noteboo
 
 ### Priority order
 
-1. **Design Mode click** — `browser_element` block in the user message:
+1. **Design Mode click** — **Cmd+Shift+D** in Glass to toggle Design Mode, then click an element. Extract ids from `browser_element` / `dom_path`:
    ```text
    dom_path: … > pluto-notebook#<notebook_id> > pluto-cell#<cell_id> > …
    ```
+   **Not** Option/Alt+click — toggle Design Mode with **Cmd+Shift+D** (`⌘⇧D`), then click.
    Regex: `pluto-notebook#([0-9a-f-]+)` and `pluto-cell#([0-9a-f-]+)`.
 
 2. **Glass browser URL** — Pluto notebook URLs embed the id:
@@ -192,7 +193,7 @@ Canonical names only — no `get_cell`, `set_cell_code`, `run_cell`.
 
 ## 9. End-to-end example
 
-User ⌥+clicks empty cell, asks: "plot sin(x)".
+User enables Design Mode (**Cmd+Shift+D**), clicks empty cell, asks: "plot sin(x)".
 
 1. Parse `notebook_id` + `cell_id` from `dom_path`.
 2. `read_cell` — confirm empty.

@@ -16,7 +16,7 @@
 | H3 | **FAIL** (expected) | C1: `additional_context` in hook stdout does not reach agent. C2: `user_message` rewrite not verified in-agent. |
 | H4 | **PASS** | `guard-edit.sh` (preToolUse) and `guard-mcp.sh` (beforeMCPExecution) both deny without read; allow after `pluto-reads.json` match. |
 
-## H1 tier matrix (Glass Design Mode, ⌥+click)
+## H1 tier matrix (Glass Design Mode: ⌘⇧D + click)
 
 | Tier | Target | `pluto-cell#`? | Source field | Notes |
 |------|--------|----------------|--------------|-------|

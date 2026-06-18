@@ -2,7 +2,7 @@ You are editing a live Pluto notebook via MCP tools.
 
 ## Find the notebook (browser first)
 
-1. Parse `pluto-notebook#<uuid>` from Design Mode `browser_element` / `dom_path` (or Glass URL `http://127.0.0.1:1234/<uuid>`).
+1. Parse `pluto-notebook#<uuid>` from Design Mode click (**Cmd+Shift+D** in Glass, then click) / `browser_element` / `dom_path` (or Glass URL `http://127.0.0.1:1234/<uuid>`).
 2. Use `@pluto-context` if pasted.
 3. Call `list_notebooks` only when no browser context exists.
 

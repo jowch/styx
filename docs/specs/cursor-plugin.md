@@ -148,7 +148,7 @@ Stage edits with edit_cell (run_after=false); submit_changes when ready.
 ```
 
 **Path A flow (production):**
-1. User ⌥+clicks cell in Agents Glass (Design Mode)
+1. User toggles Design Mode (**Cmd+Shift+D**) in Agents Glass, clicks a cell
 2. Hook receives `dom_path` in `prompt` → plugin parses `pluto-cell#` / `pluto-notebook#`
 3. Agent (or command) uses `@pluto-context` block → MCP `read_cell`
 
@@ -206,7 +206,7 @@ Cursor activates plugin
   → launcher ensures serve() bridge on :2346
   → connect() stdio proxy attaches
 User opens notebook in Agents Glass (serve() session, localhost:1234)
-User ⌥+clicks cell (Design Mode) → dom_path in hook prompt
+User toggles Design Mode (Cmd+Shift+D), clicks cell → dom_path in hook prompt
 Plugin parses pluto-cell# → @pluto-context in chat (or agent reads from hook context)
 Agent → MCP tools → in-process Notebook mutation → browser syncs via WebSocket
 ```

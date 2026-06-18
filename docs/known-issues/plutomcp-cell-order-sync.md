@@ -68,7 +68,7 @@ Optional hardening: integration test with connected WebSocket client asserting a
 |------|--------|
 | [plutomcp-architecture.md](../specs/plutomcp-architecture.md) | "Browser stays in sync via WebSocket" — true for code/output edits; structural MCP edits need caveat until fix |
 | [mcp-phase-1.md](../specs/mcp-phase-1.md) | `add_cell` / `move_cell` / `get_cell_order` — server order may diverge from DOM until fix |
-| Path A click bridge (D13) | User cannot ⌥+click agent-added cells until DOM syncs |
+| Path A click bridge (D13) | User cannot Design Mode-click agent-added cells until DOM syncs |
 | D9 draft buffer | Separate concern (unsaved browser typing vs server code) |
 | 50/50 collaboration | Narrow gap: structural agent edits invisible in UI until reload |
 
