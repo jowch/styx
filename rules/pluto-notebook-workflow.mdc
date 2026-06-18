@@ -1,58 +1,28 @@
 ---
-description: Pluto notebook MCP workflow — browser-first discovery, stage-first edits, read before edit
+description: Pluto notebooks in Cursor — agent-driven session, Design Mode edits
 alwaysApply: true
 ---
 
-# Pluto notebook workflow (PlutoMCP.jl)
+# Pluto notebooks (Styx)
 
-You edit **live Pluto notebooks** via MCP. Pluto owns persistence, reactivity, and browser sync — not raw `.jl` file patches.
+Cursor users are not always in Pluto. **Only bootstrap a Pluto session when the user requests notebook work.**
 
-**Training primer:** `docs/pluto-agent-primer.md` (browser-first, errors, staging). Cell grammar reference: `docs/pluto-semantics.md`.
+**Skills:**
+- **pluto-session** — start Pluto, choose/open notebook, open Glass (user says "work on notebooks")
+- **pluto-workflow** — cell edits once a notebook is open
+- **pluto-semantics** — cell grammar and `pluto_multi_expression` fixes
 
-## Find the notebook (browser first)
+Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()` manually — use lifecycle MCP tools (`start_pluto_session`, `open_notebook`).
 
-Resolve `notebook_id` before calling MCP write tools. **Prefer browser context over `list_notebooks`.**
+## Safe preview
 
-1. **Design Mode click** — **Cmd+Shift+D** in Glass to toggle Design Mode, then click an element. Regex `pluto-notebook#([0-9a-f-]+)` and `pluto-cell#([0-9a-f-]+)` from `browser_element` / `dom_path`.
-2. **Glass browser URL** — `http://127.0.0.1:1234/<notebook_id>` on the active Pluto tab.
-3. **`@pluto-context`** block in the prompt.
-4. **`list_notebooks`** — only when no browser/context ids are available.
+Path B (`open_notebook` default) = **Safe preview**. **Remind** the user that edits won't execute and outputs won't update until they click **Run notebook code** in Glass — still edit when asked. If they ask you to run the notebook, point them to that button (not `run_all_cells`). See **pluto-workflow** skill.
 
-If `pluto-cell#` is missing from a click, ask the user to enable Design Mode (**Cmd+Shift+D**) and re-click inside a cell (code or output).
+## Cell edits (notebook already open)
 
-## Design Mode (Glass)
+1. Design Mode (**Cmd+Shift+D**) click → **`resolve_pluto_context`** → **`read_cell`** (remind about safe preview if active)
+2. Stage → **`submit_changes`** once → re-read for errors
 
-Toggle with **Cmd+Shift+D** (`⌘⇧D`) in the Agents Glass browser panel — not Option/Alt+click. Once Design Mode is active, **click** the target cell, code line, output, or error; the blue outline confirms selection. Then send your prompt.
+## Safety
 
-## Design Mode click context (Path A, D13)
-
-On every message with a `browser_element` block:
-
-1. Call MCP **`resolve_pluto_context`** with the block (or parse `dom_path` yourself).
-2. Call **`read_cell`** with the resolved ids before answering or editing.
-3. Use **`read_notebook_code`** for full notebook context or dependencies.
-
-## Edit workflow (stage-first)
-
-1. Resolve `notebook_id` (browser first).
-2. **`read_cell`** or **`read_notebook_code`** before any mutation (MCP enforces read-before-edit).
-3. Stage with **`edit_cell`** / **`edit_cells`** / **`add_cell`** — default **`run_after=false`**. One logical step per cell for *new* code. When **fixing** `pluto_multi_expression`, default to **`begin`/`end`** wrap in the same cell; split only if separate reactive steps are intended.
-4. Optional: **`validate_cell`** on proposed code.
-5. Batch run with **`submit_changes`** (Pluto Cmd+S). Do not spam `execute_cell` or `run_all_cells`.
-6. **`read_cell`** again — check `output`, `errored`, and structured **`error`** (e.g. `pluto_multi_expression` with `boundaries` + `hint`).
-
-## Reading errors
-
-- MCP **`read_cell`**: `error.kind`, `error.hint`, `error.boundaries` mirror Pluto's browser UI for known parse errors.
-- Design Mode click on **`jlerror`**: `visible_text` has the friendly split/wrap offer.
-- Raw `syntax: extra token after end of expression` + `Boundaries: [...]` = multi-expression cell → **wrap `begin`/`end`** (default fix).
-
-## Draft-buffer warning
-
-The browser editor has a separate draft while the user types. MCP writes land on **server state** (last-write-wins). Re-read before overwriting if the user was editing the same cell.
-
-## Tool names (canonical)
-
-- Read: `read_cell`, `read_notebook_code`, `resolve_pluto_context`
-- Write: `edit_cell`, `edit_cells`, `add_cell`, `delete_cell`, `move_cell`, `submit_changes`, `execute_cell`
-- Do not use legacy aliases (`get_cell`, `set_cell_code`, `run_cell`).
+Re-read before overwriting browser drafts. **`submit_changes`** before ending turn if staged.

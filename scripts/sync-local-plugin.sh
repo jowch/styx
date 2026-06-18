@@ -18,4 +18,5 @@ rsync -a --delete \
   "${SRC}/" "${DEST}/"
 
 echo "Synced to ${DEST}"
+chmod +x "${DEST}/scripts/"*.sh 2>/dev/null || true
 echo "Reload Cursor: Cmd+Shift+P → Developer: Reload Window"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""beforeSubmitPrompt: block submit when Pluto context present but MCP bridge is down."""
+"""beforeSubmitPrompt: hint when Pluto context present but session not started (D15)."""
 from __future__ import annotations
 
 import json
@@ -8,28 +8,32 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from pluto_lib import mcp_health_ok
+from pluto_lib import pluto_session_running
+
+
+def _has_pluto_context(prompt: str) -> bool:
+    lower = prompt.lower()
+    return "pluto-notebook#" in lower or "localhost:1234" in lower
 
 
 def main() -> int:
     payload = json.load(sys.stdin)
     prompt = payload.get("prompt") or ""
 
-    if "pluto-notebook#" in prompt.lower() or "localhost:1234" in prompt:
-        if not mcp_health_ok():
-            print(
-                json.dumps(
-                    {
-                        "continue": False,
-                        "user_message": (
-                            "PlutoMCP bridge is not reachable at http://127.0.0.1:2346/health. "
-                            "Enable the pluto MCP server in Cursor (plugin mcp.json) or run "
-                            "PlutoMCP.serve() in a terminal, then retry."
-                        ),
-                    }
-                )
+    if _has_pluto_context(prompt) and not pluto_session_running():
+        print(
+            json.dumps(
+                {
+                    "continue": True,
+                    "user_message": (
+                        "Pluto notebook context detected, but the Pluto session is not running yet. "
+                        "Ask the agent to start Pluto (pluto-notebooks command or say you want to work on notebooks). "
+                        "Do not reload MCP or run pluto-serve.sh — the agent calls start_pluto_session."
+                    ),
+                }
             )
-            return 0
+        )
+        return 0
 
     print(json.dumps({"continue": True}))
     return 0

@@ -235,6 +235,25 @@ def mcp_health_ok(port: int | None = None) -> bool:
         return False
 
 
+def pluto_session_running() -> bool:
+    """True when the HTTP bridge is up and Pluto reports running."""
+    if not mcp_health_ok():
+        return False
+    try:
+        status = mcp_call("pluto_session_status", timeout=3)
+    except (
+        urllib.error.URLError,
+        TimeoutError,
+        OSError,
+        json.JSONDecodeError,
+        KeyError,
+        IndexError,
+        TypeError,
+    ):
+        return False
+    return isinstance(status, dict) and status.get("pluto") == "running"
+
+
 def hook_input() -> dict[str, Any]:
     return json.load(sys.stdin)
 
