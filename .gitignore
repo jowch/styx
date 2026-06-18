@@ -1,1 +1,5 @@
 .cursor/
+eval/node_modules/
+eval/results/
+*.jsonl
+pluto-click-queue.json
