@@ -2,12 +2,16 @@
 
 **Primary path (D13):** Glass Design Mode → `dom_path` in hook `prompt` → MCP **`resolve_pluto_context`** → **`read_cell`**.
 
+**D15 lifecycle manual checks:** [d15-lifecycle-manual-checklist.md](./d15-lifecycle-manual-checklist.md)
+
 ---
 
-## Prerequisites
+## Prerequisites (D15)
 
-- [ ] `PlutoMCP.serve(require_secret_for_access=false)` — notebook in **Agents Glass** at `http://localhost:1234`
-- [ ] MCP at `:2346` on same session
+- [ ] **pluto** MCP enabled in Cursor (stdio up; Pluto may be stopped)
+- [ ] Agent has called `start_pluto_session` (or dev `pluto-serve.sh` for legacy serve path)
+- [ ] Notebook in **Agents Glass** at `http://127.0.0.1:1234/<notebook_id>`
+- [ ] MCP HTTP bridge at `:2346` on same session (`./scripts/d15-preflight.sh --expect-running`)
 - [ ] Design Mode active in Glass (**Cmd+Shift+D**)
 
 ## After each Design Mode click on a cell target

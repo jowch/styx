@@ -14,8 +14,8 @@ PlutoMCP is a **thin MCP transport layer** on top of a normal **Pluto server ses
 
 | Server | Default port | Started by | Purpose |
 |--------|--------------|------------|---------|
-| **Pluto** (`Pluto.run!`) | `:1234` | `serve()` / standalone `connect()` | Full Pluto app: UI, notebooks, reactivity |
-| **MCP bridge** | `:2346` | `serve()` only | MCP protocol: `/sse`, `/message`, `/call`, `/health` |
+| **Pluto** (`Pluto.run!`) | `:1234` | `serve()` / `start_pluto_session` | Full Pluto app: UI, notebooks, reactivity |
+| **MCP bridge** | `:2346` | `serve()` / `start_pluto_session` | MCP protocol: `/sse`, `/message`, `/call`, `/health` |
 
 ```mermaid
 flowchart TB
@@ -52,10 +52,10 @@ What varies is **auto-open browser**:
 | Entry | `Pluto.run!` | Auto-open browser |
 |-------|--------------|-------------------|
 | `serve()` | Immediately | Yes (default `launch_browser=true`) |
-| `connect()` standalone | Lazy on first `tools/call` | No (`launch_browser=false`) |
-| `connect()` proxy | Uses existing `serve()` session | Whatever `serve()` did |
+| `connect()` deferred (D15) | On `start_pluto_session` | No (`launch_browser=false`) |
+| `connect()` proxy | Uses existing bridge session | Whatever `serve()` did |
 
-Standalone `connect()` still serves the full UI at `http://localhost:1234` — you can open it manually — but Julia won't launch a browser window.
+Standalone `connect()` (Styx launcher) keeps MCP stdio up without Pluto until `start_pluto_session`; then full UI at `http://localhost:1234` is available.
 
 ---
 
@@ -64,7 +64,7 @@ Standalone `connect()` still serves the full UI at `http://localhost:1234` — y
 MCP tools operate **in-process** on live `Pluto.Notebook` objects:
 
 1. MCP client sends JSON-RPC `tools/call`
-2. `MCP.jl` → `_dispatch_mcp` → `Tools.jl` `call_tool`
+2. `MCP.jl` → `_dispatch_mcp` → `call_tool_with_session` → `Tools.jl` `call_tool`
 3. Tool mutates `notebook.cells_dict`, calls Pluto internals (`update_save_run!`, `save_notebook`, etc.)
 4. `_notify_browser` pushes changes to connected browser tabs:
 
@@ -81,38 +81,46 @@ Pluto.send_notebook_changes!(Pluto.ClientRequest(; session, notebook))
 
 ---
 
-## Three entry modes
+## Four entry modes
 
-### 1. `serve()` — session owner (recommended for click bridge)
+### 1. `serve()` — session owner (dev / power users)
 
 ```julia
 PlutoMCP.serve()   # Pluto :1234, MCP :2346
 ```
 
-- Starts full Pluto + MCP HTTP bridge
+- Starts full Pluto + MCP HTTP bridge immediately
 - **Blocks** the Julia process on MCP HTTP server
 - User opens notebooks in Pluto UI at `:1234`
-- Cursor connects via `"url": "http://localhost:2346/sse"`
-- Agent and browser share **one** `ServerSession`
+- Cursor can connect via `"url": "http://localhost:2346/sse"` or stdio proxy
 
 ### 2. `connect()` — proxy mode
 
 ```julia
-# Cursor mcp.json spawns:
+# When :2346/health is already up:
 julia -e 'using PlutoMCP; PlutoMCP.connect()'
 ```
 
 - Probes `GET http://127.0.0.1:2346/health`
 - If bridge up → **stdio proxy** forwards JSON-RPC to `POST /call`
-- No second Pluto; attaches to existing `serve()` session
-- Thin adapter Cursor spawns; heavy state stays in `serve()` process
+- No second Pluto; attaches to existing session (from `serve()` or prior `start_pluto_session`)
 
-### 3. `connect()` — standalone (no bridge)
+### 3. `connect()` — deferred standalone (D15, Styx launcher)
 
-- On first `tools/call`, lazy-starts own `Pluto.run!` (~30s cold start)
-- Stdio MCP + Pluto in **same** Julia process
-- **Isolated** from a separately running `serve()` — different notebooks
-- OK for headless agent work; **wrong** for click-bridge on an existing browser tab
+```julia
+# Cursor mcp.json spawns (no bridge prerequisite):
+julia -e 'using PlutoMCP; PlutoMCP.connect(require_secret_for_access=false)'
+```
+
+- MCP stdio stays up; **Pluto deferred** until `start_pluto_session`
+- `start_pluto_session` starts `Pluto.run!` **and** HTTP bridge on `:2346` (hooks use `/call`)
+- Notebook tools return `pluto_not_running` until start
+- Lifecycle tools: `pluto_session_status`, `start_pluto_session`, `stop_pluto_session`, `open_notebook`
+- Optional `PLUTOMCP_AUTO_SERVE=1` restores eager start for power users
+
+### 4. Legacy note — isolated lazy-start removed
+
+Pre-D15 standalone mode lazy-started Pluto on first `tools/call`. Replaced by explicit `start_pluto_session` (no silent 30s boot).
 
 ---
 
@@ -154,4 +162,4 @@ See [cursor-plugin.md § MCP lifecycle](./cursor-plugin.md#mcp-lifecycle-d12).
 | Click context, workflow rules | Plugin (rules, commands, DOM) |
 | Julia process supervision | **Not** plugin commands/hooks |
 
-For click-bridge workflow, the browser tab and MCP tools must share the **`serve()` session**.
+For click-bridge workflow, the browser tab and MCP tools must share **one** `ServerSession` (from `serve()` or `start_pluto_session` in the same process).

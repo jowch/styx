@@ -66,6 +66,7 @@ flowchart TB
 | **3** | Styx | Design Mode click contract; hook health gate | 1 gate |
 | **4** | Styx | Cursor plugin — Design Mode hooks, commands, rules (D13 Path A) | 3 |
 | **5** | both | Snapshots, restore workflow, concurrency docs | 1 |
+| **5b** | both | Lazy warm lifecycle (D15) — agent bootstrap | PlutoMCP lifecycle tools |
 
 Phases **2 and 3 run in parallel** after Phase 1 gate. Phase 4 needs Phase 3. Phase 5 can start lightly after Phase 1.
 
@@ -76,6 +77,7 @@ Phases **2 and 3 run in parallel** after Phase 1 gate. Phase 4 needs Phase 3. Ph
 - [DOM bridge](./specs/dom-bridge.md)
 - [Cursor plugin](./specs/cursor-plugin.md)
 - [Safety & rollback](./specs/safety.md)
+- [Pluto lifecycle (D15)](./specs/pluto-lifecycle.md)
 - [**Spike:** Design Mode + hooks](./spikes/design-mode-hook.md) *(run before finalizing click delivery)*
 
 ---

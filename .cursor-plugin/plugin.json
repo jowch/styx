@@ -1,7 +1,7 @@
 {
   "name": "styx",
   "displayName": "Styx",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Cursor plugin bridging Pluto.jl notebooks and Cursor via PlutoMCP — Design Mode click context, staging workflow, and MCP auto-wiring.",
   "author": {
     "name": "Styx"

@@ -1,11 +1,14 @@
 # Pluto agent primer
 
-Training guide for AI agents editing live Pluto.jl notebooks via PlutoMCP. Read this before your first edit session.
+> **Canonical agent training is now in plugin skills:** `skills/pluto-workflow/SKILL.md` and `skills/pluto-semantics/SKILL.md`. This file is kept for reference; prefer the skills in Cursor sessions.
+
+Training guide for AI agents editing live Pluto.jl notebooks via PlutoMCP.
 
 | Also see | Purpose |
 |----------|---------|
-| [pluto-semantics.md](./pluto-semantics.md) | Cell grammar deep-dive |
-| [rules/pluto-notebook-workflow.mdc](../rules/pluto-notebook-workflow.mdc) | Always-on Cursor rule |
+| `skills/pluto-workflow/SKILL.md` | **Primary** workflow skill |
+| `skills/pluto-semantics/SKILL.md` | Cell grammar skill |
+| [pluto-semantics.md](./pluto-semantics.md) | Same content as semantics skill (reference) |
 | PlutoMCP.jl `AGENTS.md` | MCP tool API conventions |
 
 ---
@@ -59,6 +62,7 @@ Your job: use MCP tools to read, stage, and run cells — never edit the noteboo
 
 ```text
 resolve notebook_id (browser → context → list_notebooks)
+    → read_cell (note safe preview; remind user if active)
     → read_cell / read_notebook_code
     → edit_cell / edit_cells / add_cell  (run_after=false)
     → submit_changes
@@ -75,6 +79,18 @@ resolve notebook_id (browser → context → list_notebooks)
 | Verify | `read_cell` | Check `output`, `error`, `errored` |
 
 Do **not** spam `execute_cell` or `run_all_cells`. Stage multiple edits, then one `submit_changes`.
+
+### Safe preview (Path B default)
+
+`open_notebook` with `run_notebook=false` opens in **Safe preview**. Cells are visible but **not executed** until the user clicks **Run notebook code** in Glass.
+
+**MCP cannot grant execution** on an already-open notebook today (`submit_changes` / `run_all_cells` do not bypass safe preview).
+
+**MCP cannot grant execution** on an already-open notebook today (`submit_changes` / `run_all_cells` do not bypass safe preview).
+
+When safe preview is active: **keep editing** if the user asks, but **remind** them that outputs/widgets won't update until they click **Run notebook code** in Glass. If they ask you to run, point them to that button — do not use `run_all_cells` as a substitute.
+
+Use `open_notebook(..., run_notebook=true)` only when the user explicitly asked to open **and run** at open time.
 
 ---
 

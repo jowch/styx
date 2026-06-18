@@ -18,11 +18,11 @@ styx/                              # github.com/jowch/styx
   Manifest.toml                     # generated on first launch
   scripts/
     ensure-julia-env.sh             # bootstrap Julia env on first launch
-    pluto-mcp-launcher.sh           # ensure bridge + stdio proxy (primary)
+    pluto-mcp-launcher.sh           # deferred connect() stdio MCP (D15)
+    pluto-serve.sh                 # dev-only blocking serve()
   commands/
-    pluto-select-cell.md            # parse dom_path or @pluto-context fallback (intent=read)
-    pluto-edit-cell.md              # intent=edit
-    pluto-explain-cell.md           # intent=explain
+    pluto-notebooks.md              # Path A — general notebook intent
+    pluto-open.md                   # Path B — open specific .jl path
   rules/
     pluto-notebook-workflow.mdc     # stage → submit_changes; one-expression cells
   docs/
@@ -89,15 +89,15 @@ This matches other plugins (e.g. Browse): plugin ships `mcp.json`, Cursor starts
 }
 ```
 
-**Launcher behavior:**
+**Launcher behavior (D15):**
 0. Run `ensure-julia-env.sh` — bootstrap plugin-root env (local `Pkg.develop` or git add on first run)
-1. `GET http://127.0.0.1:2346/health` — if OK, skip to step 3
-2. If down: spawn `julia --project=. -e 'using PlutoMCP; PlutoMCP.serve(...)'` in background; poll `/health` until ready
-3. `exec julia --project=. -e 'using PlutoMCP; PlutoMCP.connect()'` — stdio proxy to live bridge
+1. `exec julia --project=. -e 'using PlutoMCP; PlutoMCP.connect(require_secret_for_access=false)'` — deferred standalone stdio MCP
+2. Agent calls `start_pluto_session` when user requests notebook work — starts Pluto + HTTP bridge on `:2346`
+3. If `:2346/health` is already up (e.g. dev `pluto-serve.sh`), `connect()` proxies stdio through the live bridge instead
 
-Cursor spawns the launcher; launcher delegates to PlutoMCP; plugin commands do not.
+Cursor spawns the launcher; agent owns Pluto start via MCP lifecycle tools; plugin commands do not shell out.
 
-**Fork follow-up (optional):** `PlutoMCP.ensure_serve()` to consolidate steps 1–2 inside Julia instead of shell script.
+**Dev-only:** `scripts/pluto-serve.sh` runs blocking `PlutoMCP.serve()` for power users.
 
 ### Alternative: HTTP URL (power users)
 
@@ -111,17 +111,17 @@ Cursor spawns the launcher; launcher delegates to PlutoMCP; plugin commands do n
 
 User runs `serve()` manually in a terminal. Cursor connects only; no auto-start. Useful when keeping a long-lived Pluto session open across Cursor restarts.
 
-### Why not standalone `connect()` alone?
+### Why deferred `connect()` (D15)
 
-Standalone mode lazy-starts an **isolated** Pluto session — not the browser tab from a separate `serve()`. Wrong for click-bridge. Proxy mode (step 3 above) attaches to the shared session. See [plutomcp-architecture.md § entry modes](./plutomcp-architecture.md#three-entry-modes).
+Styx launcher uses deferred standalone mode: MCP stdio is always up when **pluto** is enabled; Pluto starts only on notebook intent via `start_pluto_session`. Hooks probe `:2346` after start. See [plutomcp-architecture.md § entry modes](./plutomcp-architecture.md#four-entry-modes).
 
-### Plugin UX when bridge is down
+### Plugin UX when Pluto not started
 
 | Do | Don't |
 |----|-------|
-| Ship working `mcp.json` + launcher | Spawn Julia from command markdown |
-| Optional `beforeMCPExecution` hook: friendly error if `/health` fails | Compete with Cursor's MCP restart logic |
-| Rule: "notebooks must be opened in serve() session at localhost:1234" | Plugin-owned long-lived Julia REPL |
+| Ship working `mcp.json` + deferred launcher | Spawn Julia from command markdown |
+| `beforeSubmitPrompt`: hint to ask agent for `start_pluto_session` | Tell user to run `pluto-serve.sh` or reload MCP |
+| Rule + **pluto-session** skill for Path A/B bootstrap | Plugin-owned long-lived Julia REPL |
 
 **Auth:** Pluto default (`require_secret_for_access=true`). Plugin launcher passes `require_secret_for_access=false` on loopback (D14) so Glass opens at `http://localhost:1234/` without `?secret=` (sets auth cookie; `/edit` URLs still need that cookie while `require_secret_for_open_links` is true). Supported: local machine or SSH port-forward to loopback.
 
@@ -153,13 +153,7 @@ Stage edits with edit_cell (run_after=false); submit_changes when ready.
 
 ## Intent UX (D11)
 
-Intent set by command choice:
-
-| Command | `intent` |
-|---------|----------|
-| `pluto-select-cell` | `read` |
-| `pluto-edit-cell` | `edit` |
-| `pluto-explain-cell` | `explain` |
+Intent is conveyed in natural language or via **pluto-notebooks** / **pluto-open** commands. Legacy per-intent cell commands removed (D15).
 
 ---
 
@@ -198,11 +192,11 @@ Design Mode rule text; optional screenshot handling; `resolve_pluto_context` MCP
 ```
 Cursor activates plugin
   → spawns pluto-mcp-launcher.sh (mcp.json)
-  → launcher ensures serve() bridge on :2346
-  → connect() stdio proxy attaches
-User opens notebook in Agents Glass (serve() session, localhost:1234)
+  → connect() stdio MCP up (Pluto deferred)
+User asks for notebook work
+  → agent start_pluto_session → Pluto :1234 + bridge :2346
+User opens notebook in Agents Glass (localhost:1234)
 User toggles Design Mode (Cmd+Shift+D), clicks cell → dom_path in hook prompt
-Plugin parses pluto-cell# → @pluto-context in chat (or agent reads from hook context)
 Agent → MCP tools → in-process Notebook mutation → browser syncs via WebSocket
 ```
 

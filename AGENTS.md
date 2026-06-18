@@ -9,19 +9,21 @@
 - Freshness at write boundaries and user handoffs (click/command), not background polling.
 - Read-before-edit enforced at MCP layer (Claude Code style), not rules-only.
 - Click delivery: **D13 Path A** — Glass Design Mode `dom_path` in hook `prompt` → MCP **`resolve_pluto_context`** / **`read_cell`**.
-- Open Pluto in Agents Glass (`?secret=` from terminal by default; plugin launcher passes `require_secret_for_access=false`) — not `cursor-ide-browser` MCP.
+- **Cursor-first:** no background Pluto for non-notebook work; agent bootstraps session on notebook intent — not user shell scripts or manual `serve()`.
+- **Agent training:** skills **`pluto-session`** (bootstrap), **`pluto-workflow`** (edits), **`pluto-semantics`** (grammar) — primary onboarding, not buried docs alone.
 - **Commit hygiene:** commit at logical boundaries as you go — one focused commit per feature/doc slice, not large uncommitted batches. Split mixed files when needed (e.g. eval harness vs graph tools). Ask before pushing.
 
 ## Learned Workspace Facts
 
 - **Styx** (this repo, [github.com/jowch/styx](https://github.com/jowch/styx)) — Cursor plugin bridging Pluto.jl and Cursor; MCP tools live in PlutoMCP.jl.
-- **PLAN.md** — phase map; **DECISIONS.md** — decision log; **docs/specs/** — detailed specs including plutomcp-architecture.md.
-- MCP lifecycle: bundled `mcp.json` + launcher; Cursor spawns; plugin-root `Project.toml`/`Manifest.toml` Julia env (not user's default project).
+- **PLAN.md** — phase map; **DECISIONS.md** — decision log; **docs/specs/** — detailed specs including plutomcp-architecture.md and pluto-lifecycle.md (D15).
+- **D15 lazy warm lifecycle:** MCP stdio `connect()` always via launcher when **pluto** MCP enabled; full Pluto deferred until `start_pluto_session` on notebook intent; auto-serve on connect off by default (amends D12).
 - **D13 Path A (spike):** Design Mode (**Cmd+Shift+D**, then click) — `browser_element` in hook `prompt` includes `pluto-cell#<uuid>` in `dom_path` for in-cell clicks (code lines, output, plot, bind widgets).
-- Ambiguous Design Mode clicks (no `pluto-cell#` in `dom_path`, e.g. bare `main`) — enable Design Mode (Cmd+Shift+D) and re-click a cell, or use `@pluto-context`.
-- Design Mode drawing/annotations: screenshot to model only; no structured `browser_element` / `dom_path`.
+- **Design Mode limits:** ambiguous clicks (no `pluto-cell#` in `dom_path`, e.g. bare `main`) — re-click a cell or `@pluto-context`; drawings/annotations are screenshot-only, no structured `dom_path`.
 - **Path C removed:** no `src/dom-resolver.js`, `inject.js`, or `bridge/server.js`; click parsing is Design Mode → MCP **`resolve_pluto_context`** + hook **`pluto_lib.py`**.
-- Plugin install path: `~/.cursor/plugins/local/styx/`.
-- MCP client: `http://localhost:2346/sse` (`PlutoMCP.serve()`); MCP server key in `mcp.json` is **`pluto`**.
-- Phases 1–4 complete; Styx plugin validated through 4c (`resolve_pluto_context`, `pending_run` `stop` hook).
+- Plugin install path: `~/.cursor/plugins/local/styx/` via **`sync-local-plugin.sh`** (dev rsync only; not user-facing install).
+- **Release:** nothing published yet; first release **0.1.0**; CHANGELOG **`[Unreleased]`** until first tag.
+- **D15 session paths:** Path A = general Pluto intent → landing page in Agents Glass (not `cursor-ide-browser` MCP), user picks notebook, `notebook_id` on next prompt; Path B = named `.jl` path → landing (cookies) → **`open_notebook`** → notebook URL. Commands **`pluto-notebooks`** / **`pluto-open`** for session entry (`pluto-start` removed).
+- **`open_notebook`:** server-side notebook load; safe preview default (`execution_allowed=false`); **`run_notebook`** opt-in.
+- Phases 1–4c complete; Phase 5 partial (`pending_run` stop hook, draft-buffer docs); D15 lifecycle MCP tools spec'd, not yet implemented in PlutoMCP.
 - **Eval harness** (`eval/`): scenarios, fixtures, reference runner, SDK orchestrator; CI gate via `run_reference.jl --all --strict-trace`. PlutoMCP keeps optional `EvalLog.jl` hook only.

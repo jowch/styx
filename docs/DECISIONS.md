@@ -132,6 +132,32 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 ---
 
+## D15 — Lazy warm lifecycle; agent-owned bootstrap (2026-06-18)
+
+**Decision:** **Option C** — MCP stdio (`connect()` standalone) is always up when **pluto** MCP is enabled; **Pluto does not start** until the user requests notebook work. The **agent** runs lifecycle MCP tools — not shell scripts.
+
+| Principle | Choice |
+|-----------|--------|
+| Cursor-first | Ordinary Julia work does not start Pluto |
+| Notebook intent | User says "work on notebooks" → agent bootstraps session |
+| Notebook on disk | **Opt-in** — agent asks which file; never auto-`open_notebook` |
+| User scripts | **Not** user-facing (`pluto-serve.sh` dev-only) |
+| Auto-serve on MCP connect | **Off** default; `PLUTOMCP_AUTO_SERVE=1` opt-in |
+
+**Flow:**
+- **Path A** (no notebook named): `start_pluto_session` → landing page in Glass → user picks notebook → agent resolves id on **next** prompt.
+- **Path B** (specific path): `start_pluto_session` → landing page (cookies) → `open_notebook` → notebook URL in Glass.
+
+**Skills:** `pluto-session` (bootstrap), `pluto-workflow` (edits), `pluto-semantics` (grammar).
+
+**Spec:** [specs/pluto-lifecycle.md](./specs/pluto-lifecycle.md)
+
+**Amends D12:** Launcher targets standalone `connect()` only; lifecycle via MCP tools replaces shell `serve()` + proxy as the primary user path.
+
+**PlutoMCP (to implement):** `pluto_session_status`, `start_pluto_session`, `open_notebook`, optional `stop_pluto_session`; defer session until `start_pluto_session`.
+
+---
+
 ## Resolved questions (formerly open)
 
 | Was | Resolution |
@@ -155,5 +181,6 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 | Bridge — DOM resolver (Phase 3) | ✅ **Gated** |
 | Cursor plugin Phase 4a–4b | ✅ **Gated** — Design Mode Path A, MCP staging workflow |
 | Cursor plugin Phase 4c | ✅ `resolve_pluto_context`; `pending_run` stop hook |
+| D15 lazy warm lifecycle | 📋 Spec — [pluto-lifecycle.md](./specs/pluto-lifecycle.md); PlutoMCP tools pending |
 | SDK agent eval | ✅ `eval:stage` pass@1 (local `CURSOR_API_KEY`) |
 | Upstream PRs (#6/#7) | 📋 open on mthelm85/PlutoMCP.jl |
