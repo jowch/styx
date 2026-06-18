@@ -39,7 +39,7 @@ Edit with `run_after=false` → `submit_changes` once. Server tracks `pending_ru
 
 ## D5 — Click-to-context bridge *(target)*
 
-**Primary (D13):** Glass Design Mode → parse `pluto-cell#` from `dom_path` in hook `prompt`. **Dev fallback:** inject+queue (Path C). Spec: [specs/dom-bridge.md](./specs/dom-bridge.md).
+**Primary (D13):** Glass Design Mode → MCP **`resolve_pluto_context`** / **`read_cell`** from `dom_path` in hook `prompt`. Spec: [specs/dom-bridge.md](./specs/dom-bridge.md).
 
 ---
 

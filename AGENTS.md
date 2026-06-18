@@ -9,7 +9,7 @@
 - 50/50 user+agent Pluto collaboration — user edits freely in browser; chat memory is not notebook ground truth.
 - Freshness at write boundaries and user handoffs (click/command), not background polling.
 - Read-before-edit enforced at MCP layer (Claude Code style), not rules-only.
-- Click delivery: **D13 Path A** — parse `pluto-cell#` from Glass Design Mode `dom_path` in hook `prompt`. Path C inject+queue is dev/fallback only.
+- Click delivery: **D13 Path A** — Glass Design Mode `dom_path` in hook `prompt` → MCP **`resolve_pluto_context`** / **`read_cell`**.
 - Open Pluto in Agents Glass (`?secret=` from terminal by default; plugin launcher passes `require_secret_for_access=false`) — not `cursor-ide-browser` MCP.
 - **Commit hygiene:** commit at logical boundaries as you go — one focused commit per feature/doc slice, not large uncommitted batches. Split mixed files when needed (e.g. eval harness vs graph tools). Ask before pushing.
 
@@ -22,7 +22,6 @@
 - Ambiguous Design Mode clicks (no `pluto-cell#` in `dom_path`, e.g. bare `main`) — enable Design Mode (Cmd+Shift+D) and re-click a cell, or use `@pluto-context`.
 - Design Mode drawing/annotations: screenshot to model only; no structured `browser_element` / `dom_path`.
 - Spike H2/H3 falsified: `alwaysApply` rules session-cached; `beforeSubmitPrompt` block-only (no context injection).
-- Click context (Path C dev fallback): `composedPath()` → `PLUTO-CELL` via inject.js; production uses `parseDomPath` on Design Mode `dom_path`.
 - Plugin install path: `~/.cursor/plugins/local/styx/`.
 - MCP client: `http://localhost:2346/sse` (`PlutoMCP.serve()`); MCP server key in `mcp.json` is **`pluto`**.
 - Phases 1–4 complete; Styx plugin validated through 4c (`resolve_pluto_context`, `pending_run` `stop` hook).

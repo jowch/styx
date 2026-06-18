@@ -28,13 +28,13 @@ flowchart TB
 
   subgraph bridge [Styx]
     Plugin[Cursor plugin]
-    DomParser[parseDomPath from Design Mode]
-    DevQueue[Dev inject queue optional]
+    Hooks[Python hooks + rules]
   end
 
   subgraph mcp [PlutoMCP.jl fork]
     L1[Layer 1: read_notebook_code CRUD staging]
     L2[Layer 2: deps symbols validate]
+    Ctx[resolve_pluto_context]
     Receipts[Mutation receipts]
   end
 
@@ -42,10 +42,9 @@ flowchart TB
   Browser[Pluto UI pluto-cell]
 
   Browser -->|Design Mode dom_path| Plugin
-  Plugin --> DomParser
-  DomParser -->|@pluto-context| Cursor
-  DevQueue -.->|dev fallback| Cursor
-  Cursor --> L1
+  Plugin --> Hooks
+  Cursor -->|MCP| Ctx
+  Cursor -->|MCP| L1
   CLI --> L1
   L1 --> Receipts
   L2 --> Receipts
@@ -64,7 +63,7 @@ flowchart TB
 | **0** | PlutoMCP.jl | Reference artifacts + taxonomy | — |
 | **1** | PlutoMCP.jl | MCP v2: projection, staging, receipts, renames | 0 |
 | **2** | PlutoMCP.jl | Graph/validation (Layer 2) | 1 gate |
-| **3** | Styx | Shared resolver (`parseDomPath`, packet format); dev inject harness | 1 gate |
+| **3** | Styx | Design Mode click contract; hook health gate | 1 gate |
 | **4** | Styx | Cursor plugin — Design Mode hooks, commands, rules (D13 Path A) | 3 |
 | **5** | both | Snapshots, restore workflow, concurrency docs | 1 |
 
@@ -116,11 +115,9 @@ See [specs/mcp-phase-2.md](./specs/mcp-phase-2.md). Trigger: agents need "why di
 
 ### Phase 3 — DOM bridge utilities
 
-See [specs/dom-bridge.md](./specs/dom-bridge.md). **Primary delivery is Path A (Design Mode), not inject** — D13.
+See [specs/dom-bridge.md](./specs/dom-bridge.md). **Primary delivery is Design Mode (D13)** → MCP **`resolve_pluto_context`**.
 
-Ships `parseDomPath`, `formatPlutoContext`, shared packet schema. Optional dev inject+queue for pre-plugin testing.
-
-**Gate:** `parseDomPath` on representative Design Mode `dom_path` strings → `@pluto-context` → MCP `read_cell` succeeds.
+**Gate:** Design Mode `dom_path` → MCP `read_cell` succeeds.
 
 ### Phase 4 — Cursor plugin
 
@@ -142,7 +139,7 @@ See [specs/safety.md](./specs/safety.md).
 | PlutoMCP fork — Phase 2 graph/validation tools | ✅ `Graph.jl` — 6 tools ([spec](./specs/mcp-phase-2.md)) |
 | Bridge — eval harness + reference runner | ✅ `eval/run_reference.jl --all` — 4/4 scenarios pass |
 | Bridge — SDK eval orchestrator | ✅ [`eval/`](../eval/README.md) — `stage_and_run` pass@1 via SDK |
-| Bridge — DOM resolver utilities (Phase 3) | ✅ **Gated** — `parseDomPath` + `@pluto-context` → MCP `read_cell` |
+| Bridge — Design Mode click context (Phase 3) | ✅ **Gated** — Design Mode → MCP `read_cell` |
 | Styx plugin Phase 4a | ✅ **Gated** — MCP auto-wires via `mcp.json`; stage-first workflow |
 | Styx plugin Phase 4b | ✅ **Gated** — Design Mode click → hook `dom_path` → agent reads/edits without UUID paste |
 | Styx plugin Phase 4c | ✅ **Gated** — `resolve_pluto_context`; `pending_run` stop hook |

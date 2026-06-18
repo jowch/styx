@@ -6,7 +6,7 @@ First-class Cursor integration: workflow rules, commands, click context delivery
 
 **Related:** [PlutoMCP architecture](./plutomcp-architecture.md) · [DOM bridge](./dom-bridge.md) · [Design Mode spike](../spikes/design-mode-hook.md)
 
-**Click delivery:** **Path A** (D13) — validated in [spike-results.md](../spikes/spike-results.md). Parse Design Mode `dom_path` → MCP `read_cell`.
+**Click delivery:** **Design Mode** (D13) — validated in [spike-results.md](../spikes/spike-results.md). `dom_path` in hook prompt → MCP **`resolve_pluto_context`** → **`read_cell`**.
 
 ## Plugin structure
 
@@ -29,13 +29,9 @@ styx/                              # github.com/jowch/styx
     pluto-agent-primer.md           # Agent training (browser-first, errors, staging)
     pluto-semantics.md              # Cell grammar reference
   hooks/
-    hooks.json                      # Design Mode dom_path parse; edit guard (H4)
+    hooks.json                      # MCP health gate; edit guard (H4)
+    pluto_lib.py                    # parse_dom_path helpers
     session-start.sh                # static MCP workflow context
-  src/
-    dom-resolver.js                 # parseDomPath (Path A), formatPlutoContext
-    inject.js                       # dev/fallback only (Path C)
-  bridge/
-    server.js                       # dev queue only (Path C)
   README.md
 ```
 
@@ -45,14 +41,13 @@ styx/                              # github.com/jowch/styx
 
 | Component | Role |
 |-----------|------|
-| `rules/pluto-notebook-workflow.mdc` | Always-on: stage-first, `submit_changes`, read before edit, one-expression cell grammar |
-| `hooks/` (Path A) | Parse Design Mode `dom_path` from hook `prompt`; `preToolUse` / `beforeMCPExecution` edit guard (H4) |
-| `commands/pluto-*-cell` | Format `@pluto-context` from parsed IDs or manual fallback |
+| `rules/pluto-notebook-workflow.mdc` | Always-on: stage-first, `submit_changes`, read before edit, Design Mode → **`resolve_pluto_context`** |
+| `hooks/` | MCP health gate on Design Mode prompts; `preToolUse` / `beforeMCPExecution` edit guard (H4) |
+| `commands/pluto-*-cell` | Intent commands with manual ID / `@pluto-context` fallback |
 | `hooks/sessionStart` | Optional: inject static workflow via `additional_context` |
 | `mcp.json` | Declares MCP entrypoint; **Cursor spawns it** (see MCP lifecycle) |
 | `scripts/pluto-mcp-launcher.sh` | Bootstraps plugin-root Julia env, ensures bridge healthy, then exec stdio proxy |
-| `src/dom-resolver.js` | **`parseDomPath`** (Path A), `formatPlutoContext`, packet builders |
-| `src/inject.js` + `bridge/server.js` | **Dev/fallback only** (Path C) — not production click UX |
+| PlutoMCP `resolve_pluto_context` | Canonical server-side parser for Design Mode `dom_path` / browser blocks |
 
 ---
 
@@ -149,10 +144,10 @@ Stage edits with edit_cell (run_after=false); submit_changes when ready.
 
 **Path A flow (production):**
 1. User toggles Design Mode (**Cmd+Shift+D**) in Agents Glass, clicks a cell
-2. Hook receives `dom_path` in `prompt` → plugin parses `pluto-cell#` / `pluto-notebook#`
-3. Agent (or command) uses `@pluto-context` block → MCP `read_cell`
+2. Hook receives `dom_path` in `prompt`; agent calls MCP **`resolve_pluto_context`**
+3. Agent calls **`read_cell`** with resolved IDs
 
-**Fallback:** `@pluto-context` command with manual IDs, or Path C dev inject queue for local testing.
+**Fallback:** `@pluto-context` command with manual IDs.
 
 ---
 

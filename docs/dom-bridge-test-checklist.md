@@ -1,32 +1,22 @@
 # DOM Bridge — Manual Test Checklist
 
-Two paths — **Path A is primary** (D13); Path C is dev/fallback only.
+**Primary path (D13):** Glass Design Mode → `dom_path` in hook `prompt` → MCP **`resolve_pluto_context`** → **`read_cell`**.
 
 ---
 
-## Path A — Design Mode (primary)
+## Prerequisites
 
-**Prerequisites**
+- [ ] `PlutoMCP.serve(require_secret_for_access=false)` — notebook in **Agents Glass** at `http://localhost:1234`
+- [ ] MCP at `:2346` on same session
+- [ ] Design Mode active in Glass (**Cmd+Shift+D**)
 
-- [x] `PlutoMCP.serve(require_secret_for_access=false)` — notebook in **Agents Glass** at `http://localhost:1234`
-- [x] MCP at `:2346` on same session
-- [x] Design Mode active in Glass (**Cmd+Shift+D** — not Option/Alt+click)
-
-**After each Design Mode click on a cell target:**
+## After each Design Mode click on a cell target
 
 1. Confirm hook `prompt` includes `dom_path` with `pluto-cell#<uuid>`
-2. Run parser (Node or pasted in devtools):
+2. Agent calls MCP **`resolve_pluto_context`** with the `browser_element` block (or regexes IDs from `dom_path`)
+3. Agent calls **`read_cell`** without manual UUID paste
 
-```javascript
-import { parseDomPath, buildContextPacket, formatPlutoContext } from "./src/dom-resolver.js";
-// Or copy dom_path string from hook prompt:
-const domPath = "… > pluto-notebook#… > pluto-cell#… > pluto-output …";
-formatPlutoContext(buildContextPacket(parseDomPath(domPath), "read"));
-```
-
-3. Paste `@pluto-context` block into Cursor → agent calls MCP `read_cell` without manual UUIDs
-
-### Path A test matrix (from spike H1)
+### Design Mode test matrix (from spike H1)
 
 | # | Target | Expected `pluto-cell#` in `dom_path`? | Notes |
 |---|--------|--------------------------------------|-------|
@@ -39,62 +29,24 @@ formatPlutoContext(buildContextPacket(parseDomPath(domPath), "read"));
 | 7 | Bare `main` / helpbox / header | ❌ | Re-click cell or `@pluto-context` |
 | 8 | Drawing on screenshot | ❌ | Vision-only, no structured ID |
 
-### parseDomPath unit checks
+### ID extraction checks
+
+Use MCP **`resolve_pluto_context`** or hook helper `parse_dom_path` semantics:
 
 | Input | Expected |
 |-------|----------|
 | Contains `pluto-cell#<uuid>` | ✅ `cell_id` extracted |
 | Contains `pluto-notebook#<uuid>` | ✅ `notebook_id` extracted |
-| No `pluto-cell#` | ❌ `no_pluto_cell_in_dom_path` |
+| No `pluto-cell#` | ❌ reject / ask user to re-click |
 
 ---
 
-## Path C — Inject + queue (dev / fallback only)
+## MCP end-to-end gate
 
-**Not production UX.** Dev harness to test packet format (Path C). Styx plugin hooks cover Path A in production.
-
-**Prerequisites**
-
-- [ ] `PlutoMCP.serve()` — notebook at `http://localhost:1234`
-- [ ] Click bridge: `npm run bridge` → `http://127.0.0.1:3457/health`
-- [ ] Inject active: `fetch('http://127.0.0.1:3457/inject.js').then(r=>r.text()).then(eval)`
-- [ ] Toast: "Pluto click bridge active"
-
-**After each click:**
-
-```bash
-curl -s http://127.0.0.1:3457/click/format
-```
-
-### Path C test matrix
-
-| # | Target | Expected | Notes |
-|---|--------|----------|-------|
-| 1 | CodeMirror / `pluto-input` | ✅ capture | `in_input=true` |
-| 2 | Plain text output | ✅ capture | |
-| 3 | Markdown HTML | ✅ capture | |
-| 4 | `@bind` slider | ✅ capture | `composedPath()` |
-| 5 | Plot iframe **border** | ✅ capture | |
-| 6 | Plot iframe **interior** | ❌ reject | Toast: inside iframe |
-| 7 | Header / settings chrome | ❌ reject | Toast: no Pluto cell |
-
-### Bridge API smoke tests
-
-```bash
-curl -s http://127.0.0.1:3457/health
-curl -s http://127.0.0.1:3457/click/latest | jq .
-curl -s http://127.0.0.1:3457/click/pop | jq .
-```
-
-Teardown: `__plutoClickBridgeTeardown()` in console; Ctrl+C on bridge.
-
----
-
-## MCP end-to-end gate (both paths)
-
-- [x] `@pluto-context` block in Cursor chat (from Path A parser or Path C `/click/format`)
-- [x] Agent calls `read_cell` with `notebook_id` + `cell_id`
-- [x] Returns current cell code/output without user pasting UUIDs
+- [ ] Design Mode click → agent chat resolves context without UUID paste
+- [ ] Agent calls `read_cell` with `notebook_id` + `cell_id`
+- [ ] Returns current cell code/output
+- [ ] Stage-first `edit_cell` → `submit_changes` → browser sync
 
 ---
 
@@ -104,10 +56,8 @@ Teardown: `__plutoClickBridgeTeardown()` in console; Ctrl+C on bridge.
 |-------|--------|
 | Bridge health `:2346` + Pluto `:1234` | ✅ |
 | Reference eval `run_reference.jl --all` | ✅ 4/4 |
-| `parseDomPath` (cell, plot img, jlerror, no-cell) | ✅ |
-| Design Mode → hook → agent without UUID paste | ✅ (prior session + matrix targets) |
+| Design Mode → hook → agent without UUID paste | ✅ |
 | Stage-first `edit_cell` → `submit_changes` → browser sync | ✅ |
 | Multi-expression → structured `error.kind` + boundaries | ✅ |
-| begin/end-first hint order in live `read_cell` | ⚠️ restart `serve()` after fork updates |
 | SDK eval `eval:stage` | ✅ pass@1 (local `CURSOR_API_KEY`) |
 | Styx Phase 4c (`resolve_pluto_context`, `pending_run` stop hook) | ✅ |
