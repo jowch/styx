@@ -72,10 +72,10 @@ Layer 2 graph tools (fork) ∥ DOM bridge (here). Plugin Phase 4 after Phase 3.
 | Tier | Criterion | Enforced by |
 |------|-----------|-------------|
 | CI | Reference runner: all 4 v1 scenarios via HTTP `/call` | PlutoMCP `eval/run_reference.jl --all` |
-| Manual | SDK `stage_and_run` outcome pass@1 | [bridge/eval/run.ts](./eval/run.ts) + `score.jl` |
+| Manual | SDK `stage_and_run` outcome pass@1 | [`eval/run.ts`](./eval/run.ts) + `score.jl` |
 | Baseline | SDK trace score recorded (advisory) | `eval/results/` |
 
-Details: [PlutoMCP eval/README.md](../../PlutoMCP.jl/eval/README.md), [bridge/eval/README.md](./eval/README.md).
+Details: [PlutoMCP eval/README.md](../../PlutoMCP.jl/eval/README.md), [`eval/README.md`](./eval/README.md).
 
 ---
 

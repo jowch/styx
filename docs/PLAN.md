@@ -108,7 +108,7 @@ Ground projection rules: cell types, manifest blobs, `@bind` shims, markdown cel
 
 See [specs/mcp-phase-1.md](./specs/mcp-phase-1.md).
 
-**Gate:** See eval harness — CI runs [`run_reference.jl --all`](../../PlutoMCP.jl/eval/README.md) (deterministic); manual SDK `stage_and_run` outcome pass@1 via [bridge/eval](../eval/README.md).
+**Gate:** See eval harness — CI runs [`run_reference.jl --all`](../../PlutoMCP.jl/eval/README.md) (deterministic); manual SDK `stage_and_run` outcome pass@1 via [`eval/`](../eval/README.md).
 
 ### Phase 2 — Graph / validation
 
