@@ -125,12 +125,47 @@ def has_read(notebook_id: str | None, cell_id: str | None) -> bool:
     return False
 
 
+def edit_target_cell_ids(tool_name: str, inp: dict[str, Any]) -> list[str]:
+    """Cell ids targeted by a write tool (edit_cells uses cells[], not top-level cell_id)."""
+    bare = tool_name.removeprefix("MCP:")
+    if bare == "edit_cells":
+        cells = inp.get("cells") or []
+        return [c["cell_id"] for c in cells if isinstance(c, dict) and c.get("cell_id")]
+    cid = inp.get("cell_id")
+    return [cid] if cid else []
+
+
+def write_allowed(tool_name: str, inp: dict[str, Any]) -> bool:
+    """True when read receipts cover this write (read-before-edit guard)."""
+    notebook_id = inp.get("notebook_id")
+    if not notebook_id:
+        return False
+    bare = tool_name.removeprefix("MCP:")
+    if bare == "add_cell":
+        return any(r.get("notebook_id") == notebook_id for r in load_reads())
+    if bare == "edit_cells":
+        ids = edit_target_cell_ids(tool_name, inp)
+        if not ids:
+            return False
+        return all(has_read(notebook_id, cid) for cid in ids)
+    ids = edit_target_cell_ids(tool_name, inp)
+    if len(ids) == 1:
+        return has_read(notebook_id, ids[0])
+    return has_read(notebook_id, inp.get("cell_id"))
+
+
 def save_selection(selection: dict[str, Any]) -> None:
     with open(selection_path(), "w", encoding="utf-8") as f:
         json.dump(selection, f, indent=2)
 
 
-def mcp_call(name: str, arguments: dict[str, Any] | None = None) -> dict[str, Any]:
+class PendingRunError(Exception):
+    """MCP pending_run check failed (bridge down, timeout, or malformed response)."""
+
+
+def mcp_call(
+    name: str, arguments: dict[str, Any] | None = None, *, timeout: float = 5
+) -> dict[str, Any]:
     """POST tools/call to the PlutoMCP HTTP bridge."""
     port = int(os.environ.get("PLUTOMCP_MCP_PORT", "2346"))
     body = json.dumps(
@@ -147,7 +182,7 @@ def mcp_call(name: str, arguments: dict[str, Any] | None = None) -> dict[str, An
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=5) as resp:
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
         payload = json.load(resp)
     result = payload.get("result") or {}
     text = (result.get("content") or [{}])[0].get("text") or "{}"
@@ -160,17 +195,17 @@ def mcp_call(name: str, arguments: dict[str, Any] | None = None) -> dict[str, An
 def pending_run_notebooks() -> list[dict[str, Any]]:
     """Return notebooks with non-empty pending_run from the live bridge."""
     if not mcp_health_ok():
-        return []
+        raise PendingRunError("Pluto MCP bridge not healthy")
     out: list[dict[str, Any]] = []
     try:
-        notebooks = mcp_call("list_notebooks")
+        notebooks = mcp_call("list_notebooks", timeout=3)
         if not isinstance(notebooks, list):
-            return []
+            raise PendingRunError("list_notebooks returned unexpected payload")
         for nb in notebooks:
             nb_id = nb.get("notebook_id")
             if not nb_id:
                 continue
-            proj = mcp_call("read_notebook_code", {"notebook_id": nb_id})
+            proj = mcp_call("read_notebook_code", {"notebook_id": nb_id}, timeout=4)
             pending = proj.get("pending_run") or []
             if pending:
                 out.append(
@@ -180,8 +215,18 @@ def pending_run_notebooks() -> list[dict[str, Any]]:
                         "pending_run": pending,
                     }
                 )
-    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError, KeyError, IndexError):
-        return []
+    except PendingRunError:
+        raise
+    except (
+        urllib.error.URLError,
+        TimeoutError,
+        OSError,
+        json.JSONDecodeError,
+        KeyError,
+        IndexError,
+        TypeError,
+    ) as e:
+        raise PendingRunError(f"pending_run check failed: {e}") from e
     return out
 
 
@@ -202,8 +247,11 @@ def hook_input() -> dict[str, Any]:
 def tool_input(payload: dict[str, Any]) -> dict[str, Any]:
     raw = payload.get("tool_input") or {}
     if isinstance(raw, str):
-        return json.loads(raw)
-    return raw
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            return {}
+    return raw if isinstance(raw, dict) else {}
 
 
 def deny_edit(agent_message: str) -> None:

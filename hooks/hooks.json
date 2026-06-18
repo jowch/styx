@@ -31,7 +31,7 @@
     "postToolUse": [
       {
         "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/record-read.py",
-        "matcher": "MCP:read_cell|MCP:read_notebook_code",
+        "matcher": "MCP:read_cell|MCP:read_notebook_code|read_cell|read_notebook_code",
         "timeout": 5
       }
     ],
