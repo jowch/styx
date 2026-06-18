@@ -16,7 +16,7 @@ You are editing a live Pluto notebook via MCP tools.
 
 ## Cell grammar
 
-One expression per cell. Split multi-step code across cells or wrap in `begin`/`let`.
-On error: `error.kind=pluto_multi_expression` → split at `error.boundaries` or wrap begin/end.
+One expression per cell. New code: split cells or `begin`/`let`. **Fixing errors:** wrap `begin`/`end` in the same cell (default).
+On error: `error.kind=pluto_multi_expression` → wrap `begin`/`end` (default), or split using `error.boundaries`.
 
 Full primer: `docs/pluto-agent-primer.md`.

@@ -36,7 +36,7 @@ On every message with a `browser_element` block:
 
 1. Resolve `notebook_id` (browser first).
 2. **`read_cell`** or **`read_notebook_code`** before any mutation (MCP enforces read-before-edit).
-3. Stage with **`edit_cell`** / **`edit_cells`** / **`add_cell`** — default **`run_after=false`**. One logical step per cell; wrap multi-statement code in `begin`/`let` or split cells.
+3. Stage with **`edit_cell`** / **`edit_cells`** / **`add_cell`** — default **`run_after=false`**. One logical step per cell for *new* code. When **fixing** `pluto_multi_expression`, default to **`begin`/`end`** wrap in the same cell; split only if separate reactive steps are intended.
 4. Optional: **`validate_cell`** on proposed code.
 5. Batch run with **`submit_changes`** (Pluto Cmd+S). Do not spam `execute_cell` or `run_all_cells`.
 6. **`read_cell`** again — check `output`, `errored`, and structured **`error`** (e.g. `pluto_multi_expression` with `boundaries` + `hint`).
@@ -45,7 +45,7 @@ On every message with a `browser_element` block:
 
 - MCP **`read_cell`**: `error.kind`, `error.hint`, `error.boundaries` mirror Pluto's browser UI for known parse errors.
 - Design Mode click on **`jlerror`**: `visible_text` has the friendly split/wrap offer.
-- Raw `syntax: extra token after end of expression` + `Boundaries: [...]` = multi-expression cell.
+- Raw `syntax: extra token after end of expression` + `Boundaries: [...]` = multi-expression cell → **wrap `begin`/`end`** (default fix).
 
 ## Draft-buffer warning
 

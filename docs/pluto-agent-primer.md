@@ -88,7 +88,15 @@ using Plots
 plot(sin, 0, 2pi)
 ```
 
-**Valid — split cells (preferred):**
+**Valid — wrap in `begin`/`end` (preferred when fixing errors):**
+```julia
+begin
+    using Plots
+    plot(sin, 0, 2pi)
+end
+```
+
+**Valid — split cells (when separate reactive steps are intended):**
 ```julia
 # cell 1
 using Plots
@@ -98,15 +106,16 @@ using Plots
 plot(sin, 0, 2pi)
 ```
 
-**Valid — wrap in one cell:**
+**Valid — wrap in `let` (locals should not become notebook globals):**
 ```julia
-begin
-    using Plots
-    plot(sin, 0, 2pi)
+let
+    x = 1
+    y = x + 1
+    y
 end
 ```
 
-See [pluto-semantics.md](./pluto-semantics.md) for `let/end`, `@bind`, and reactivity details.
+When a user asks you to **fix** a multi-expression error, default to **`begin`/`end`** in the same cell unless they want separate reactive cells.
 
 ---
 
@@ -138,8 +147,8 @@ Errored cells return:
 | `output` | Human-readable summary (matches browser intent) |
 | `error.kind` | Machine classification |
 | `error.boundaries` | Byte positions to split cell |
-| `error.fixes` | `split_cells` or `wrap_begin_end` |
-| `error.hint` | What to tell the user / how to fix |
+| `error.fixes` | `wrap_begin_end` first, then `split_cells` |
+| `error.hint` | Default fix: wrap in `begin`/`end` |
 
 ### Design Mode click on `jlerror`
 
@@ -182,7 +191,7 @@ Canonical names only — no `get_cell`, `set_cell_code`, `run_cell`.
 | Mistake | Symptom | Fix |
 |---------|---------|-----|
 | `list_notebooks` first | Wrong/missing context | Browser URL / Design Mode click |
-| Multi-statement cell | `pluto_multi_expression` | Split cells or `begin`/`let` |
+| Multi-statement cell | `pluto_multi_expression` | Wrap `begin`/`end` (default); split only if separate reactive steps wanted |
 | Edit without read | `read_required` | `read_cell` first |
 | Run after every edit | Slow, fights staging | `submit_changes` once |
 | Patch `.jl` on disk | Desync | MCP only |

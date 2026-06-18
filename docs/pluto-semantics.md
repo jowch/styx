@@ -17,25 +17,33 @@ plot(sin, 0, 2pi)
 
 Pluto rejects them with `pluto_multi_expression` (MCP) or `syntax: extra token after end of expression` (raw runner). **`Boundaries: […]`** marks byte positions where extra statements start.
 
-### Fix: wrap in `begin … end` or `let … end`
+### Fix: wrap in `begin … end` or `let … end` (preferred when fixing errors)
 
 ```julia
 begin
-    using Plots
-    plot(sin, 0, 2pi)
+    x = 1
+    y = x + 1
+    y
 end
 ```
 
-### Better fix: split across cells (preferred)
+Use **`let`** when temporaries should not become notebook globals.
+
+When a user asks to **fix** this error, default to **`begin`/`end`** in the same cell — most users want the code kept together.
+
+### Alternative: split across cells
+
+Use when each step should be a separate reactive node:
 
 | Cell | Code |
 |------|------|
-| 1 | `using Plots` |
-| 2 | `plot(sin, 0, 2pi)` |
+| 1 | `x = 1` |
+| 2 | `y = x + 1` |
+| 3 | `y` |
 
 ---
 
-## Recommended cell structure
+## Recommended cell structure (new code, not error recovery)
 
 | Pattern | Guidance |
 |---------|----------|
@@ -75,9 +83,9 @@ end
 
 When `read_cell` returns `errored: true`, check `error`:
 
-| `error.kind` | Meaning | Agent action |
-|--------------|---------|--------------|
-| `pluto_multi_expression` | Multiple top-level statements | Split at `boundaries` or wrap `begin`/`let` |
-| `runtime` | Ordinary exception | Read `msg`, use graph tools / fix code |
+| `error.kind` | Meaning | Agent action (default) |
+|--------------|---------|------------------------|
+| `pluto_multi_expression` | Multiple top-level statements | **`edit_cell` with `begin`/`end` wrap**, then `submit_changes` |
+| `runtime` | Ordinary exception | Read `msg`, fix code |
 
-The `output` string mirrors the browser hint text for known Pluto parse errors.
+`error.fixes` is ordered: `wrap_begin_end` first, `split_cells` second.
