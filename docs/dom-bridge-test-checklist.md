@@ -51,7 +51,7 @@ formatPlutoContext(buildContextPacket(parseDomPath(domPath), "read"));
 
 ## Path C — Inject + queue (dev / fallback only)
 
-**Not production UX.** Use to test packet format before Phase 4 plugin hooks.
+**Not production UX.** Dev harness to test packet format (Path C). Styx plugin hooks cover Path A in production.
 
 **Prerequisites**
 
@@ -108,6 +108,6 @@ Teardown: `__plutoClickBridgeTeardown()` in console; Ctrl+C on bridge.
 | Design Mode → hook → agent without UUID paste | ✅ (prior session + matrix targets) |
 | Stage-first `edit_cell` → `submit_changes` → browser sync | ✅ |
 | Multi-expression → structured `error.kind` + boundaries | ✅ |
-| begin/end-first hint order in live `read_cell` | ⚠️ needs `serve()` restart |
-| SDK eval `eval/run.ts` | ⏸ `CURSOR_API_KEY` |
-| Phase 4c polish | 📋 not started |
+| begin/end-first hint order in live `read_cell` | ⚠️ restart `serve()` after fork updates |
+| SDK eval `eval:stage` | ✅ pass@1 (local `CURSOR_API_KEY`) |
+| Styx Phase 4c (`resolve_pluto_context`, `pending_run` stop hook) | ✅ |

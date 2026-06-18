@@ -1,4 +1,4 @@
-"""Shared helpers for Pluto Cursor plugin hooks."""
+"""Shared helpers for Styx (Pluto ↔ Cursor) plugin hooks."""
 from __future__ import annotations
 
 import json

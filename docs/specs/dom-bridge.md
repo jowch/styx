@@ -99,7 +99,7 @@ Shared format for Path A, B, and C:
 
 ## Path C — Inject + queue (dev / fallback only)
 
-For local testing before Phase 4 plugin hooks exist. **Not the production click path.**
+For local testing of Path C packet format. **Not the production click path** — Styx plugin hooks handle Path A.
 
 `resolvePlutoClick` uses `composedPath()` (not bare `closest()`) for shadow-DOM widgets:
 

@@ -26,7 +26,7 @@ flowchart TB
     CLI[CLI agent]
   end
 
-  subgraph bridge [pluto-cursor-bridge]
+  subgraph bridge [Styx]
     Plugin[Cursor plugin]
     DomParser[parseDomPath from Design Mode]
     DevQueue[Dev inject queue optional]
@@ -64,8 +64,8 @@ flowchart TB
 | **0** | PlutoMCP.jl | Reference artifacts + taxonomy | — |
 | **1** | PlutoMCP.jl | MCP v2: projection, staging, receipts, renames | 0 |
 | **2** | PlutoMCP.jl | Graph/validation (Layer 2) | 1 gate |
-| **3** | pluto-cursor-bridge | Shared resolver (`parseDomPath`, packet format); dev inject harness | 1 gate |
-| **4** | pluto-cursor-bridge | Cursor plugin — Design Mode hooks, commands, rules (D13 Path A) | 3 |
+| **3** | Styx | Shared resolver (`parseDomPath`, packet format); dev inject harness | 1 gate |
+| **4** | Styx | Cursor plugin — Design Mode hooks, commands, rules (D13 Path A) | 3 |
 | **5** | both | Snapshots, restore workflow, concurrency docs | 1 |
 
 Phases **2 and 3 run in parallel** after Phase 1 gate. Phase 4 needs Phase 3. Phase 5 can start lightly after Phase 1.
@@ -143,10 +143,10 @@ See [specs/safety.md](./specs/safety.md).
 | PlutoMCP fork — agent eval harness | ✅ Reference runner + score.jl — 4/4 scenarios pass |
 | Bridge — SDK eval orchestrator | ✅ [`eval/`](../eval/README.md) — `stage_and_run` pass@1 via SDK |
 | Bridge — DOM resolver utilities (Phase 3) | ✅ **Gated** — `parseDomPath` + `@pluto-context` → MCP `read_cell` |
-| Bridge — Cursor plugin Phase 4a | ✅ **Gated** — MCP auto-wires via `mcp.json`; stage-first workflow |
-| Bridge — Cursor plugin Phase 4b | ✅ **Gated** — Design Mode click → hook `dom_path` → agent reads/edits without UUID paste |
-| Bridge — Cursor plugin Phase 4c | ✅ `resolve_pluto_context` MCP tool; `stop` hook warns on `pending_run` |
-| Bridge — structured Pluto errors | ⚠️ Live on bridge; **restart `serve()`** to pick up begin/end-first hints in fork `Output.jl` |
+| Styx plugin Phase 4a | ✅ **Gated** — MCP auto-wires via `mcp.json`; stage-first workflow |
+| Styx plugin Phase 4b | ✅ **Gated** — Design Mode click → hook `dom_path` → agent reads/edits without UUID paste |
+| Styx plugin Phase 4c | ✅ **Gated** — `resolve_pluto_context`; `pending_run` stop hook |
+| Styx — structured Pluto errors | ⚠️ **Restart `serve()`** after fork updates to pick up begin/end-first hints in `Output.jl` |
 
 ---
 

@@ -1,4 +1,4 @@
-# Cursor Plugin Spec — Phase 4
+# Styx plugin spec (Phase 4 — complete)
 
 ## Goal
 
@@ -11,7 +11,7 @@ First-class Cursor integration: workflow rules, commands, click context delivery
 ## Plugin structure
 
 ```
-pluto-cursor-bridge/
+styx/                              # github.com/jowch/styx
   .cursor-plugin/plugin.json
   mcp.json                          # Cursor-managed MCP entrypoint
   Project.toml                      # Plugin-owned Julia env (root)
@@ -39,7 +39,7 @@ pluto-cursor-bridge/
   README.md
 ```
 
-**Install:** `~/.cursor/plugins/local/pluto-cursor-bridge/`
+**Install:** `~/.cursor/plugins/local/styx/` via `./scripts/sync-local-plugin.sh`
 
 ## Component responsibilities
 
@@ -178,7 +178,7 @@ Intent set by command choice:
 
 ### Phase 4b — Click context *(D13: Path A)*
 
-**Chosen:** Glass Design Mode → `browser_element` / `dom_path` in prompt (hook-visible) → parse `pluto-cell#` / `pluto-notebook#` → MCP `get_cell`; `preToolUse` / `beforeMCPExecution` edit guard.
+**Chosen:** Glass Design Mode → `browser_element` / `dom_path` in prompt (hook-visible) → `resolve_pluto_context` or parse `pluto-cell#` / `pluto-notebook#` → MCP `read_cell`; `preToolUse` / `beforeMCPExecution` edit guard.
 
 **Fallback:** `@pluto-context` command for manual IDs.
 

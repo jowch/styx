@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SRC="$(cd "$(dirname "$0")/.." && pwd)"
-DEST="${HOME}/.cursor/plugins/local/pluto-cursor-bridge"
+DEST="${HOME}/.cursor/plugins/local/styx"
 
 mkdir -p "${HOME}/.cursor/plugins/local"
 rsync -a --delete \

@@ -4,7 +4,7 @@ Running log of architectural and workflow decisions. **Planning details:** [PLAN
 
 | Repo | Role |
 |------|------|
-| **pluto-cursor-bridge** (this repo) | Cursor plugin, DOM click bridge, integration planning |
+| **Styx** (this repo) | Cursor plugin bridging Pluto.jl ↔ Cursor; DOM resolver; integration planning |
 | **[PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl)** fork | MCP tool surface (may upstream) |
 
 **Doc split (D1):** Planning docs live here unless purely MCP-server internals. Fork `AGENTS.md` holds canonical MCP agent semantics.
@@ -27,7 +27,7 @@ Planning and integration specs in this repo. Fork implements MCP; may upstream g
 
 One canonical name per operation. Full catalog: [specs/mcp-phase-1.md](./specs/mcp-phase-1.md).
 
-**Interim (today):** upstream names (`get_cell`, `set_cell_code`, `run_cell`); use `run_after=false` explicitly until Phase 1 ships.
+**Shipped (Phase 1):** canonical names (`read_cell`, `edit_cell`, `submit_changes`, …). No parallel legacy aliases.
 
 ---
 
@@ -105,7 +105,7 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 ## D13 — Click delivery: Path A (spike 2026-06-17, revised)
 
-**Decision:** Glass Design Mode → `browser_element` / `dom_path` in hook `prompt` carries `pluto-notebook#` + `pluto-cell#` IDs → parse → MCP `get_cell` / `resolve_pluto_context`; **`preToolUse` + `beforeMCPExecution` edit guard**; **`@pluto-context` command** as fallback.
+**Decision:** Glass Design Mode → `browser_element` / `dom_path` in hook `prompt` carries `pluto-notebook#` + `pluto-cell#` IDs → `resolve_pluto_context` or parse → MCP `read_cell`; **`preToolUse` + `beforeMCPExecution` edit guard**; **`@pluto-context` command** as fallback.
 
 **Spike results:** [spikes/spike-results.md](./spikes/spike-results.md)
 
@@ -114,7 +114,7 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 | H1 Design Mode → hook stdin | **Pass (H1a)** — `dom_path` in `prompt` with parseable notebook + cell UUIDs (Glass retest) |
 | H2 mid-session rule reload | **Fail** — session-cached `alwaysApply` |
 | H3 hook context injection | **Fail** — `beforeSubmitPrompt` block-only |
-| H4 edit guard | **Pass** — both hook events deny without `get_cell` receipt |
+| H4 edit guard | **Pass** — both hook events deny without `read_cell` receipt |
 
 **Not primary:** inject+queue dom-bridge (Path D).
 

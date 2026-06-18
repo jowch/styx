@@ -1,8 +1,10 @@
-# pluto-cursor-bridge
+# Styx
 
-Bridge Pluto.jl notebooks to Cursor agent workflows via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) and Glass Design Mode click context.
+**Styx** is a Cursor plugin that bridges [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebooks and Cursor agent workflows via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) and Glass Design Mode click context.
 
-## Planning (read before building)
+Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
+
+## Planning
 
 | Doc | Purpose |
 |-----|---------|
@@ -17,44 +19,44 @@ Fork MCP semantics: PlutoMCP.jl `AGENTS.md`.
 
 ## Quick reference
 
-- MCP endpoint: `http://localhost:2346/sse` (wired by plugin `mcp.json` + launcher)
+- MCP server key: **`pluto`** → `http://localhost:2346/sse` (wired by plugin `mcp.json` + launcher)
 - Click context: **Glass Design Mode** (`Cmd+Shift+D`, then click) → `pluto-cell#` in hook `prompt` (D13 Path A)
 - Dev fallback: inject + queue at `http://127.0.0.1:3457` (`npm run bridge`) — not production UX
-- Plugin install: `~/.cursor/plugins/local/pluto-cursor-bridge/` (symlink to this repo for dev)
+- Plugin install: `~/.cursor/plugins/local/styx/` (via `sync-local-plugin.sh`)
 
 ---
 
-## Cursor plugin (Phase 4)
+## Styx plugin
 
 Install for local development (Cursor 3.x):
 
 ```bash
-./scripts/sync-local-plugin.sh   # copies into ~/.cursor/plugins/local/
+./scripts/sync-local-plugin.sh   # copies into ~/.cursor/plugins/local/styx/
 ```
 
 Then **Developer: Reload Window** (`Cmd+Shift+P`).
 
-**Cursor 3 note:** External symlinks into `~/.cursor/plugins/local/` are **rejected** (security). Use `sync-local-plugin.sh` after each change, or copy manually — do not `ln -s` from `~/projects/...`.
+**Cursor 3 note:** External symlinks into `~/.cursor/plugins/local/` are **rejected** (security). Use `sync-local-plugin.sh` after each change — do not `ln -s` from `~/projects/...`.
 
-Verify under **Cursor Settings (`Cmd+Shift+J`) → Plugins → Installed**. Toggle MCP under **Features → Model Context Protocol** if needed.
+Verify under **Cursor Settings (`Cmd+Shift+J`) → Plugins → Installed** (look for **Styx**). Toggle MCP under **Features → Model Context Protocol** if needed.
 
 ### What ships
 
 | Component | Role |
 |-----------|------|
 | `mcp.json` + `scripts/pluto-mcp-launcher.sh` | Cursor spawns MCP; launcher bootstraps plugin-root Julia env, ensures `serve()` bridge, then `connect()` stdio proxy |
-| `rules/pluto-notebook-workflow.mdc` | Stage-first workflow + Design Mode `dom_path` parsing instructions |
+| `rules/pluto-notebook-workflow.mdc` | Stage-first workflow + Design Mode / `resolve_pluto_context` instructions |
 | `commands/pluto-*-cell` | Read / edit / explain intent commands (manual ID fallback) |
-| `hooks/` | Design Mode selection tracking, bridge health check, read-before-edit guard (H4) |
+| `hooks/` | Design Mode selection tracking, bridge health check, read-before-edit guard, `pending_run` stop warning |
 
 Dev env: copy `.env.dev.example` → `.env.dev` (gitignored), set `PLUTOMCP_SOURCE`, then `./scripts/sync-local-plugin.sh` and reload Cursor. The launcher loads `.env.dev` automatically.
 
 ### End-to-end (Path A)
 
-1. Enable plugin → Cursor starts `pluto` MCP via launcher (Pluto UI at `http://localhost:1234`).
+1. Enable **Styx** → Cursor starts `pluto` MCP via launcher (Pluto UI at `http://localhost:1234`).
 2. Open a notebook in **Agents Glass**.
 3. In Glass: **Cmd+Shift+D** to toggle Design Mode, click a cell, then send a prompt.
-4. Agent parses `pluto-cell#` from the `browser_element` block → `read_cell` → staged edits → `submit_changes`.
+4. Agent calls `resolve_pluto_context` or parses `pluto-cell#` from the `browser_element` block → `read_cell` → staged edits → `submit_changes`.
 
 See [docs/specs/cursor-plugin.md](docs/specs/cursor-plugin.md) for full spec.
 
@@ -62,14 +64,13 @@ See [docs/specs/cursor-plugin.md](docs/specs/cursor-plugin.md) for full spec.
 
 ## Click context — Path A (primary)
 
-**Production flow (D13):** Open Pluto in **Agents Glass** (`PlutoMCP.serve(require_secret_for_access=false)` on loopback). User toggles Design Mode (**Cmd+Shift+D**), clicks a cell, and sends a prompt. Hook `prompt` includes `dom_path` with `pluto-notebook#…` and `pluto-cell#…`. Plugin parses IDs and the agent calls MCP `read_cell`.
+**Production flow (D13):** Open Pluto in **Agents Glass** (`PlutoMCP.serve(require_secret_for_access=false)` on loopback). User toggles Design Mode (**Cmd+Shift+D**), clicks a cell, and sends a prompt. Hook `prompt` includes `dom_path` with `pluto-notebook#…` and `pluto-cell#…`. Agent resolves IDs via MCP and calls `read_cell`.
 
 Spike evidence: [docs/spikes/spike-results.md](docs/spikes/spike-results.md).
 
-Phase 4 ships plugin hooks/commands that wire this automatically. Until then, test the parser manually:
+The plugin hooks and workflow rule wire this automatically. For manual parser testing:
 
 ```javascript
-// Node or browser with dom-resolver loaded
 import { parseDomPath, formatPlutoContext, buildContextPacket } from "./src/dom-resolver.js";
 
 const domPath =
@@ -83,7 +84,7 @@ console.log(formatPlutoContext(packet));
 
 ## Click context — Path C (dev / fallback only)
 
-Optional harness for testing packet format before Phase 4. **Not the production click path.**
+Optional harness for testing packet format. **Not the production click path.**
 
 Requires a notebook opened via `PlutoMCP.serve()` — MCP session and browser tab must be the same Pluto instance.
 

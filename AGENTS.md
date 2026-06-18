@@ -15,7 +15,7 @@
 
 ## Learned Workspace Facts
 
-- This repo holds the Cursor plugin and DOM click bridge; MCP tools live in PlutoMCP.jl.
+- **Styx** (this repo, [github.com/jowch/styx](https://github.com/jowch/styx)) — Cursor plugin bridging Pluto.jl and Cursor; MCP tools live in PlutoMCP.jl.
 - **PLAN.md** — phase map; **DECISIONS.md** — decision log; **docs/specs/** — detailed specs including plutomcp-architecture.md.
 - MCP lifecycle: bundled `mcp.json` + launcher; Cursor spawns; plugin-root `Project.toml`/`Manifest.toml` Julia env (not user's default project).
 - **D13 Path A (spike):** Design Mode (**Cmd+Shift+D**, then click) — `browser_element` in hook `prompt` includes `pluto-cell#<uuid>` in `dom_path` for in-cell clicks (code lines, output, plot, bind widgets).
@@ -23,7 +23,7 @@
 - Design Mode drawing/annotations: screenshot to model only; no structured `browser_element` / `dom_path`.
 - Spike H2/H3 falsified: `alwaysApply` rules session-cached; `beforeSubmitPrompt` block-only (no context injection).
 - Click context (Path C dev fallback): `composedPath()` → `PLUTO-CELL` via inject.js; production uses `parseDomPath` on Design Mode `dom_path`.
-- Plugin install path: `~/.cursor/plugins/local/pluto-cursor-bridge/`.
-- MCP client: `http://localhost:2346/sse` (`PlutoMCP.serve()`).
-- Phases 1–3 complete; Phase 4 plugin+DOM bridge validated through 4c (`resolve_pluto_context`, `pending_run` `stop` hook).
-- **SDK eval** (`eval/`): headless `serve()`, no Glass/plugin; `CURSOR_API_KEY` via gitignored `eval/.env` (dotenv); cloud not a hard constraint — harness colocates orchestrator+serve+agent today.
+- Plugin install path: `~/.cursor/plugins/local/styx/`.
+- MCP client: `http://localhost:2346/sse` (`PlutoMCP.serve()`); MCP server key in `mcp.json` is **`pluto`**.
+- Phases 1–4 complete; Styx plugin validated through 4c (`resolve_pluto_context`, `pending_run` `stop` hook).
+- **SDK eval** (`eval/`): headless `serve()`, no Glass/plugin; `CURSOR_API_KEY` via gitignored `eval/.env` (dotenv); `stage_and_run` pass@1 locally.

@@ -1,5 +1,7 @@
 # Design Mode + Hook Spike Results
 
+> **Historical** — spike validated Path A (2026-06-17). Styx plugin Phase 4 is complete; see [dom-bridge-test-checklist.md](../dom-bridge-test-checklist.md) for current validation log.
+
 - Date: 2026-06-17 (H1 matrix completed in follow-up session)
 - Cursor version: 3.7.42
 - Julia version: 1.12.6
