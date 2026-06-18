@@ -1,0 +1,47 @@
+name: Eval reference runner
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "eval/**"
+      - ".github/workflows/eval-reference.yml"
+  pull_request:
+    paths:
+      - "eval/**"
+      - ".github/workflows/eval-reference.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: eval-reference-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  reference:
+    name: Reference runner (4 scenarios)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: styx
+
+      - uses: actions/checkout@v4
+        with:
+          repository: jowch/PlutoMCP.jl
+          path: PlutoMCP.jl
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1.11"
+
+      - uses: julia-actions/julia-buildpkg@v1
+        with:
+          project: PlutoMCP.jl
+
+      - name: Run reference scenarios
+        working-directory: styx/eval
+        env:
+          PLUTOMCP_ROOT: ${{ github.workspace }}/PlutoMCP.jl
+          JULIA_PRECOMPILE: "0"
+        run: julia run_reference.jl --all --strict-trace
