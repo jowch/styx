@@ -34,6 +34,12 @@
         "matcher": "MCP:read_cell|MCP:read_notebook_code",
         "timeout": 5
       }
+    ],
+    "stop": [
+      {
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/warn-pending-run.py",
+        "timeout": 8
+      }
     ]
   }
 }

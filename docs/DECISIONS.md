@@ -145,12 +145,15 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 ---
 
-## Status snapshot (2026-06-17)
+## Status snapshot (2026-06-18)
 
 | Component | State |
 |-----------|-------|
 | Planning docs | ✅ [PLAN.md](./PLAN.md) + specs |
 | PlutoMCP fork — Phase 1 | ✅ Implemented |
 | PlutoMCP fork — Phase 2 | ✅ Graph tools |
-| Bridge — DOM resolver (Phase 3) | ✅ `parseDomPath`, packet format; dev inject harness |
-| Cursor plugin (Phase 4) | 📋 Path A hooks/commands |
+| Bridge — DOM resolver (Phase 3) | ✅ **Gated** |
+| Cursor plugin Phase 4a–4b | ✅ **Gated** — Design Mode Path A, MCP staging workflow |
+| Cursor plugin Phase 4c | ✅ `resolve_pluto_context`; `pending_run` stop hook |
+| SDK agent eval | ✅ `eval:stage` pass@1 (local `CURSOR_API_KEY`) |
+| Upstream PRs (#6/#7) | 📋 open on mthelm85/PlutoMCP.jl |

@@ -134,16 +134,19 @@ See [specs/safety.md](./specs/safety.md).
 
 ---
 
-## Current state (2026-06-17)
+## Current state (2026-06-18)
 
 | Component | State |
 |-----------|-------|
 | PlutoMCP fork — Phase 1 MCP tools | ✅ Implemented |
 | PlutoMCP fork — Phase 2 graph/validation tools | ✅ `Graph.jl` — 6 tools ([spec](./specs/mcp-phase-2.md)) |
-| PlutoMCP fork — agent eval harness | ✅ Reference runner + score.jl ([eval README](../../PlutoMCP.jl/eval/README.md)) |
-| Bridge — SDK eval orchestrator | ✅ [`eval/`](../eval/README.md) (manual, `CURSOR_API_KEY`) |
-| Bridge — DOM resolver utilities (Phase 3) | ✅ `parseDomPath`, `formatPlutoContext` + dev inject harness ([spec](./specs/dom-bridge.md)) |
-| Bridge — Design Mode plugin wiring (Phase 4) | ✅ Plugin scaffold: `mcp.json`, rules, commands, hooks ([spec](./specs/cursor-plugin.md)) |
+| PlutoMCP fork — agent eval harness | ✅ Reference runner + score.jl — 4/4 scenarios pass |
+| Bridge — SDK eval orchestrator | ✅ [`eval/`](../eval/README.md) — `stage_and_run` pass@1 via SDK |
+| Bridge — DOM resolver utilities (Phase 3) | ✅ **Gated** — `parseDomPath` + `@pluto-context` → MCP `read_cell` |
+| Bridge — Cursor plugin Phase 4a | ✅ **Gated** — MCP auto-wires via `mcp.json`; stage-first workflow |
+| Bridge — Cursor plugin Phase 4b | ✅ **Gated** — Design Mode click → hook `dom_path` → agent reads/edits without UUID paste |
+| Bridge — Cursor plugin Phase 4c | ✅ `resolve_pluto_context` MCP tool; `stop` hook warns on `pending_run` |
+| Bridge — structured Pluto errors | ⚠️ Live on bridge; **restart `serve()`** to pick up begin/end-first hints in fork `Output.jl` |
 
 ---
 

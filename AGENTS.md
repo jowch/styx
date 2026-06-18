@@ -25,4 +25,5 @@
 - Click context (Path C dev fallback): `composedPath()` → `PLUTO-CELL` via inject.js; production uses `parseDomPath` on Design Mode `dom_path`.
 - Plugin install path: `~/.cursor/plugins/local/pluto-cursor-bridge/`.
 - MCP client: `http://localhost:2346/sse` (`PlutoMCP.serve()`).
-- Phase 1 gate before parallel Phase 2 (graph MCP) + Phase 3 (DOM bridge).
+- Phases 1–3 complete; Phase 4 plugin+DOM bridge validated through 4c (`resolve_pluto_context`, `pending_run` `stop` hook).
+- **SDK eval** (`eval/`): headless `serve()`, no Glass/plugin; `CURSOR_API_KEY` via gitignored `eval/.env` (dotenv); cloud not a hard constraint — harness colocates orchestrator+serve+agent today.

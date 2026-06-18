@@ -8,9 +8,9 @@ Two paths — **Path A is primary** (D13); Path C is dev/fallback only.
 
 **Prerequisites**
 
-- [ ] `PlutoMCP.serve(require_secret_for_access=false)` — notebook in **Agents Glass** at `http://localhost:1234`
-- [ ] MCP at `:2346` on same session
-- [ ] Design Mode active in Glass (**Cmd+Shift+D** — not Option/Alt+click)
+- [x] `PlutoMCP.serve(require_secret_for_access=false)` — notebook in **Agents Glass** at `http://localhost:1234`
+- [x] MCP at `:2346` on same session
+- [x] Design Mode active in Glass (**Cmd+Shift+D** — not Option/Alt+click)
 
 **After each Design Mode click on a cell target:**
 
@@ -92,6 +92,22 @@ Teardown: `__plutoClickBridgeTeardown()` in console; Ctrl+C on bridge.
 
 ## MCP end-to-end gate (both paths)
 
-- [ ] `@pluto-context` block in Cursor chat (from Path A parser or Path C `/click/format`)
-- [ ] Agent calls `read_cell` with `notebook_id` + `cell_id`
-- [ ] Returns current cell code/output without user pasting UUIDs
+- [x] `@pluto-context` block in Cursor chat (from Path A parser or Path C `/click/format`)
+- [x] Agent calls `read_cell` with `notebook_id` + `cell_id`
+- [x] Returns current cell code/output without user pasting UUIDs
+
+---
+
+## Phase 4 validation log (2026-06-18)
+
+| Check | Result |
+|-------|--------|
+| Bridge health `:2346` + Pluto `:1234` | ✅ |
+| Reference eval `run_reference.jl --all` | ✅ 4/4 |
+| `parseDomPath` (cell, plot img, jlerror, no-cell) | ✅ |
+| Design Mode → hook → agent without UUID paste | ✅ (prior session + matrix targets) |
+| Stage-first `edit_cell` → `submit_changes` → browser sync | ✅ |
+| Multi-expression → structured `error.kind` + boundaries | ✅ |
+| begin/end-first hint order in live `read_cell` | ⚠️ needs `serve()` restart |
+| SDK eval `eval/run.ts` | ⏸ `CURSOR_API_KEY` |
+| Phase 4c polish | 📋 not started |

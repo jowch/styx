@@ -126,6 +126,61 @@ def save_selection(selection: dict[str, Any]) -> None:
         json.dump(selection, f, indent=2)
 
 
+def mcp_call(name: str, arguments: dict[str, Any] | None = None) -> dict[str, Any]:
+    """POST tools/call to the PlutoMCP HTTP bridge."""
+    port = int(os.environ.get("PLUTOMCP_MCP_PORT", "2346"))
+    body = json.dumps(
+        {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "tools/call",
+            "params": {"name": name, "arguments": arguments or {}},
+        }
+    ).encode("utf-8")
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{port}/call",
+        data=body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=5) as resp:
+        payload = json.load(resp)
+    result = payload.get("result") or {}
+    text = (result.get("content") or [{}])[0].get("text") or "{}"
+    parsed = json.loads(text)
+    if result.get("isError"):
+        return {"ok": False, "error": parsed}
+    return parsed
+
+
+def pending_run_notebooks() -> list[dict[str, Any]]:
+    """Return notebooks with non-empty pending_run from the live bridge."""
+    if not mcp_health_ok():
+        return []
+    out: list[dict[str, Any]] = []
+    try:
+        notebooks = mcp_call("list_notebooks")
+        if not isinstance(notebooks, list):
+            return []
+        for nb in notebooks:
+            nb_id = nb.get("notebook_id")
+            if not nb_id:
+                continue
+            proj = mcp_call("read_notebook_code", {"notebook_id": nb_id})
+            pending = proj.get("pending_run") or []
+            if pending:
+                out.append(
+                    {
+                        "notebook_id": nb_id,
+                        "path": proj.get("path"),
+                        "pending_run": pending,
+                    }
+                )
+    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError, KeyError, IndexError):
+        return []
+    return out
+
+
 def mcp_health_ok(port: int | None = None) -> bool:
     port = port or int(os.environ.get("PLUTOMCP_MCP_PORT", "2346"))
     url = f"http://127.0.0.1:{port}/health"

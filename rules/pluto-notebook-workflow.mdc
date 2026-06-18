@@ -28,8 +28,8 @@ Toggle with **Cmd+Shift+D** (`⌘⇧D`) in the Agents Glass browser panel — no
 
 On every message with a `browser_element` block:
 
-1. Extract notebook/cell ids from `dom_path` (see above).
-2. Call MCP **`read_cell`** before answering or editing.
+1. Call MCP **`resolve_pluto_context`** with the block (or parse `dom_path` yourself).
+2. Call **`read_cell`** with the resolved ids before answering or editing.
 3. Use **`read_notebook_code`** for full notebook context or dependencies.
 
 ## Edit workflow (stage-first)
@@ -53,6 +53,6 @@ The browser editor has a separate draft while the user types. MCP writes land on
 
 ## Tool names (canonical)
 
-- Read: `read_cell`, `read_notebook_code`
+- Read: `read_cell`, `read_notebook_code`, `resolve_pluto_context`
 - Write: `edit_cell`, `edit_cells`, `add_cell`, `delete_cell`, `move_cell`, `submit_changes`, `execute_cell`
 - Do not use legacy aliases (`get_cell`, `set_cell_code`, `run_cell`).
