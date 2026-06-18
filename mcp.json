@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pluto": {
+      "command": "${CURSOR_PLUGIN_ROOT}/scripts/pluto-mcp-launcher.sh",
+      "cwd": "${CURSOR_PLUGIN_ROOT}"
+    }
+  }
+}

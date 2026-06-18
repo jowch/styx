@@ -1,0 +1,11 @@
+.cursor/
+hooks/state/*.json
+hooks/__pycache__/
+Manifest.toml
+.julia-env-instantiated
+.env.dev
+eval/node_modules/
+eval/results/
+eval/.env
+*.jsonl
+pluto-click-queue.json

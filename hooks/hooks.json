@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "${CURSOR_PLUGIN_ROOT}/hooks/session-start.sh",
+        "timeout": 5
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/check-design-mode.py",
+        "matcher": "UserPromptSubmit",
+        "timeout": 5
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/guard-edit.py",
+        "matcher": "MCP:edit_cell|MCP:edit_cells|MCP:add_cell|MCP:delete_cell|MCP:move_cell",
+        "timeout": 5
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/guard-mcp.py",
+        "matcher": "edit_cell|edit_cells|add_cell|delete_cell|move_cell",
+        "timeout": 5
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/record-read.py",
+        "matcher": "MCP:read_cell|MCP:read_notebook_code|read_cell|read_notebook_code",
+        "timeout": 5
+      }
+    ],
+    "stop": [
+      {
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/warn-pending-run.py",
+        "timeout": 8
+      }
+    ]
+  }
+}

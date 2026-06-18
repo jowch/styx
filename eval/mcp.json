@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "pluto": {
+      "url": "http://127.0.0.1:2346/sse"
+    }
+  }
+}
