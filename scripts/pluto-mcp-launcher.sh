@@ -3,7 +3,6 @@
 set -euo pipefail
 
 PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
-ENV_DIR="${PLUGIN_ROOT}/@pluto-mcp"
 MCP_PORT="${PLUTOMCP_MCP_PORT:-2346}"
 PLUTO_PORT="${PLUTOMCP_PLUTO_PORT:-1234}"
 JULIA="${JULIA:-julia}"
@@ -15,7 +14,7 @@ health_ok() {
 }
 
 julia_cmd() {
-  "$JULIA" --project="$ENV_DIR" "$@"
+  "$JULIA" --project="$PLUGIN_ROOT" "$@"
 }
 
 if ! health_ok; then

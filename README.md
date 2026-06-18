@@ -37,12 +37,12 @@ Then enable the **Pluto Cursor Bridge** plugin in Cursor settings.
 
 | Component | Role |
 |-----------|------|
-| `mcp.json` + `scripts/pluto-mcp-launcher.sh` | Cursor spawns MCP; launcher bootstraps `@pluto-mcp` Julia env, ensures `serve()` bridge, then `connect()` stdio proxy |
+| `mcp.json` + `scripts/pluto-mcp-launcher.sh` | Cursor spawns MCP; launcher bootstraps plugin-root Julia env, ensures `serve()` bridge, then `connect()` stdio proxy |
 | `rules/pluto-notebook-workflow.mdc` | Stage-first workflow + Design Mode `dom_path` parsing instructions |
 | `commands/pluto-*-cell` | Read / edit / explain intent commands (manual ID fallback) |
 | `hooks/` | Design Mode selection tracking, bridge health check, read-before-edit guard (H4) |
 
-Set `PLUTOMCP_SOURCE=/path/to/PlutoMCP.jl` to develop a local fork instead of the git `[sources]` pin in `@pluto-mcp/Project.toml`. Set `PLUTOMCP_ENV_FORCE=1` to re-run `Pkg.instantiate()`.
+Set `PLUTOMCP_SOURCE=/path/to/PlutoMCP.jl` to develop a local fork instead of the git default on first run. Set `PLUTOMCP_ENV_FORCE=1` to re-run `Pkg.instantiate()`.
 
 ### End-to-end (Path A)
 

@@ -1,0 +1,6 @@
+# Plugin-owned Julia environment for PlutoMCP (MCP launcher uses --project=@.)
+[deps]
+PlutoMCP = "22d0dc7c-8f49-4890-9bf9-be4a32466a36"
+
+[compat]
+julia = "1.9"
