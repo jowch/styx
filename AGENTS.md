@@ -2,7 +2,8 @@
 
 - Full Cursor plugin (commands, rules, browser hook) — not rules-only lightweight integration.
 - Plugin workflow rule should reference PlutoMCP.jl for MCP tool semantics (stage → `submit_changes`).
-- Agent-facing Pluto cell grammar: one expression per cell; multi-statement code needs `begin`/`let` or split cells — see `docs/pluto-semantics.md`.
+- Agent-facing Pluto cell grammar: one expression per cell; multi-statement code needs `begin`/`let` or split cells — see `docs/pluto-agent-primer.md`.
+- Resolve `notebook_id` from Glass browser URL or Design Mode click before `list_notebooks`.
 - **Planning up front:** integrated plan + phase specs in this repo before implementation.
 - Planning docs live here unless MCP-server-specific; fork may upstream.
 - 50/50 user+agent Pluto collaboration — user edits freely in browser; chat memory is not notebook ground truth.

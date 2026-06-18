@@ -11,9 +11,10 @@ The user wants to **read / inspect** a Pluto notebook cell.
 1. **Design Mode (preferred):** If the conversation includes a `browser_element` block or `dom_path` line, extract:
    - `pluto-notebook#([0-9a-f-]+)` → `notebook_id`
    - `pluto-cell#([0-9a-f-]+)` → `cell_id`
-2. **Manual fallback:** If the user provided `$ARGUMENTS`, parse `notebook_id` and `cell_id` from there.
-3. **@pluto-context block:** Use IDs from a pasted context block.
-4. If still unknown, call `list_notebooks` and ask which cell.
+2. **Glass browser URL:** `http://127.0.0.1:1234/<notebook_id>` on the active Pluto tab.
+3. **Manual fallback:** If the user provided `$ARGUMENTS`, parse `notebook_id` and `cell_id` from there.
+4. **@pluto-context block:** Use IDs from a pasted context block.
+5. **`list_notebooks`** only if none of the above apply.
 
 ## Agent actions
 

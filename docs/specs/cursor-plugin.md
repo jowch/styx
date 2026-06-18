@@ -26,7 +26,8 @@ pluto-cursor-bridge/
   rules/
     pluto-notebook-workflow.mdc     # stage → submit_changes; one-expression cells
   docs/
-    pluto-semantics.md              # Pluto cell grammar for agents
+    pluto-agent-primer.md           # Agent training (browser-first, errors, staging)
+    pluto-semantics.md              # Cell grammar reference
   hooks/
     hooks.json                      # Design Mode dom_path parse; edit guard (H4)
     session-start.sh                # static MCP workflow context

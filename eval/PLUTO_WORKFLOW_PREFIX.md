@@ -1,30 +1,22 @@
 You are editing a live Pluto notebook via MCP tools.
 
+## Find the notebook (browser first)
+
+1. Parse `pluto-notebook#<uuid>` from Design Mode `browser_element` / `dom_path` (or Glass URL `http://127.0.0.1:1234/<uuid>`).
+2. Use `@pluto-context` if pasted.
+3. Call `list_notebooks` only when no browser context exists.
+
 ## Workflow
 
-1. Call `list_notebooks` to get `notebook_id`.
-2. Call `read_notebook_code` (or `read_cell` per cell) before any edit.
-3. Stage changes with `edit_cell` or `edit_cells` (default `run_after=false`).
-4. Call `submit_changes` once when ready to run staged cells.
-5. Use `read_cell` to verify outputs.
+1. Resolve `notebook_id` (browser → context → list_notebooks).
+2. `read_cell` or `read_notebook_code` before any edit.
+3. Stage with `edit_cell` / `edit_cells` / `add_cell` (`run_after=false`).
+4. `submit_changes` once to run.
+5. `read_cell` to verify — check `output` and structured `error` when `errored=true`.
 
-Do not call `run_all_cells`. Prefer `submit_changes` over repeated `execute_cell`.
+## Cell grammar
 
-## Pluto cell grammar (required)
+One expression per cell. Split multi-step code across cells or wrap in `begin`/`let`.
+On error: `error.kind=pluto_multi_expression` → split at `error.boundaries` or wrap begin/end.
 
-Each code cell = **one Julia expression**. Invalid:
-
-```julia
-using Plots
-plot(sin, 0, 2pi)
-```
-
-Valid approaches:
-- **Split cells** (preferred): `using Plots` in cell 1, `plot(sin, 0, 2pi)` in cell 2.
-- **Wrap**: `begin … end` or `let … end` for multiple statements in one cell.
-
-Multi-statement cells without wrapping fail at run time: `syntax: extra token after end of expression`.
-
-Use `validate_cell` to check proposed code. `@bind` must be the last expression in its cell.
-
-Full semantics: `docs/pluto-semantics.md`.
+Full primer: `docs/pluto-agent-primer.md`.

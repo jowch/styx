@@ -9,8 +9,10 @@ The user wants to **change code** in a Pluto notebook cell.
 ## Resolve IDs
 
 1. **Design Mode (preferred):** Parse `pluto-notebook#` and `pluto-cell#` from any `dom_path` / `browser_element` block in the prompt.
-2. **Manual fallback:** Use `$ARGUMENTS` or an `@pluto-context` block for `notebook_id` and `cell_id`.
-3. If missing, ask the user to ⌥+click the cell in Glass Design Mode or paste IDs.
+2. **Glass browser URL:** `http://127.0.0.1:1234/<notebook_id>`.
+3. **Manual fallback:** Use `$ARGUMENTS` or an `@pluto-context` block for `notebook_id` and `cell_id`.
+4. **`list_notebooks`** only if no browser/context ids are available.
+5. If still missing, ask the user to ⌥+click the cell in Glass Design Mode or paste IDs.
 
 ## Agent actions
 

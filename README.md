@@ -9,7 +9,8 @@ Bridge Pluto.jl notebooks to Cursor agent workflows via [PlutoMCP.jl](https://gi
 | **[PLAN.md](docs/PLAN.md)** | Integrated phase map, architecture, build sequence |
 | **[DECISIONS.md](docs/DECISIONS.md)** | Running decision log (D13: Design Mode = primary click path) |
 | **[specs/](docs/specs/)** | Detailed specs per phase |
-| **[Pluto semantics](docs/pluto-semantics.md)** | Cell grammar, reactivity, common agent mistakes |
+| **[Pluto agent primer](docs/pluto-agent-primer.md)** | Agent training: browser-first, staging, errors, tools |
+| **[Pluto semantics](docs/pluto-semantics.md)** | Cell grammar and reactivity reference |
 | **[PlutoMCP architecture](docs/specs/plutomcp-architecture.md)** | How serve/connect works; full frontend; session model |
 
 Fork MCP semantics: PlutoMCP.jl `AGENTS.md`.
