@@ -1,0 +1,11 @@
+{
+  "name": "pluto-cursor-bridge",
+  "displayName": "Pluto Cursor Bridge",
+  "version": "0.1.0",
+  "description": "Cursor plugin for Pluto.jl notebooks via PlutoMCP — Design Mode click context, staging workflow, and MCP auto-wiring.",
+  "author": {
+    "name": "Pluto Cursor Bridge"
+  },
+  "license": "MIT",
+  "keywords": ["pluto", "julia", "notebook", "mcp", "design-mode"]
+}

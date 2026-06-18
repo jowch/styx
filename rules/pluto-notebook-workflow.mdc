@@ -1,0 +1,49 @@
+---
+description: Pluto notebook MCP workflow — stage-first edits, read before edit, Design Mode click context
+alwaysApply: true
+---
+
+# Pluto notebook workflow (PlutoMCP.jl)
+
+You edit **live Pluto notebooks** via MCP tools. Pluto owns persistence, reactivity, and browser sync — not raw `.jl` file patches.
+
+## Session setup
+
+- Notebooks must be opened in the Pluto UI started by `PlutoMCP.serve()` (default `http://localhost:1234`).
+- MCP bridge: `http://localhost:2346/sse` (this plugin wires it via `mcp.json`).
+- Use **Agents Glass** for the Pluto tab — not the IDE browser MCP.
+
+## Design Mode click context (Path A, D13)
+
+When the user ⌥+clicks a cell in Glass Design Mode, their message often includes a `browser_element` block with a `dom_path` line, for example:
+
+```text
+dom_path: … > pluto-notebook#<notebook_id> > pluto-cell#<cell_id> > …
+```
+
+**On every such message:**
+
+1. Regex-extract `pluto-notebook#([0-9a-f-]+)` and `pluto-cell#([0-9a-f-]+)` from the full prompt (including the `browser_element` block).
+2. If `pluto-cell#` is missing, ask the user to re-click inside a cell (code or output) — chrome-only clicks have no cell id.
+3. Call MCP `read_cell` with `notebook_id` and `cell_id` **before** answering or editing.
+4. Use `read_notebook_code` when you need full notebook context or dependencies.
+
+If the user pasted an `@pluto-context` block instead, use those IDs directly.
+
+## Edit workflow (stage-first)
+
+1. `list_notebooks` if `notebook_id` is unknown.
+2. `read_cell` or `read_notebook_code` before any mutation (MCP enforces read-before-edit).
+3. Stage with `edit_cell` / `edit_cells` / `add_cell` — default **`run_after=false`**.
+4. Batch run with **`submit_changes`** (Pluto Cmd+S semantics). Do not spam `execute_cell` or `run_all_cells`.
+5. Check mutation receipts for `pending_run`, `stale_cell_ids`, and output summaries.
+
+## Draft-buffer warning
+
+The browser editor has a separate draft while the user types. MCP writes land on **server state** (last-write-wins on sync). If the user was editing the same cell in the browser, prefer `read_cell` again before overwriting.
+
+## Tool names (canonical)
+
+- Read: `read_cell`, `read_notebook_code`
+- Write: `edit_cell`, `edit_cells`, `add_cell`, `delete_cell`, `move_cell`, `submit_changes`, `execute_cell`
+- Do not use legacy aliases (`get_cell`, `set_cell_code`, `run_cell`).
