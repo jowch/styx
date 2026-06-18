@@ -1,31 +1,19 @@
 #!/usr/bin/env python3
-"""beforeSubmitPrompt: record Design Mode selection; warn if MCP bridge is down."""
+"""beforeSubmitPrompt: block submit when Pluto context present but MCP bridge is down."""
 from __future__ import annotations
 
 import json
 import os
 import sys
-from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from pluto_lib import mcp_health_ok, parse_prompt_text, save_selection
+from pluto_lib import mcp_health_ok
 
 
 def main() -> int:
     payload = json.load(sys.stdin)
     prompt = payload.get("prompt") or ""
-    parsed = parse_prompt_text(prompt)
-
-    if parsed.get("ok"):
-        save_selection(
-            {
-                "notebook_id": parsed.get("notebook_id"),
-                "cell_id": parsed.get("cell_id"),
-                "dom_path": parsed.get("dom_path"),
-                "captured_at": datetime.now(timezone.utc).isoformat(),
-            }
-        )
 
     if "pluto-notebook#" in prompt.lower() or "localhost:1234" in prompt:
         if not mcp_health_ok():

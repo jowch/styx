@@ -50,10 +50,6 @@ def reads_path() -> str:
     return os.path.join(state_dir(), "pluto-reads.json")
 
 
-def selection_path() -> str:
-    return os.path.join(state_dir(), "pluto-selection.json")
-
-
 def parse_dom_path(dom_path: str) -> dict[str, Any]:
     if not dom_path or not isinstance(dom_path, str):
         return {"ok": False, "reason": "invalid_dom_path"}
@@ -71,15 +67,19 @@ def parse_dom_path(dom_path: str) -> dict[str, Any]:
 def parse_prompt_text(text: str) -> dict[str, Any]:
     if not text:
         return {"ok": False, "reason": "empty_prompt"}
-    cell = RE_CELL_ID.search(text)
-    if not cell:
-        return {"ok": False, "reason": "no_pluto_cell_in_prompt"}
-    notebook = RE_NOTEBOOK_ID.search(text)
     dom_path = None
     for line in text.splitlines():
         if line.strip().lower().startswith("dom_path:"):
             dom_path = line.split(":", 1)[1].strip()
             break
+    if dom_path:
+        parsed = parse_dom_path(dom_path)
+        if parsed.get("ok"):
+            return {**parsed, "dom_path": dom_path}
+    cell = RE_CELL_ID.search(text)
+    if not cell:
+        return {"ok": False, "reason": "no_pluto_cell_in_prompt"}
+    notebook = RE_NOTEBOOK_ID.search(text)
     return {
         "ok": True,
         "cell_id": cell.group(1),
@@ -152,11 +152,6 @@ def write_allowed(tool_name: str, inp: dict[str, Any]) -> bool:
     if len(ids) == 1:
         return has_read(notebook_id, ids[0])
     return has_read(notebook_id, inp.get("cell_id"))
-
-
-def save_selection(selection: dict[str, Any]) -> None:
-    with open(selection_path(), "w", encoding="utf-8") as f:
-        json.dump(selection, f, indent=2)
 
 
 class PendingRunError(Exception):
