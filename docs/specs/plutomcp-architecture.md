@@ -74,7 +74,8 @@ Pluto.send_notebook_changes!(Pluto.ClientRequest(; session, notebook))
 
 **Implications:**
 - MCP writes **server state** directly; Pluto owns persistence and reactivity
-- Browser stays in sync via normal WebSocket push (same as human edits through UI)
+- Browser stays in sync via WebSocket push for **code/output** edits on existing cells
+- Structural edits (`add_cell`, `delete_cell`, `move_cell`) require a new `cell_order` vector assignment so Firebasey emits order patches — see [known issue](../known-issues/plutomcp-cell-order-sync.md) if DOM lags server
 - Browser editor has a **separate draft buffer** while typing; MCP server writes win on sync (see D9)
 - No file-watcher or line-based patching
 

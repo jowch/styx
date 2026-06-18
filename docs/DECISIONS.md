@@ -39,7 +39,7 @@ Edit with `run_after=false` → `submit_changes` once. Server tracks `pending_ru
 
 ## D5 — Click-to-context bridge *(target)*
 
-`composedPath()` resolution; iframe interior rejected. Spec: [specs/dom-bridge.md](./specs/dom-bridge.md).
+**Primary (D13):** Glass Design Mode → parse `pluto-cell#` from `dom_path` in hook `prompt`. **Dev fallback:** inject+queue (Path C). Spec: [specs/dom-bridge.md](./specs/dom-bridge.md).
 
 ---
 
@@ -47,7 +47,7 @@ Edit with `run_after=false` → `submit_changes` once. Server tracks `pending_ru
 
 Full plugin; commands deliver click context (no native browser hook). Spec: [specs/cursor-plugin.md](./specs/cursor-plugin.md).
 
-Phased: 4a manual cell_id → 4b click queue → 4c production inject.
+Phased: 4a manual cell_id → 4b Design Mode (Path A) → 4c polish (screenshots, resolve_pluto_context).
 
 ---
 
@@ -67,7 +67,15 @@ Phased: 4a manual cell_id → 4b click queue → 4c production inject.
 
 Layer 2 graph tools (fork) ∥ DOM bridge (here). Plugin Phase 4 after Phase 3.
 
-**Phase 1 gate:** `read_notebook_code` → stage → `submit_changes` → verifiable output in Cursor against `serve()`.
+**Phase 1 gate:**
+
+| Tier | Criterion | Enforced by |
+|------|-----------|-------------|
+| CI | Reference runner: all 4 v1 scenarios via HTTP `/call` | PlutoMCP `eval/run_reference.jl --all` |
+| Manual | SDK `stage_and_run` outcome pass@1 | [bridge/eval/run.ts](./eval/run.ts) + `score.jl` |
+| Baseline | SDK trace score recorded (advisory) | `eval/results/` |
+
+Details: [PlutoMCP eval/README.md](../../PlutoMCP.jl/eval/README.md), [bridge/eval/README.md](./eval/README.md).
 
 ---
 
@@ -95,6 +103,35 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 ---
 
+## D13 — Click delivery: Path A (spike 2026-06-17, revised)
+
+**Decision:** Glass Design Mode → `browser_element` / `dom_path` in hook `prompt` carries `pluto-notebook#` + `pluto-cell#` IDs → parse → MCP `get_cell` / `resolve_pluto_context`; **`preToolUse` + `beforeMCPExecution` edit guard**; **`@pluto-context` command** as fallback.
+
+**Spike results:** [spikes/spike-results.md](./spikes/spike-results.md)
+
+| Hypothesis | Outcome |
+|------------|---------|
+| H1 Design Mode → hook stdin | **Pass (H1a)** — `dom_path` in `prompt` with parseable notebook + cell UUIDs (Glass retest) |
+| H2 mid-session rule reload | **Fail** — session-cached `alwaysApply` |
+| H3 hook context injection | **Fail** — `beforeSubmitPrompt` block-only |
+| H4 edit guard | **Pass** — both hook events deny without `get_cell` receipt |
+
+**Not primary:** inject+queue dom-bridge (Path D).
+
+**Do not use** `cursor-ide-browser` MCP for Pluto — use Agents Glass (`PlutoMCP.serve(require_secret_for_access=false)` for seamless loopback open).
+
+---
+
+## D14 — Loopback auth kwarg (2026-06-17)
+
+**Decision:** Expose `require_secret_for_access` on `PlutoMCP.serve()` and standalone `connect()`; **default stays `true`** (Pluto-compatible) for upstream PRs. Cursor plugin launcher passes `require_secret_for_access=false` on loopback for seamless Glass open without `?secret=` URLs.
+
+**Rationale:** Cursor auto-review blocks agent navigation to secret URLs; loopback trust comes from `127.0.0.1` bind or SSH tunnel. Default unchanged so fork fixes upstream cleanly.
+
+**Plugin:** `serve(require_secret_for_access=false)` — local machine or SSH port-forward only. `require_secret_for_open_links` stays `true`.
+
+---
+
 ## Resolved questions (formerly open)
 
 | Was | Resolution |
@@ -113,6 +150,7 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 | Component | State |
 |-----------|-------|
 | Planning docs | ✅ [PLAN.md](./PLAN.md) + specs |
-| PlutoMCP fork — Phase 1 | 📋 Spec ready; not implemented |
-| DOM bridge | 📋 Spec ready |
-| Cursor plugin | 📋 Spec ready |
+| PlutoMCP fork — Phase 1 | ✅ Implemented |
+| PlutoMCP fork — Phase 2 | ✅ Graph tools |
+| Bridge — DOM resolver (Phase 3) | ✅ `parseDomPath`, packet format; dev inject harness |
+| Cursor plugin (Phase 4) | 📋 Path A hooks/commands |

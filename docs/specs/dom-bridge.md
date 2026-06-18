@@ -1,50 +1,82 @@
 # DOM Bridge Spec — Phase 3
 
+> **Click delivery (D13):** **Path A** — Glass Design Mode → `dom_path` in hook `prompt` → `parseDomPath()` → MCP `read_cell`. See [DECISIONS.md § D13](../DECISIONS.md), [spike-results.md](../spikes/spike-results.md).
+
 ## Goal
 
-User clicks Pluto code or output in the live browser; structured `cell_id` context is captured without manual UUID copy-paste.
+Structured `notebook_id` + `cell_id` context when the user selects a Pluto cell — without manual UUID copy-paste.
 
-## Deliverables
+## Delivery paths
 
-| Artifact | Description |
-|----------|-------------|
-| `src/dom-resolver.js` | Click resolution + packet builder |
-| `src/inject.js` | Dev loader (bookmarklet / console paste) |
-| `bridge/server.js` | Local HTTP/WS queue for click packets |
-| Manual test checklist | Code, text output, plot, markdown, `@bind`, iframe |
+| Path | Role | When |
+|------|------|------|
+| **A — Design Mode** (primary) | Parse `pluto-cell#` / `pluto-notebook#` from Glass Design Mode `dom_path` in hook `prompt` | Production plugin (Phase 4b) |
+| **B — Manual `@pluto-context`** | User or command pastes formatted block with IDs | Fallback when Design Mode is ambiguous |
+| **C — Inject + queue** (dev only) | `inject.js` listener → `bridge/server.js` queue | Local dev, pre-plugin testing, inject-path regression |
 
-## Click resolution
+**Not primary:** Path C (inject+queue). Do not ship inject-as-default UX in the plugin.
 
-Prefer `composedPath()` over bare `closest()` for shadow-DOM widget output:
+## Phase 3 deliverables
 
-```javascript
-function resolvePlutoClick(event) {
-  const path = event.composedPath();
-  const cell = path.find(el =>
-    el instanceof Element && el.tagName === "PLUTO-CELL" && el.id
-  );
-  if (!cell) return { ok: false, reason: "no_pluto_cell" };
+Shared resolver utilities + optional dev harness:
 
-  const notebook = path.find(el =>
-    el instanceof Element && el.tagName === "PLUTO-NOTEBOOK" && el.id
-  ) ?? document.querySelector("pluto-notebook");
+| Artifact | Role |
+|----------|------|
+| `src/dom-resolver.js` | **`parseDomPath`** (Path A), **`formatPlutoContext`**, `buildContextPacket`; `resolvePlutoClick` for Path C dev |
+| `src/inject.js` | **Dev/fallback only** — console paste listener (Path C) |
+| `bridge/server.js` | **Dev/fallback only** — local HTTP queue for Path C |
+| `docs/dom-bridge-test-checklist.md` | Manual tests for Path A + Path C |
 
-  return {
-    ok: true,
-    cell_id: cell.id,
-    notebook_id: notebook?.id ?? new URLSearchParams(location.search).get("id"),
-    in_output: path.some(el => el.tagName === "PLUTO-OUTPUT"),
-    in_input: path.some(el => el.tagName === "PLUTO-INPUT"),
-    inside_iframe: event.target.ownerDocument !== document,
-    target_tag: event.target?.tagName ?? null,
-    text_snippet: (event.target?.textContent ?? "").slice(0, 500),
-  };
-}
+Phase 4 wires Path A into plugin hooks/commands. Phase 3 ships the shared parser and packet format.
+
+---
+
+## Path A — Design Mode (primary)
+
+Validated in spike H1. User ⌥+clicks a cell in **Agents Glass** (Design Mode). Hook stdin includes `browser_element` / `dom_path`:
+
+```text
+… > pluto-notebook#836a54be-… > pluto-cell#98b9ea94-… > pluto-output… > bond > input
 ```
 
-Attach listener on `document` or `pluto-editor` in capture phase. Require `pluto-editor` present and not `.loading`.
+Plugin hook or command extracts IDs:
+
+```javascript
+import { parseDomPath, buildContextPacket, formatPlutoContext } from "./dom-resolver.js";
+
+const resolved = parseDomPath(domPathFromHookPrompt);
+const packet = buildContextPacket(resolved, intent);
+const block = formatPlutoContext(packet);
+// → agent calls MCP read_cell(notebook_id, cell_id)
+```
+
+### Path A acceptance
+
+| Target | `pluto-cell#` in `dom_path`? |
+|--------|------------------------------|
+| CodeMirror line (`pluto-input`) | ✅ |
+| Plain text output | ✅ |
+| Markdown rendered HTML | ✅ |
+| `@bind` slider | ✅ |
+| Plot (`img` / SVG in output) | ✅ |
+| Between-cells chrome (add button) | ✅ (attached cell) |
+| Bare `main` / helpbox / header | ❌ — re-click cell or use `@pluto-context` |
+| Drawing annotation on screenshot | ❌ — vision-only, no structured ID |
+
+### Path A fallback rules
+
+| Condition | Action |
+|-----------|--------|
+| No `pluto-cell#` in `dom_path` | Reject; user re-clicks a cell or uses `@pluto-context` |
+| `notebook_id` missing from path | URL `?id=` or MCP `list_notebooks` |
+| MCP `read_cell` fails | Wrong session — notebook must be from `PlutoMCP.serve()` |
+| Ambiguous gap (notebook id only) | Advisory; agent uses `read_notebook_code` |
+
+---
 
 ## Context packet
+
+Shared format for Path A, B, and C:
 
 ```json
 {
@@ -61,45 +93,60 @@ Attach listener on `document` or `pluto-editor` in capture phase. Require `pluto
 }
 ```
 
-## Fallback rules
+`formatPlutoContext(packet)` produces the `@pluto-context` chat block.
+
+---
+
+## Path C — Inject + queue (dev / fallback only)
+
+For local testing before Phase 4 plugin hooks exist. **Not the production click path.**
+
+`resolvePlutoClick` uses `composedPath()` (not bare `closest()`) for shadow-DOM widgets:
+
+```javascript
+function resolvePlutoClick(event) {
+  const path = event.composedPath();
+  const cell = path.find(el =>
+    el instanceof Element && el.tagName === "PLUTO-CELL" && el.id
+  );
+  if (!cell) return { ok: false, reason: "no_pluto_cell" };
+  // ...
+}
+```
+
+Attach via `inject.js` on `document` capture phase. Requires `pluto-editor` present and not `.loading`.
+
+### Path C rejection rules
 
 | Condition | Action |
 |-----------|--------|
 | No `pluto-cell` in path | Reject; user-visible error |
-| Click inside iframe `contentDocument` | Reject; suggest click outside frame or advisory mode |
-| `notebook_id` missing | URL `?id=` → `list_notebooks` |
-| MCP `read_cell` fails | Wrong session — user must open notebook via `PlutoMCP.serve()` |
-| Ambiguous figure (iframe interior) | `cell_id` + advisory mode; screenshot deferred to plugin |
+| Click inside iframe `contentDocument` | Reject; suggest border click or Path A |
+| Plot iframe interior | ❌ reject (Path A may still work on frame chrome in Glass) |
+
+---
 
 ## DOM facts (Pluto frontend)
 
 - `<pluto-cell id="{cell_id}">` from Julia UUID
 - `<pluto-notebook id="{notebook_id}">` container
-- Markdown, `@bind` (`<bond def="...">`), plots all under `pluto-output` inside cell
+- Markdown, `@bind` (`<bond def="...">`), plots under `pluto-output`
 - Core Pluto chrome is light DOM; user HTML may use declarative shadow roots
-- Iframe outputs (Plotly, full HTML): parent resolves iframe element; inner clicks unreachable
+- Iframe outputs (Plotly): inject path rejects interior; Design Mode often resolves parent cell from frame chrome
 
 ## Constraints
 
-- Target live hydrated DOM (user's Pluto tab), not static export HTML
+- Target live hydrated DOM in Agents Glass / user's Pluto tab — not static export HTML
 - MCP session must be Pluto instance from `PlutoMCP.serve()` — document clearly
 - Do not use `bond[def]` or variable span IDs as `cell_id`
+- Do not use `cursor-ide-browser` MCP for Pluto (D13) — use Agents Glass
 
-## Acceptance
+## Phase 3 gate
 
-- Click code, text output, plot chrome in live notebook → valid `cell_id`
-- Hand-built `@pluto-context` + MCP `read_cell` succeeds without typing UUID
-- `@bind` widget click resolves to owning cell
-- Iframe interior click rejected with clear message
+- [ ] `parseDomPath` extracts IDs from representative Design Mode `dom_path` strings
+- [ ] `formatPlutoContext` → paste → MCP `read_cell` succeeds
+- [ ] (Optional dev) Path C inject captures code/output/`@bind` clicks per test matrix
 
-## Test matrix
+## Phase 4 gate (plugin)
 
-| Target | Expected `cell_id` | Notes |
-|--------|-------------------|-------|
-| CodeMirror (`pluto-input`) | ✅ | `in_input=true` |
-| Plain text output | ✅ | |
-| Markdown rendered HTML | ✅ | |
-| `@bind` slider | ✅ | use `composedPath()` |
-| Plot iframe border | ✅ | |
-| Plot iframe interior | ❌ | reject |
-| Header/settings chrome | ❌ | reject |
+Install plugin → Design Mode click → hook/command → agent chat has context → edit via MCP without UUID paste. See [cursor-plugin.md](./cursor-plugin.md).

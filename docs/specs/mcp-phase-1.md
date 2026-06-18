@@ -26,6 +26,7 @@ Agent-grade MCP surface: file-shaped read, cell-ID edit, stage-first workflow, m
 | `execute_cell` | Run one cell (Shift+Enter) |
 | `get_cell_order` | Visual order |
 | `get_execution_order` | Dependency order |
+| `resolve_pluto_context` | *(Phase 4 addendum, D13)* Map Design Mode xpath/URL hint → `notebook_id` + `cell_id`; agent calls before `read_cell` |
 
 ### Removed from agent surface
 

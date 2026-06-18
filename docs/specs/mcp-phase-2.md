@@ -1,6 +1,6 @@
 # MCP Phase 2 Spec — Graph & Validation
 
-> Staging doc for PlutoMCP.jl fork. **Blocked on Phase 1 gate.**
+> Staging doc for PlutoMCP.jl fork. **Implemented** in `src/Graph.jl` (Phase 1 gate passed).
 
 ## Goal
 

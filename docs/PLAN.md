@@ -28,8 +28,8 @@ flowchart TB
 
   subgraph bridge [pluto-cursor-bridge]
     Plugin[Cursor plugin]
-    ClickBridge[DOM click resolver]
-    Queue[Local click queue]
+    DomParser[parseDomPath from Design Mode]
+    DevQueue[Dev inject queue optional]
   end
 
   subgraph mcp [PlutoMCP.jl fork]
@@ -41,17 +41,16 @@ flowchart TB
   Pluto[Pluto.ServerSession]
   Browser[Pluto UI pluto-cell]
 
-  Cursor --> Plugin
-  Plugin --> Queue
-  ClickBridge --> Queue
-  Queue -->|@pluto-context| Cursor
+  Browser -->|Design Mode dom_path| Plugin
+  Plugin --> DomParser
+  DomParser -->|@pluto-context| Cursor
+  DevQueue -.->|dev fallback| Cursor
   Cursor --> L1
   CLI --> L1
   L1 --> Receipts
   L2 --> Receipts
   Receipts --> Pluto
   Pluto --> Browser
-  ClickBridge -.->|inject| Browser
 ```
 
 **Identity everywhere:** `notebook_id` + `cell_id`.
@@ -65,8 +64,8 @@ flowchart TB
 | **0** | PlutoMCP.jl | Reference artifacts + taxonomy | — |
 | **1** | PlutoMCP.jl | MCP v2: projection, staging, receipts, renames | 0 |
 | **2** | PlutoMCP.jl | Graph/validation (Layer 2) | 1 gate |
-| **3** | pluto-cursor-bridge | DOM click → context packet | 1 gate |
-| **4** | pluto-cursor-bridge | Cursor plugin (rules, commands, queue) | 3 |
+| **3** | pluto-cursor-bridge | Shared resolver (`parseDomPath`, packet format); dev inject harness | 1 gate |
+| **4** | pluto-cursor-bridge | Cursor plugin — Design Mode hooks, commands, rules (D13 Path A) | 3 |
 | **5** | both | Snapshots, restore workflow, concurrency docs | 1 |
 
 Phases **2 and 3 run in parallel** after Phase 1 gate. Phase 4 needs Phase 3. Phase 5 can start lightly after Phase 1.
@@ -78,6 +77,7 @@ Phases **2 and 3 run in parallel** after Phase 1 gate. Phase 4 needs Phase 3. Ph
 - [DOM bridge](./specs/dom-bridge.md)
 - [Cursor plugin](./specs/cursor-plugin.md)
 - [Safety & rollback](./specs/safety.md)
+- [**Spike:** Design Mode + hooks](./spikes/design-mode-hook.md) *(run before finalizing click delivery)*
 
 ---
 
@@ -108,23 +108,25 @@ Ground projection rules: cell types, manifest blobs, `@bind` shims, markdown cel
 
 See [specs/mcp-phase-1.md](./specs/mcp-phase-1.md).
 
-**Gate:** Agent in Cursor calls `read_notebook_code` → stages with `edit_cell` → `submit_changes` → verifiable output on live notebook opened via `PlutoMCP.serve()`.
+**Gate:** See eval harness — CI runs [`run_reference.jl --all`](../../PlutoMCP.jl/eval/README.md) (deterministic); manual SDK `stage_and_run` outcome pass@1 via [bridge/eval](../eval/README.md).
 
 ### Phase 2 — Graph / validation
 
 See [specs/mcp-phase-2.md](./specs/mcp-phase-2.md). Trigger: agents need "why did this re-run?" or "where is `foo` defined?"
 
-### Phase 3 — DOM click bridge
+### Phase 3 — DOM bridge utilities
 
-See [specs/dom-bridge.md](./specs/dom-bridge.md).
+See [specs/dom-bridge.md](./specs/dom-bridge.md). **Primary delivery is Path A (Design Mode), not inject** — D13.
 
-**Gate:** Click code/output/plot in live notebook → valid packet → manual `@pluto-context` paste → MCP `read_cell` succeeds.
+Ships `parseDomPath`, `formatPlutoContext`, shared packet schema. Optional dev inject+queue for pre-plugin testing.
+
+**Gate:** `parseDomPath` on representative Design Mode `dom_path` strings → `@pluto-context` → MCP `read_cell` succeeds.
 
 ### Phase 4 — Cursor plugin
 
-See [specs/cursor-plugin.md](./specs/cursor-plugin.md).
+See [specs/cursor-plugin.md](./specs/cursor-plugin.md). Wire **Path A**: Design Mode `dom_path` in hook `prompt` → parse → MCP.
 
-**Gate:** Install plugin → click cell → command → agent chat has context → edit via MCP without pasting UUID.
+**Gate:** Install plugin → Design Mode click in Glass → agent chat has context → edit via MCP without pasting UUID.
 
 ### Phase 5 — Safety
 
@@ -136,11 +138,12 @@ See [specs/safety.md](./specs/safety.md).
 
 | Component | State |
 |-----------|-------|
-| PlutoMCP fork — upstream tools (old names) | ✅ Works |
-| PlutoMCP fork — Phase 1 spec | 📋 Planned ([spec](./specs/mcp-phase-1.md)) |
-| DOM bridge | 📋 Planned |
-| Cursor plugin | 📋 Planned |
-| This repo planning docs | ✅ In progress |
+| PlutoMCP fork — Phase 1 MCP tools | ✅ Implemented |
+| PlutoMCP fork — Phase 2 graph/validation tools | ✅ `Graph.jl` — 6 tools ([spec](./specs/mcp-phase-2.md)) |
+| PlutoMCP fork — agent eval harness | ✅ Reference runner + score.jl ([eval README](../../PlutoMCP.jl/eval/README.md)) |
+| Bridge — SDK eval orchestrator | ✅ [`eval/`](../eval/README.md) (manual, `CURSOR_API_KEY`) |
+| Bridge — DOM resolver utilities (Phase 3) | ✅ `parseDomPath`, `formatPlutoContext` + dev inject harness ([spec](./specs/dom-bridge.md)) |
+| Bridge — Design Mode plugin wiring (Phase 4) | 📋 Path A hooks/commands ([spec](./specs/cursor-plugin.md)) |
 
 ---
 
