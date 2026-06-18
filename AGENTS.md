@@ -9,6 +9,7 @@
 - Read-before-edit enforced at MCP layer (Claude Code style), not rules-only.
 - Click delivery: **D13 Path A** — parse `pluto-cell#` from Glass Design Mode `dom_path` in hook `prompt`. Path C inject+queue is dev/fallback only.
 - Open Pluto in Agents Glass (`?secret=` from terminal by default; plugin launcher passes `require_secret_for_access=false`) — not `cursor-ide-browser` MCP.
+- **Commit hygiene:** commit at logical boundaries as you go — one focused commit per feature/doc slice, not large uncommitted batches. Split mixed files when needed (e.g. eval harness vs graph tools). Ask before pushing.
 
 ## Learned Workspace Facts
 
