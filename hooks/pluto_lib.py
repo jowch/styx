@@ -101,6 +101,10 @@ def save_reads(reads: list[dict[str, Any]]) -> None:
         json.dump(reads, f, indent=2)
 
 
+def clear_reads() -> None:
+    save_reads([])
+
+
 def record_read(notebook_id: str | None, cell_id: str | None) -> None:
     if not notebook_id or not cell_id:
         return

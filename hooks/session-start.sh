@@ -5,6 +5,9 @@ set -euo pipefail
 ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 PREFIX="${ROOT}/eval/PLUTO_WORKFLOW_PREFIX.md"
 
+# Fresh read receipts each agent session (edit guard scopes to current chat).
+python3 -c "import sys; sys.path.insert(0, '${ROOT}/hooks'); from pluto_lib import clear_reads; clear_reads()" 2>/dev/null || true
+
 escape_for_json() {
   local s="$1"
   s="${s//\\/\\\\}"
