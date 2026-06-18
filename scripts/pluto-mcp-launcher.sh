@@ -25,7 +25,7 @@ if ! health_ok; then
   LOG="${TMPDIR:-/tmp}/plutomcp-serve.log"
   echo "PlutoMCP bridge not detected on :${MCP_PORT}; starting serve() (log: ${LOG})" >&2
   julia_cmd -e \
-    "using PlutoMCP; PlutoMCP.serve(pluto_port=${PLUTO_PORT}, mcp_port=${MCP_PORT}, launch_browser=true, require_secret_for_access=false)" \
+    "using PlutoMCP; PlutoMCP.serve(pluto_port=${PLUTO_PORT}, mcp_port=${MCP_PORT}, launch_browser=false, require_secret_for_access=false)" \
     >>"$LOG" 2>&1 &
   for _ in $(seq 1 90); do
     health_ok && break
@@ -37,5 +37,5 @@ if ! health_ok; then
   fi
 fi
 
-exec julia_cmd -e \
+exec "$JULIA" --project="$PLUGIN_ROOT" -e \
   "using PlutoMCP; PlutoMCP.connect(pluto_port=${PLUTO_PORT}, mcp_port=${MCP_PORT}, require_secret_for_access=false)"
