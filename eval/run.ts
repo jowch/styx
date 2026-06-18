@@ -67,6 +67,10 @@ function parseArgs(argv: string[]) {
   return opts;
 }
 
+function evalRoot(): string {
+  return __dirname;
+}
+
 function plutomcpRoot(): string {
   return resolve(
     process.env.PLUTOMCP_ROOT ??
@@ -206,15 +210,15 @@ function killServe(proc: ChildProcess | null) {
 }
 
 function loadScenario(idOrPath: string): Scenario {
-  const plutomcp = plutomcpRoot();
+  const evalDir = evalRoot();
   const path = idOrPath.endsWith(".json")
     ? idOrPath
-    : join(plutomcp, "eval", "scenarios", `${idOrPath}.json`);
+    : join(evalDir, "scenarios", `${idOrPath}.json`);
   return JSON.parse(readFileSync(path, "utf8")) as Scenario;
 }
 
 function scenarioFiles(): string[] {
-  const dir = join(plutomcpRoot(), "eval", "scenarios");
+  const dir = join(evalRoot(), "scenarios");
   return ["stage_and_run", "batch_edit", "read_guard_recovery", "add_cell_placement"].map(
     (id) => join(dir, `${id}.json`),
   );
@@ -228,7 +232,7 @@ async function runScenario(scenarioPath: string): Promise<boolean> {
     throw new Error("CURSOR_API_KEY is required for SDK eval runs");
   }
 
-  const fixtureSrc = join(plutomcp, "eval", "fixtures", scenario.fixture);
+  const fixtureSrc = join(evalRoot(), "fixtures", scenario.fixture);
   const tmpDir = mkdtempSync(join(tmpdir(), "pluto-eval-"));
   const fixturePath = join(tmpDir, scenario.fixture);
   copyFileSync(fixtureSrc, fixturePath);
@@ -263,7 +267,7 @@ async function runScenario(scenarioPath: string): Promise<boolean> {
     }
     const notebookId = await waitReadiness(mcpUrl, scenario);
 
-    const prefixPath = join(plutomcp, "eval", "PLUTO_WORKFLOW_PREFIX.md");
+    const prefixPath = join(evalRoot(), "SDK_WORKFLOW_PREFIX.md");
     const prefix =
       scenario.orchestrator?.workflow_prefix !== false
         ? readFileSync(prefixPath, "utf8") + "\n\n"
@@ -308,11 +312,11 @@ async function runScenario(scenarioPath: string): Promise<boolean> {
       "julia",
       [
         "--project=" + plutomcp,
-        join(plutomcp, "eval", "score.jl"),
+        join(evalRoot(), "score.jl"),
         "--scenario",
         scenarioPath.endsWith(".json")
           ? scenarioPath
-          : join(plutomcp, "eval", "scenarios", `${scenario.id}.json`),
+          : join(evalRoot(), "scenarios", `${scenario.id}.json`),
         "--log",
         evalLog,
         "--mcp-url",
@@ -348,10 +352,9 @@ async function main() {
     return;
   }
   const scenario = (opts.scenario as string) ?? "stage_and_run";
-  const plutomcp = plutomcpRoot();
   const path = scenario.endsWith(".json")
     ? scenario
-    : join(plutomcp, "eval", "scenarios", `${scenario}.json`);
+    : join(evalRoot(), "scenarios", `${scenario}.json`);
   const ok = await runScenario(path);
   if (!ok) process.exit(1);
 }
