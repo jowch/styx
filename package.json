@@ -1,0 +1,10 @@
+{
+  "name": "pluto-cursor-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Bridge Pluto.jl notebooks to Cursor via click context and PlutoMCP",
+  "scripts": {
+    "bridge": "node bridge/server.js"
+  }
+}
