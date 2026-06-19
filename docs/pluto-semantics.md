@@ -1,6 +1,6 @@
 # Pluto cell semantics (reference)
 
-Deep reference for Pluto's cell grammar and reactivity. For the full agent training guide (browser-first discovery, staging workflow, error fields), start with **[pluto-agent-primer.md](./pluto-agent-primer.md)**.
+Human-readable mirror of **`skills/pluto-semantics/`**. Agents should use the skill and its `reference/` files (especially [pluto-sources.md](../skills/pluto-semantics/reference/pluto-sources.md) for Pluto.jl citations).
 
 ---
 

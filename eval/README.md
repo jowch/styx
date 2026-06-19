@@ -8,6 +8,7 @@ Evaluation harness for Pluto MCP agent workflows: deterministic reference runner
 eval/
   SDK_WORKFLOW_PREFIX.md     # minimal MCP workflow for SDK runs (no plugin rules)
   PLUTO_WORKFLOW_PREFIX.md   # plugin session-start prefix (Design Mode / Styx)
+  SKILL_BASELINE_SCENARIOS.md  # TDD pressure scenarios for pluto-* skills
   fixtures/                  # notebooks with stable cell UUIDs
   scenarios/                 # task specs + rubrics
   lib/EvalShared.jl          # HTTP client, outcome + trace scoring
@@ -67,6 +68,7 @@ PlutoMCP provides the optional `EvalLog.jl` hook (`serve(eval_log=...)`). This r
 |------|-----------|
 | CI | `run_reference.jl --all --strict-trace` |
 | Manual | SDK `stage_and_run` outcome pass@1 |
+| Skills | [SKILL_BASELINE_SCENARIOS.md](./SKILL_BASELINE_SCENARIOS.md) — five pressure scenarios after skill changes |
 
 ## Data handling
 

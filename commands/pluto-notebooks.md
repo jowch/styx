@@ -1,23 +1,12 @@
 ---
-description: Start a Pluto notebook session — agent handles setup and Glass navigation
+description: User wants to work on Pluto notebooks — agent invokes pluto-session
 ---
 
 # Pluto notebooks
 
-The user wants to **work on Pluto notebooks**. They should not run shell scripts.
+Invoke **pluto-session** and follow it.
 
-## Agent actions
+- **No specific notebook** (Path A): start session if needed → open `http://127.0.0.1:1234/` in Glass → user picks notebook on next prompt.
+- **Named notebook** (Path B): landing first (cookies) → `open_notebook(path=…)` → open `http://127.0.0.1:1234/edit?id=<notebook_id>` → safe-preview reminder.
 
-1. Invoke **pluto-session** and follow it.
-
-**If no specific notebook named** (Path A):
-- `start_pluto_session` if needed
-- Open `http://127.0.0.1:1234/` in Agents Glass
-- Tell user to pick a notebook there; resolve `notebook_id` on their **next** prompt
-
-**If user named a specific notebook** (Path B):
-- `start_pluto_session` if needed
-- Open landing page `http://127.0.0.1:1234/` first (cookies)
-- `open_notebook(path=…)` → open `http://127.0.0.1:1234/<notebook_id>` in Glass
-
-After bootstrap, use **pluto-workflow** for cell edits.
+Lifecycle tools may be hidden in the MCP picker — invoke by name. Full steps: **pluto-session**. Cell edits: **pluto-workflow**.

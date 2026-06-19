@@ -1,28 +1,30 @@
 ---
-description: Pluto notebooks in Cursor — agent-driven session, Design Mode edits
+description: Pluto notebook intent in Cursor — route to pluto-session, pluto-workflow, pluto-semantics
 alwaysApply: true
 ---
 
 # Pluto notebooks (Styx)
 
-Cursor users are not always in Pluto. **Only bootstrap a Pluto session when the user requests notebook work.**
+**Bootstrap only when the user requests notebook work.**
 
-**Skills:**
-- **pluto-session** — start Pluto, choose/open notebook, open Glass (user says "work on notebooks")
+## Skills
+
+- **pluto-session** — start Pluto, open notebook, Glass navigation
 - **pluto-workflow** — cell edits once a notebook is open
 - **pluto-semantics** — cell grammar and `pluto_multi_expression` fixes
 
-Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()` manually — use lifecycle MCP tools (`start_pluto_session`, `open_notebook`).
+Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()` — call `start_pluto_session` / `open_notebook` **by name** even if not in the MCP tool picker.
+
+## Bootstrap
+
+Notebook intent → **pluto-session** first. Glass URLs: landing `http://127.0.0.1:1234/`; notebook `http://127.0.0.1:1234/edit?id=<id>` (Path B: landing first for cookies). Prefer `open_resource`; if unavailable, direct user to open URL in Agents Glass.
 
 ## Safe preview
 
-Path B (`open_notebook` default) = **Safe preview**. **Remind** the user that edits won't execute and outputs won't update until they click **Run notebook code** in Glass — still edit when asked. If they ask you to run the notebook, point them to that button (not `run_all_cells`). See **pluto-workflow** skill.
+Path B default = **Safe preview**. Remind user to click **Run notebook code** in Glass — still edit when asked. Detection signals → **pluto-workflow**.
 
-## Cell edits (notebook already open)
+## Cell edits (notebook open)
 
-1. Design Mode (**Cmd+Shift+D**) click → **`resolve_pluto_context`** → **`read_cell`** (remind about safe preview if active)
-2. Stage → **`submit_changes`** once → re-read for errors
-
-## Safety
+Design Mode (**⌘⇧D**) → **`resolve_pluto_context`** → **`read_cell`** → stage → **`submit_changes`** → re-read.
 
 Re-read before overwriting browser drafts. **`submit_changes`** before ending turn if staged.

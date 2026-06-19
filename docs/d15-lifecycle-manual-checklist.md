@@ -85,7 +85,7 @@ Ask: *"What is pluto_session_status?"*
 
 | Step | You do | Pass criteria |
 |------|--------|---------------|
-| A.6 | On landing page, open or create a notebook | Notebook URL is `http://127.0.0.1:1234/<notebook_id>` |
+| A.6 | On landing page, open or create a notebook | Notebook URL is `http://127.0.0.1:1234/edit?id=<notebook_id>` |
 | A.7 | Note the `notebook_id` from the Glass URL bar (for verification only) | UUID visible |
 
 - [x] A.6–A.7 pass
@@ -125,7 +125,7 @@ Ask: *"What is pluto_session_status?"*
 | B.1 | Agent | `start_pluto_session` if not already running |
 | B.2 | Agent | Opens landing `http://127.0.0.1:1234/` in Glass **first** |
 | B.3 | Agent | `open_notebook(path=…)` with your path |
-| B.4 | Agent | Opens `http://127.0.0.1:1234/<notebook_id>` in Glass |
+| B.4 | Agent | Opens `http://127.0.0.1:1234/edit?id=<notebook_id>` in Glass |
 | B.5 | You | Notebook visible; **blue safe-preview / Run notebook banner** (cells not auto-run) |
 | B.6 | Agent | Does **not** call `run_all_cells` unless you asked to run |
 
@@ -197,7 +197,7 @@ Optional: agent `read_cell` on cell `11111111-1111-1111-1111-111111111111` — o
 | Hook says "reload MCP" | Old hook copy | Reinstall/sync plugin; hook should mention `start_pluto_session` |
 | `pluto_not_running` on edit | Session not started | Agent calls `start_pluto_session` first |
 | Design Mode click, no `pluto-cell#` | Design Mode off or bare `main` click | ⌘⇧D, re-click inside cell |
-| Notebook URL 403 / secret | Skipped landing (Path B) | Open `http://127.0.0.1:1234/` first, then notebook URL |
+| Notebook URL 403 / secret | Skipped landing (Path B) | Open `http://127.0.0.1:1234/` first, then `http://127.0.0.1:1234/edit?id=<notebook_id>` |
 | Hook pending_run fails | Bridge down | Confirm `./scripts/d15-preflight.sh --expect-running` |
 
 ---

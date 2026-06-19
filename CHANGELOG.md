@@ -11,30 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **D15** lazy warm lifecycle — [docs/specs/pluto-lifecycle.md](docs/specs/pluto-lifecycle.md)
-- **Skill:** `pluto-session` — agent-owned bootstrap (start Pluto, choose notebook, open Glass)
-- **Skills:** `pluto-workflow`, `pluto-semantics` — cell editing and grammar
-- **Command:** `pluto-notebooks` — user entry for notebook work
+- **D15** lazy warm lifecycle — [docs/specs/pluto-lifecycle.md](docs/specs/pluto-lifecycle.md); PlutoMCP lifecycle tools implemented
+- **Skills:** `pluto-session`, `pluto-workflow`, `pluto-semantics` with progressive-disclosure `reference/` files
+- **Docs:** [docs/skill-architecture.md](docs/skill-architecture.md), [eval/SKILL_BASELINE_SCENARIOS.md](eval/SKILL_BASELINE_SCENARIOS.md) (TDD pressure scenarios)
+- **Command:** `pluto-notebooks`, `pluto-open` — user entry for notebook work
 - `package-plugin.sh` — release tree without dev artifacts
 - Cursor plugin: rules, hooks, bundled `mcp.json`, eval harness, Design Mode (D13)
 
 ### Changed
 
-- **Rule** — agent-driven lifecycle; no user shell scripts (D15)
-- **pluto-workflow** — defers session setup to pluto-session
-- Launcher connect-only (interim until D15 PlutoMCP tools ship)
-- Version **0.1.0** pre-release
+- **Rule** — agent-driven lifecycle; thin router to skills (D15)
+- **Skills** — CSO descriptions (triggers only); Pluto.jl research in `reference/`; canonical Glass URL `/edit?id=`
+- Launcher — `connect()` only (D15); `pluto-serve.sh` dev-only
+- Version **0.1.0** pre-release; D15 acceptance signed off 2026-06-18
 
 ### Removed
 
 - Path C DOM bridge (`bridge/`, `src/`)
-- `commands/pluto-start.md` — replaced by D15 agent lifecycle
+- `commands/pluto-start.md`, legacy `pluto-*-cell` commands — replaced by D15 agent lifecycle + skills
 
 ### Known gaps before 0.1.0
 
-- **PlutoMCP:** `pluto_session_status`, `start_pluto_session`, `open_notebook` not implemented
-- Launcher needs standalone `connect()` per D15
-- Legacy `pluto-*-cell` commands still present
 - Marketplace install path
+- Lifecycle tools not always visible in Cursor MCP tool picker (invoke by name)
+- `allow_execution` MCP tool for exiting safe preview on open notebook (optional)
+- Pure deferred Scenario 0 (stdio-only, no proxy `serve()`) not re-validated end-to-end
 
 [Unreleased]: https://github.com/jowch/styx/compare/HEAD...HEAD

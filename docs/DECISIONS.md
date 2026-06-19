@@ -154,7 +154,7 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 **Amends D12:** Launcher targets standalone `connect()` only; lifecycle via MCP tools replaces shell `serve()` + proxy as the primary user path.
 
-**PlutoMCP (to implement):** `pluto_session_status`, `start_pluto_session`, `open_notebook`, optional `stop_pluto_session`; defer session until `start_pluto_session`.
+**PlutoMCP (implemented):** `pluto_session_status`, `start_pluto_session`, `stop_pluto_session`, `open_notebook`; deferred standalone `connect()` until `start_pluto_session`. Acceptance signed off 2026-06-18 ([d15-lifecycle-manual-checklist.md](./d15-lifecycle-manual-checklist.md)).
 
 ---
 
@@ -181,6 +181,6 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 | Bridge — DOM resolver (Phase 3) | ✅ **Gated** |
 | Cursor plugin Phase 4a–4b | ✅ **Gated** — Design Mode Path A, MCP staging workflow |
 | Cursor plugin Phase 4c | ✅ `resolve_pluto_context`; `pending_run` stop hook |
-| D15 lazy warm lifecycle | 📋 Spec — [pluto-lifecycle.md](./specs/pluto-lifecycle.md); PlutoMCP tools pending |
+| D15 lazy warm lifecycle | ✅ Implemented — [pluto-lifecycle.md](./specs/pluto-lifecycle.md); Path A/B validated in Glass |
 | SDK agent eval | ✅ `eval:stage` pass@1 (local `CURSOR_API_KEY`) |
 | Upstream PRs (#6/#7) | 📋 open on mthelm85/PlutoMCP.jl |

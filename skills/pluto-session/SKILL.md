@@ -1,17 +1,16 @@
 ---
 name: pluto-session
 description: >-
-  Start and open Pluto.jl notebook sessions from Cursor — lazy warm lifecycle,
-  Glass browser navigation. Use when the user wants to work on Pluto notebooks,
-  open a notebook, start Pluto, or begin notebook editing for the first time
-  in a chat.
+  Use when the user mentions Pluto.jl notebooks, wants to start or open Pluto,
+  open a specific .jl notebook in Glass, or begins notebook work with no
+  notebook_id yet in browser context or chat.
 ---
 
 # Pluto session bootstrap
 
 The user is a **Cursor user first**. Only start Pluto when they **request notebook work**. You handle setup — never ask them to run shell scripts.
 
-## Two paths (pick from user message)
+## Pick a path
 
 | User said | Path |
 |-----------|------|
@@ -20,78 +19,32 @@ The user is a **Cursor user first**. Only start Pluto when they **request notebo
 
 Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 
----
+## Quick start
 
-## Path A — General Pluto intent (landing page)
+**Path A:** `pluto_session_status` → `start_pluto_session` if stopped → open landing `http://127.0.0.1:1234/` in Glass → tell user to pick a notebook → **stop** (no `open_notebook`, no `list_notebooks`).
 
-**Examples:** "I want to work on my notebooks", "open Pluto", "let's use Pluto"
+**Path B:** `start_pluto_session` if needed → landing first (cookies) → `open_notebook(path=…)` → open `http://127.0.0.1:1234/edit?id=<notebook_id>` → safe-preview reminder → **pluto-workflow** for edits.
 
-### Steps
+**Already running:** Path A → landing only. Path B → `list_notebooks`; skip `open_notebook` if target is open.
 
-1. `pluto_session_status` → if stopped, `start_pluto_session`
-2. Open **Pluto landing page** in Agents Glass: `http://127.0.0.1:1234/`
-3. Tell the user briefly:
-   > Pluto is ready. Pick or create a notebook on this page. When you're in a notebook, send your next message — click a cell with **⌘⇧D** (Design Mode) or describe what you want.
+## REQUIRED chain
 
-4. **Stop.** Do not call `open_notebook`, `list_notebooks`, or ask which file.
+- Cell edits → **pluto-workflow**
+- Lifecycle tools may be hidden in MCP picker — **invoke by name** anyway
 
-### Next user prompt (notebook chosen in UI)
+## Common mistakes
 
-The user has selected a notebook in Pluto. Resolve context via **pluto-workflow**:
+| Mistake | Fix |
+|---------|-----|
+| Ask which notebook on Path A | Stop after landing |
+| `open_notebook` without user path | Never scan repo and pick |
+| Bare `/<notebook_id>` URL | Use `/edit?id=<notebook_id>` |
+| User runs `pluto-serve.sh` | Use `start_pluto_session` |
 
-- Design Mode click → `resolve_pluto_context` → `read_cell`
-- Glass URL `http://127.0.0.1:1234/edit?id=<notebook_id>` (or bare `/<notebook_id>` if that works in their Glass build)
-- `list_notebooks` if needed
+## Additional resources
 
----
-
-## Path B — Specific notebook intent
-
-**Examples:** "Open `experiments/odes.jl` in Pluto", "work on my signal analysis notebook at `analysis/signal.jl`"
-
-### Steps
-
-1. `pluto_session_status` → if stopped, `start_pluto_session`
-2. Open **landing page** first in Agents Glass: `http://127.0.0.1:1234/`  
-   *(Sets loopback session cookies — required before notebook URLs work reliably, D14.)*
-3. `open_notebook(path="<user-specified path>")` → record `notebook_id`  
-   Default: safe preview (like Pluto UI — no auto-run). Use `run_notebook=true` only if user asked to run.
-4. Open **notebook URL** in Agents Glass: `http://127.0.0.1:1234/edit?id=<notebook_id>`
-5. Tell the user:
-   > Your notebook is open in **Safe preview** — code won't run until you click **Run notebook code** in Glass (top right). I can still edit cells; you won't see outputs or widgets update until you run.
-
-   Use `run_notebook=true` on `open_notebook` **only** if the user explicitly asked to open **and run**.
-
-6. Proceed to **pluto-workflow** when they ask for edits (remind about preview if outputs matter).
-
-**Never** `open_notebook` without a user-specified path. Do not scan the repo and pick a file.
-
----
-
-## If Pluto is already running
-
-| Situation | Action |
-|-----------|--------|
-| Path A, user wants Pluto again | Open landing page only |
-| Path B, notebook may already be open | `list_notebooks` — if target is open, skip `open_notebook`; open notebook URL in Glass |
-| User asks to edit cells | Skip bootstrap; use **pluto-workflow** |
-
----
-
-## Glass navigation
-
-- Use `open_resource` (cursor-app-control MCP) when available
-- **Not** `cursor-ide-browser` MCP (D13)
-- Path B: landing page **then** notebook URL (two navigations)
-
-## Stopping (optional)
-
-On "done with notebooks": `submit_changes` if staged; optional `stop_pluto_session`.
-
-## Errors
-
-| Error | Action |
-|-------|--------|
-| `pluto_not_running` | `start_pluto_session` |
-| `notebook_not_found` | Confirm path with user |
-| MCP unreachable | Enable **pluto** MCP in Cursor Settings |
+- **Path A steps:** [reference/path-a-landing.md](reference/path-a-landing.md)
+- **Path B + cookies + safe preview:** [reference/path-b-open.md](reference/path-b-open.md)
+- **Glass navigation + `open_resource` fallback:** [reference/glass-navigation.md](reference/glass-navigation.md)
+- **Lifecycle tools + MCP picker quirk:** [reference/lifecycle-tools.md](reference/lifecycle-tools.md)
+- **Bootstrap errors:** [reference/errors.md](reference/errors.md)

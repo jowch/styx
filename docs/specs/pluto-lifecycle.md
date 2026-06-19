@@ -84,7 +84,7 @@ julia --project=$PLUGIN_ROOT -e 'using PlutoMCP; PlutoMCP.connect(...)'
 
 ### `open_notebook` semantics
 
-Loads a notebook **server-side** so MCP tools and Glass share the same session. The user never sees the tool name — Path B ends with Glass on `http://127.0.0.1:1234/<notebook_id>`.
+Loads a notebook **server-side** so MCP tools and Glass share the same session. The user never sees the tool name — Path B ends with Glass on `http://127.0.0.1:1234/edit?id=<notebook_id>`.
 
 **Pluto API:** `Pluto.SessionActions.open(session, path; …)`
 
@@ -113,7 +113,7 @@ Loads a notebook **server-side** so MCP tools and Glass share the same session. 
 | Step | URL | When |
 |------|-----|------|
 | Landing | `http://127.0.0.1:1234/` | Always after `start_pluto_session`; Path A stops here |
-| Notebook | `http://127.0.0.1:1234/<notebook_id>` | Path B after `open_notebook`; Path A only on a later prompt once id is known |
+| Notebook | `http://127.0.0.1:1234/edit?id=<notebook_id>` | Path B after `open_notebook`; Path A only on a later prompt once id is known |
 
 Use `open_resource` in Agents Glass. Path B: **landing first**, then notebook (cookie setup).
 
@@ -143,7 +143,7 @@ Use `open_resource` in Agents Glass. Path B: **landing first**, then notebook (c
 Agent opens Pluto in **Agents Glass** via `open_resource` (cursor-app-control MCP) when available:
 
 - Home: `http://127.0.0.1:1234/`
-- Notebook: `http://127.0.0.1:1234/<notebook_id>`
+- Notebook: `http://127.0.0.1:1234/edit?id=<notebook_id>`
 
 Do not use `cursor-ide-browser` MCP for Pluto (D13).
 
@@ -179,7 +179,7 @@ Agent does **not** ask which notebook in chat. Notebook id comes from the **seco
 | 2 | Agent | `start_pluto_session` |
 | 3 | Agent | Opens `http://127.0.0.1:1234/` in Glass *(cookies)* |
 | 4 | Agent | `open_notebook(path=…)` → `notebook_id` *(safe preview; run banner unless `run_notebook=true`)* |
-| 5 | Agent | Opens `http://127.0.0.1:1234/<notebook_id>` in Glass |
+| 5 | Agent | Opens `http://127.0.0.1:1234/edit?id=<notebook_id>` in Glass |
 | 6 | User | Sees notebook directly; edits via Design Mode or chat |
 
 ---

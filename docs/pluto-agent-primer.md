@@ -1,14 +1,17 @@
 # Pluto agent primer
 
-> **Canonical agent training is now in plugin skills:** `skills/pluto-workflow/SKILL.md` and `skills/pluto-semantics/SKILL.md`. This file is kept for reference; prefer the skills in Cursor sessions.
-
-Training guide for AI agents editing live Pluto.jl notebooks via PlutoMCP.
+> **Deprecated for agents.** Use plugin skills instead — they load progressively with linked references:
+> - `skills/pluto-session/SKILL.md` — bootstrap
+> - `skills/pluto-workflow/SKILL.md` — cell edits
+> - `skills/pluto-semantics/SKILL.md` — cell grammar
+>
+> This primer is kept for long JSON examples only. Do not treat it as canonical if a skill covers the topic.
 
 | Also see | Purpose |
 |----------|---------|
-| `skills/pluto-workflow/SKILL.md` | **Primary** workflow skill |
-| `skills/pluto-semantics/SKILL.md` | Cell grammar skill |
-| [pluto-semantics.md](./pluto-semantics.md) | Same content as semantics skill (reference) |
+| `skills/pluto-session/SKILL.md` | Session bootstrap (Path A/B) |
+| `skills/pluto-workflow/SKILL.md` | Cell editing workflow |
+| `skills/pluto-semantics/SKILL.md` | Cell grammar + Pluto source refs |
 | PlutoMCP.jl `AGENTS.md` | MCP tool API conventions |
 
 ---
@@ -41,7 +44,7 @@ Your job: use MCP tools to read, stage, and run cells — never edit the noteboo
 
 2. **Glass browser URL** — Pluto notebook URLs embed the id:
    ```text
-   http://127.0.0.1:1234/<notebook_id>
+   http://127.0.0.1:1234/edit?id=<notebook_id>
    ```
    Check the active Glass tab before calling MCP.
 

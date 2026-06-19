@@ -1,24 +1,16 @@
 ---
 name: pluto-semantics
 description: >-
-  Pluto.jl cell grammar and reactivity — one expression per cell, begin/end wraps,
-  @bind rules, multi_expression errors. Use when fixing parse errors, splitting cells,
-  or reasoning about Pluto reactivity.
+  Use when fixing pluto_multi_expression or extra-token parse errors,
+  deciding begin/end wrap vs splitting cells, placing @bind, or reasoning
+  about Pluto reactivity and cell execution order.
 ---
 
 # Pluto cell semantics
 
 ## One expression per cell (critical)
 
-Each code cell = **exactly one Julia expression**.
-
-**Invalid:**
-```julia
-using Plots
-plot(sin, 0, 2pi)
-```
-
-Pluto returns `pluto_multi_expression` or `syntax: extra token after end of expression`. `error.boundaries` marks where extra statements start.
+Each code cell = **exactly one Julia expression**. Multiple statements → `pluto_multi_expression` or `extra token after end of expression`.
 
 ### Fix errors: wrap `begin`/`end` (default)
 
@@ -29,46 +21,25 @@ begin
 end
 ```
 
+Default to **`begin`/`end`** in the **same cell** when fixing errors. Split only when separate reactive steps are intended.
+
 Use **`let`/`end`** when temporaries must not become notebook globals.
 
-When a user asks to **fix** a multi-expression error, default to **`begin`/`end`** in the **same cell** unless separate reactive steps are intended.
+## Quick rules
 
-### Split cells (intentional reactive steps)
+- `@bind` must be the **returning expression** (last in cell, or inside `md"…"`)
+- Visual `cell_order` ≠ execution order — use `read_notebook_code`
+- `error.fixes` order: `wrap_begin_end` first, `split_cells` second
 
-| Cell | Code |
-|------|------|
-| 1 | `using Plots` |
-| 2 | `plot(sin, 0, 2pi)` |
+## REQUIRED chain
 
-## New code structure
+- Session bootstrap → **pluto-session**
+- MCP edit pipeline → **pluto-workflow**
 
-| Pattern | Guidance |
-|---------|----------|
-| `using` / `import` | Own cell at top |
-| Constants / inputs | One binding per cell, or one `let` block |
-| Derived values | Separate cells |
-| Plots | Last expression is displayed |
-| `@bind` | **`@bind` must be last** in cell; bound value in next cell |
+## Additional resources
 
-## Reactivity
-
-- Shared notebook module scope.
-- Edit upstream → downstream cells re-run.
-- `read_notebook_code` = execution order; `get_cell_order` = visual order.
-
-## MCP edit semantics
-
-| Tool | Behavior |
-|------|----------|
-| `edit_cell` | Replaces entire body; default `run_after=false` |
-| `submit_changes` | Batch run staged cells (Cmd+S) |
-| `validate_cell` | Pre-check; returns `multi_expression` when invalid |
-
-## Error kinds
-
-| `error.kind` | Default action |
-|--------------|----------------|
-| `pluto_multi_expression` | `edit_cell` with `begin`/`end`, then `submit_changes` |
-| `runtime` | Read `msg`, fix code |
-
-`error.fixes` order: `wrap_begin_end` first, `split_cells` second.
+- **Full grammar + `@bind`:** [reference/grammar.md](reference/grammar.md)
+- **Reactivity + order:** [reference/reactivity.md](reference/reactivity.md)
+- **Error kinds:** [reference/error-kinds.md](reference/error-kinds.md)
+- **Pluto.jl source citations:** [reference/pluto-sources.md](reference/pluto-sources.md)
+- Human-readable mirror: `docs/pluto-semantics.md`
