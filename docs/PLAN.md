@@ -17,7 +17,7 @@
 | Gate | Command |
 |------|---------|
 | Reference scenarios (CI) | `eval/run_reference.jl --all --strict-trace` |
-| D15 deferred lifecycle | `scripts/d15-validate-deferred.sh` |
+| D15 deferred lifecycle | `scripts/validate-pluto-lifecycle.sh` |
 | Manual Glass walkthrough | [d15-lifecycle-manual-checklist.md](./d15-lifecycle-manual-checklist.md) |
 
 ## Where details live

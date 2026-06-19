@@ -231,7 +231,7 @@ Agent does **not** call `open_notebook` until user names a path (Path B) or pick
 
 Automated gates: `Pkg.test()` (PlutoMCP), `eval/run_reference.jl --all --strict-trace` (Styx).
 
-**Manual walkthrough:** [d15-lifecycle-manual-checklist.md](../d15-lifecycle-manual-checklist.md) — Path A/B in Glass + Design Mode. Preflight: `./scripts/d15-preflight.sh`.
+**Manual walkthrough:** [d15-lifecycle-manual-checklist.md](../d15-lifecycle-manual-checklist.md) — Path A/B in Glass + Design Mode. Preflight: `./scripts/pluto-lifecycle-preflight.sh`.
 
 **Signed off:** 2026-06-18 — Path A follow-up (Design Mode → `resolve_pluto_context` → edit, plot notebook) and Path B (`reactive_xy.jl` safe preview + slider edit) validated in live Glass session.
 

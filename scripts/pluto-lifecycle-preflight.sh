@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# D15 lifecycle preflight — check ports and optional pluto_session_status via HTTP bridge.
+# Pluto lifecycle preflight — ports, plugin files, optional session status.
 set -euo pipefail
 
 PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
@@ -7,21 +7,24 @@ MCP_PORT="${PLUTOMCP_MCP_PORT:-2346}"
 PLUTO_PORT="${PLUTOMCP_PLUTO_PORT:-1234}"
 
 EXPECT_RUNNING=0
+REQUIRE_PORTS_FREE=0
 NOTEBOOK_ID=""
 
 usage() {
   cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Check D15 deferred-lifecycle preconditions (ports + optional MCP status).
+Check deferred-lifecycle preconditions (ports + optional MCP status).
 
 Options:
   --expect-running       Fail if :2346 bridge is down (use after start_pluto_session)
+  --require-ports-free   Fail if :2346 or :1234 are in use (for validate-pluto-lifecycle.sh)
   --notebook-id UUID     After --expect-running, verify notebook appears in status
   -h, --help             Show this help
 
 Examples:
-  $(basename "$0")                              # baseline: bridge should be down
+  $(basename "$0")                              # informational port check
+  $(basename "$0") --require-ports-free         # before validate-pluto-lifecycle.sh
   $(basename "$0") --expect-running             # after agent start_pluto_session
   $(basename "$0") --expect-running --notebook-id <uuid>
 EOF
@@ -30,6 +33,7 @@ EOF
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --expect-running) EXPECT_RUNNING=1; shift ;;
+    --require-ports-free) REQUIRE_PORTS_FREE=1; shift ;;
     --notebook-id) NOTEBOOK_ID="${2:?--notebook-id requires UUID}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 1 ;;
@@ -51,7 +55,7 @@ mcp_call() {
     -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"${name}\",\"arguments\":{}}}"
 }
 
-echo "=== D15 preflight ==="
+echo "=== Pluto lifecycle preflight ==="
 echo "Plugin root: ${PLUGIN_ROOT}"
 echo "Pluto port:  ${PLUTO_PORT}"
 echo "MCP port:    ${MCP_PORT}"
@@ -68,16 +72,30 @@ for f in "${PLUGIN_ROOT}/mcp.json" "${PLUGIN_ROOT}/scripts/pluto-mcp-launcher.sh
   fi
 done
 
+bridge_up=0
+pluto_up=0
 if health_ok; then
+  bridge_up=1
   echo "OK  MCP bridge :${MCP_PORT}/health"
 else
   echo "—   MCP bridge :${MCP_PORT}/health (down)"
 fi
 
 if pluto_ui_up; then
+  pluto_up=1
   echo "OK  Pluto UI   :${PLUTO_PORT}/"
 else
   echo "—   Pluto UI   :${PLUTO_PORT}/ (down)"
+fi
+
+if [[ "$REQUIRE_PORTS_FREE" -eq 1 ]]; then
+  if [[ "$bridge_up" -eq 1 || "$pluto_up" -eq 1 ]]; then
+    echo "FAIL :${MCP_PORT} or :${PLUTO_PORT} in use." >&2
+    echo "     Toggle pluto MCP off in Cursor Settings (or stop pluto-serve.sh) and retry." >&2
+    fail=1
+  else
+    echo "OK  ports free (:${MCP_PORT}, :${PLUTO_PORT})"
+  fi
 fi
 
 if [[ "$EXPECT_RUNNING" -eq 1 ]]; then
@@ -120,11 +138,11 @@ print('yes' if '${NOTEBOOK_ID}' in ids else 'no')
     fi
   fi
   fi
-else
-  if health_ok; then
-    echo "NOTE bridge already up (proxy/dev serve?) — baseline deferred test expects down"
+elif [[ "$REQUIRE_PORTS_FREE" -eq 0 ]]; then
+  if [[ "$bridge_up" -eq 1 ]]; then
+    echo "NOTE bridge already up (Cursor pluto MCP or dev serve?)"
   else
-    echo "OK  deferred baseline (bridge down, MCP stdio may still be up in Cursor)"
+    echo "OK  deferred baseline (bridge down; Cursor stdio MCP may still be up)"
   fi
 fi
 

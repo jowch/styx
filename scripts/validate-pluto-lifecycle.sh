@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-# Automated D15 deferred lifecycle checks (Scenarios 0, C, D, E at protocol/hook layer).
-# Live Cursor agent behavior (0.2, C.1) still requires manual chat validation.
+# Automated deferred Pluto lifecycle checks (start/stop, pending_run hook).
+# Requires :1234 and :2346 free — toggle pluto MCP off in Cursor before running.
+# Live agent behavior (Scenarios 0.2, C.1) still needs manual chat validation.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-echo "=== D15 automated validation ==="
+echo "=== Pluto lifecycle validation ==="
+
+echo
+echo "--- Preflight: ports free ---"
+./scripts/pluto-lifecycle-preflight.sh --require-ports-free
 
 echo
 echo "--- Scenario 0 / E: deferred lifecycle (Julia) ---"
@@ -24,8 +29,8 @@ println("Scenario E.2 OK")
 '
 
 echo
-echo "--- Scenario 0: preflight baseline (ports down) ---"
-./scripts/d15-preflight.sh
+echo "--- Scenario 0: post-stop baseline (ports down) ---"
+./scripts/pluto-lifecycle-preflight.sh --require-ports-free
 
 echo
 echo "--- Scenario D: pending_run stop hook ---"
@@ -53,5 +58,5 @@ println("Scenario D OK")
 '
 
 echo
-echo "All automated D15 checks passed."
+echo "All automated lifecycle checks passed."
 echo "Manual: Scenario 0.2 (non-notebook chat), C.1 (agent skips start_pluto_session) — see docs/d15-lifecycle-manual-checklist.md"

@@ -72,7 +72,7 @@ Layer 2 graph tools (fork) ∥ DOM bridge (here). Plugin Phase 4 after Phase 3.
 | Tier | Criterion | Enforced by |
 |------|-----------|-------------|
 | CI | Reference runner: all v1 scenarios via HTTP `/call` | [`eval/run_reference.jl --all --strict-trace`](./eval/run_reference.jl) |
-| D15 | Deferred lifecycle scenarios 0/C/D/E | [`scripts/d15-validate-deferred.sh`](../scripts/d15-validate-deferred.sh) |
+| D15 | Deferred lifecycle scenarios 0/C/D/E | [`scripts/validate-pluto-lifecycle.sh`](../scripts/validate-pluto-lifecycle.sh) |
 
 Details: [`eval/README.md`](./eval/README.md). PlutoMCP provides optional `EvalLog.jl` trace hook only.
 
@@ -180,7 +180,7 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 | Bridge — DOM resolver (Phase 3) | ✅ **Gated** |
 | Cursor plugin Phase 4a–4b | ✅ **Gated** — Design Mode Path A, MCP staging workflow |
 | Cursor plugin Phase 4c | ✅ `resolve_pluto_context`; `pending_run` stop hook |
-| D15 lazy warm lifecycle | ✅ Implemented — automated validation `scripts/d15-validate-deferred.sh` |
+| D15 lazy warm lifecycle | ✅ Implemented — automated validation `scripts/validate-pluto-lifecycle.sh` |
 | Reference eval (CI) | ✅ `run_reference.jl --all --strict-trace` |
 | Structural cell_order sync | PlutoMCP: assign new `cell_order` vector before `_notify_browser` on add/delete/move |
 | Upstream PRs (#6/#7) | 📋 open on mthelm85/PlutoMCP.jl |

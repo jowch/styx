@@ -16,6 +16,8 @@ Lifecycle tools are registered on the **pluto** MCP server but **may not appear 
 
 **Invoke by name anyway** — the agent can call `start_pluto_session`, `open_notebook`, etc. even when they are hidden from the picker.
 
+**After upgrading PlutoMCP:** toggle **pluto** MCP off/on in Cursor Settings (or Reload Window) so `tools/list` refreshes — e.g. `allow_execution` won't be callable until the cache updates.
+
 After `start_pluto_session`, the HTTP bridge on `:2346` is up (hooks use this for health checks).
 
 ## Never ask the user to run

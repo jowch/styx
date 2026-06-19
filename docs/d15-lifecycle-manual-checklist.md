@@ -1,16 +1,18 @@
 # D15 Lifecycle — Manual Validation Checklist
 
-After automated gates (`scripts/d15-validate-deferred.sh`, `eval/run_reference.jl --all --strict-trace`). Spec: [pluto-lifecycle.md](./specs/pluto-lifecycle.md).
+After automated gates (`scripts/validate-pluto-lifecycle.sh`, `eval/run_reference.jl --all --strict-trace`). Spec: [pluto-lifecycle.md](./specs/pluto-lifecycle.md).
 
 ## Preflight
 
 ```bash
 ./scripts/ensure-julia-env.sh          # first run
-./scripts/d15-preflight.sh             # baseline: :2346 and :1234 down
-./scripts/d15-validate-deferred.sh     # Scenarios 0, C.2, D, E
+./scripts/pluto-lifecycle-preflight.sh --require-ports-free   # :2346 and :1234 must be down
+./scripts/validate-pluto-lifecycle.sh  # Scenarios 0, C.2, D, E
 ```
 
-Styx at `~/.cursor/plugins/local/styx/`; **pluto** MCP enabled.
+Toggle **pluto** MCP off in Cursor Settings before the validation script if ports are in use.
+
+Styx at `~/.cursor/plugins/local/styx/`; **pluto** MCP enabled for manual checks.
 
 ## Scenario A — Landing (Path A)
 
