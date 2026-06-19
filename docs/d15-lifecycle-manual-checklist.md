@@ -13,12 +13,14 @@ Walk **Path A**, **Path B**, and hook integration in a real Cursor + Agents Glas
 - [ ] Styx plugin installed at `~/.cursor/plugins/local/styx/` (or dev symlink from this repo)
 - [ ] **pluto** MCP enabled in Cursor Settings → MCP shows **connected** (stdio up; Pluto may still be stopped)
 - [ ] No dev `pluto-serve.sh` running unless you are explicitly testing proxy mode
+- [ ] If MCP calls fail with `Bridge proxy error` / `ECONNREFUSED`, toggle **pluto** MCP off/on (proxy attach survives after `serve()` dies)
 - [ ] Julia env bootstrapped: `./scripts/ensure-julia-env.sh` (first run only)
 
 ### Preflight script (terminal)
 
 ```bash
 ./scripts/d15-preflight.sh
+./scripts/d15-validate-deferred.sh   # automated Scenarios 0, C.2, D, E
 ```
 
 | Check | Expected (baseline) |
@@ -50,7 +52,7 @@ Ask: *"What is pluto_session_status?"*
 | 0.2 | Ask about a normal `.jl` file (not notebooks) | Agent does **not** call `start_pluto_session` |
 | 0.3 | Run `./scripts/d15-preflight.sh` | `:2346` and `:1234` still down |
 
-- [ ] Scenario 0 pass
+- [x] Scenario 0 pass *(automated 2026-06-18: preflight baseline + PlutoMCP deferred protocol tests + `d15-validate-deferred.sh`; manual 0.2 = agent must not start Pluto on non-notebook chat)*
 
 ---
 
@@ -159,7 +161,7 @@ Optional: agent `read_cell` on cell `11111111-1111-1111-1111-111111111111` — o
 | C.1 | *"Add a cell at the end that prints hello"* | Agent skips `start_pluto_session`; uses `pluto-workflow` |
 | C.2 | `pluto_session_status` | `pluto: "running"`, notebook listed |
 
-- [ ] Scenario C pass
+- [x] Scenario C pass *(automated C.2: session stays running; manual C.1: agent skips `start_pluto_session` when Pluto already up)*
 
 ---
 
@@ -171,7 +173,7 @@ Optional: agent `read_cell` on cell `11111111-1111-1111-1111-111111111111` — o
 | D.2 | Send **next** message without submitting | Stop hook warns about staged changes (or blocks per hook config) |
 | D.3 | Agent `submit_changes` | Warning clears |
 
-- [ ] Scenario D pass
+- [x] Scenario D pass *(automated 2026-06-18: `warn-pending-run.py` + `d15-validate-deferred.sh`)*
 
 ---
 
@@ -185,7 +187,7 @@ Optional: agent `read_cell` on cell `11111111-1111-1111-1111-111111111111` — o
 | E.2 | Optional `stop_pluto_session` |
 | E.3 | `./scripts/d15-preflight.sh` → `:2346` down, MCP still connected in Cursor |
 
-- [ ] Scenario E pass
+- [x] Scenario E pass *(automated 2026-06-18: `stop_pluto_session` + preflight baseline in `d15-validate-deferred.sh`)*
 
 ---
 
@@ -198,7 +200,7 @@ Optional: agent `read_cell` on cell `11111111-1111-1111-1111-111111111111` — o
 | `pluto_not_running` on edit | Session not started | Agent calls `start_pluto_session` first |
 | Design Mode click, no `pluto-cell#` | Design Mode off or bare `main` click | ⌘⇧D, re-click inside cell |
 | Notebook URL 403 / secret | Skipped landing (Path B) | Open `http://127.0.0.1:1234/` first, then `http://127.0.0.1:1234/edit?id=<notebook_id>` |
-| Hook pending_run fails | Bridge down | Confirm `./scripts/d15-preflight.sh --expect-running` |
+| MCP tools fail after killing `serve()` | `connect()` was in **proxy** mode; bridge died | Toggle **pluto** MCP off/on in Cursor Settings (restart with no `serve()` running) |
 
 ---
 
@@ -206,6 +208,7 @@ Optional: agent `read_cell` on cell `11111111-1111-1111-1111-111111111111` — o
 
 | Date | Tester | 0 deferred | A bootstrap | A Design Mode | B open + preview | C skip start | D pending_run | Notes |
 |------|--------|------------|-------------|---------------|------------------|--------------|---------------|-------|
+| 2026-06-18 | live session | ☑ | ☑ | ☑ | ☑ | ☑ | ☑ | Path A/B Glass; automated 0/C/D/E via `scripts/d15-validate-deferred.sh` |
 | 2026-06-18 | live session | ☐ | ☑ | ☑ | ☑ | ☐ | ☐ | Proxy `serve()`; Path A plot edit; Path B `reactive_xy.jl`; acceptance signed off |
 
 When all rows pass, check the two remaining boxes in [pluto-lifecycle.md § Acceptance](./specs/pluto-lifecycle.md#acceptance-010):

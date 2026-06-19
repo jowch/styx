@@ -181,6 +181,6 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 | Bridge — DOM resolver (Phase 3) | ✅ **Gated** |
 | Cursor plugin Phase 4a–4b | ✅ **Gated** — Design Mode Path A, MCP staging workflow |
 | Cursor plugin Phase 4c | ✅ `resolve_pluto_context`; `pending_run` stop hook |
-| D15 lazy warm lifecycle | ✅ Implemented — [pluto-lifecycle.md](./specs/pluto-lifecycle.md); Path A/B validated in Glass |
+| D15 lazy warm lifecycle | ✅ Implemented — automated validation `scripts/d15-validate-deferred.sh` |
 | SDK agent eval | ✅ `eval:stage` pass@1 (local `CURSOR_API_KEY`) |
 | Upstream PRs (#6/#7) | 📋 open on mthelm85/PlutoMCP.jl |
