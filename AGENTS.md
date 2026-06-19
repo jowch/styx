@@ -2,7 +2,7 @@
 
 - Full Cursor plugin (commands, rules, browser hook) — not rules-only lightweight integration.
 - Plugin workflow rule should reference PlutoMCP.jl for MCP tool semantics (stage → `submit_changes`).
-- When fixing `pluto_multi_expression`, default to `begin`/`end` wrap; split cells only for intentional reactive steps.
+- When fixing `pluto_multi_expression`, wrap `begin`/`end` or split at reactive boundaries; when authoring, follow **pluto-semantics** cell-structure (`imports_cell`, `compute_cell`, `widget_cell`).
 - Resolve `notebook_id` from Glass browser URL or Design Mode click before `list_notebooks`; skills **`pluto-session`** / **`pluto-workflow`** / **`pluto-semantics`** are primary onboarding (lean SKILL.md + `reference/` deep-dives); no `@pluto-context` or **`pluto-open`** commands.
 - **Planning up front:** **DECISIONS.md** decision log + lean **PLAN.md** / **pluto-lifecycle.md** before implementation; prune stale historical specs before release; MCP-only details in fork (`AGENTS.md`); agent onboarding in skills only.
 - 50/50 user+agent Pluto collaboration — user edits freely in browser; chat memory is not notebook ground truth.
