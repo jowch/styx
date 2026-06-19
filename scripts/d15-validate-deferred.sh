@@ -33,7 +33,10 @@ julia --project=. -e '
 using PlutoMCP
 PlutoMCP.stop_pluto_stack!()
 PlutoMCP.tool_start_pluto_session(Dict{String,Any}())
-nb = PlutoMCP.tool_open_notebook(Dict("path" => abspath("eval/fixtures/reactive_xy.jl"), "run_notebook" => false))
+fixture = abspath("eval/fixtures/reactive_xy.jl")
+tmp = joinpath(tempdir(), "reactive_xy-pending_run-$(rand(UInt32)).jl")
+cp(fixture, tmp)
+nb = PlutoMCP.tool_open_notebook(Dict("path" => tmp, "run_notebook" => false))
 nid, cid = nb["notebook_id"], "11111111-1111-1111-1111-111111111111"
 sess = PlutoMCP.standalone_session()
 PlutoMCP.call_tool_with_session(sess, "read_cell", Dict("notebook_id" => nid, "cell_id" => cid))
@@ -44,6 +47,7 @@ out = read(`python3 hooks/warn-pending-run.py`, String)
 PlutoMCP.call_tool_with_session(sess, "submit_changes", Dict("notebook_id" => nid))
 @assert isempty(PlutoMCP.call_tool_with_session(sess, "read_notebook_code", Dict("notebook_id" => nid))["pending_run"])
 @assert strip(read(`python3 hooks/warn-pending-run.py`, String)) == "{}"
+rm(tmp; force=true)
 PlutoMCP.stop_pluto_stack!()
 println("Scenario D OK")
 '

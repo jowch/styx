@@ -99,7 +99,7 @@ Loads a notebook **server-side** so MCP tools and Glass share the same session. 
 
 **Do not** auto-run on Path B unless the user requested it. For staged agent edits after open, use normal **pluto-workflow** (`edit_cell` → `submit_changes`), not `run_all_cells`.
 
-**Agent cannot exit safe preview via MCP** (no `allow_execution` tool yet). **Remind** the user that the notebook is in preview mode and that staged edits won't run / outputs won't update until they click **Run notebook code** in Glass — still edit when asked. If they ask the agent to run, direct them to that button (not `run_all_cells`).
+**Safe preview exit:** `allow_execution(notebook_id=…)` — Glass **Run notebook code** equivalent; optional `run_notebook` (default true). If the tool is not in the MCP picker, invoke by name. On risky remote sources, Glass UI may still be required. **Remind** the user in safe preview that outputs/widgets won't update until execution is allowed — still edit when asked.
 
 ### Behavior changes
 
