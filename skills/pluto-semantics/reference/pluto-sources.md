@@ -15,8 +15,8 @@ Curated references for agent skill authors. Package version at research time: **
 | `src/webserver/Router.jl` | HTTP routes, `execution_allowed` query param |
 | `src/webserver/Dynamic.jl` | Notebook state payload, `restart_process`, Safe preview prerender |
 | `src/analysis/is_just_text.jl` | Which cells can run in Safe preview |
-| `sample/Interactivity.jl` | `@bind` patterns and pedagogy |
-| `sample/Getting started.jl` | One-expression-per-cell pedagogy |
+
+**Maintainers only** (do not point agents at bundled `sample/` for style): `sample/Interactivity.jl`, `sample/Getting started.jl` — use [agent-examples.md](agent-examples.md) instead.
 
 Local package path (Julia depot): `~/.julia/packages/Pluto/*/`
 

@@ -33,7 +33,7 @@ Do **not** atomize every line into its own cell when statements share one reacti
 
 ## Fixing `pluto_multi_expression`
 
-Two valid fixes (Getting started.jl):
+Two valid fixes — see [agent-examples.md](agent-examples.md) ex. 8:
 
 **Wrap** — minimal change, same cell:
 

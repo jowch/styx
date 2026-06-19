@@ -25,7 +25,7 @@ Each cell = **exactly one Julia expression**. Bare multiple statements → `plut
 
 **Still split** at reactive boundaries: imports | widgets | distinct downstream steps.
 
-Full patterns + decision table: [reference/cell-structure.md](reference/cell-structure.md). Sample notebooks: [reference/pluto-samples-index.md](reference/pluto-samples-index.md).
+Full patterns + decision table: [reference/cell-structure.md](reference/cell-structure.md). Curated layouts: [reference/agent-examples.md](reference/agent-examples.md).
 
 ## `@bind`
 
@@ -34,7 +34,7 @@ Full patterns + decision table: [reference/cell-structure.md](reference/cell-str
 
 ## Fixing `pluto_multi_expression`
 
-Wrap in **`begin`/`end`** in the same cell **or** split at reactive boundaries — both valid ([Getting started.jl](https://featured.plutojl.org) teaches both). Prefer wrap for minimal diff on edit; prefer split when separate reactive steps are intended.
+Wrap in **`begin`/`end`** in the same cell **or** split at reactive boundaries — see [agent-examples.md](reference/agent-examples.md) ex. 8. Prefer wrap for minimal diff; split when separate reactive steps are intended.
 
 ## REQUIRED chain
 
@@ -44,7 +44,7 @@ Wrap in **`begin`/`end`** in the same cell **or** split at reactive boundaries �
 ## Additional resources
 
 - **Structure patterns:** [reference/cell-structure.md](reference/cell-structure.md)
-- **Sample notebooks index:** [reference/pluto-samples-index.md](reference/pluto-samples-index.md)
+- **Curated examples:** [reference/agent-examples.md](reference/agent-examples.md)
 - **Parse grammar:** [reference/grammar.md](reference/grammar.md)
 - **Reactivity + order:** [reference/reactivity.md](reference/reactivity.md)
 - **Error kinds:** [reference/error-kinds.md](reference/error-kinds.md)

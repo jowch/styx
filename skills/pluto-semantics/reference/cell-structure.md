@@ -1,8 +1,6 @@
 # Notebook cell structure (agent authoring)
 
-Pluto enforces **one expression per cell** (parse). This doc is the **structure model** for how agents should organize notebooks — not the same as pedagogy notebooks that split every line for learners.
-
-**Samples index:** [pluto-samples-index.md](pluto-samples-index.md)
+Pluto enforces **one expression per cell** (parse). This doc defines **roles** and **boundaries**. Copy code from [agent-examples.md](agent-examples.md).
 
 ---
 
@@ -10,135 +8,52 @@ Pluto enforces **one expression per cell** (parse). This doc is the **structure 
 
 | Layer | Rule |
 |-------|------|
-| **Parse** | One Julia expression per cell (`begin`/`end`, `let`/`end`, `md"…"`, `@bind`, `function`… all count) |
-| **Structure** | Group by **reactive role**; use `begin`/`end` inside a cell for multi-statement **conceptual blocks** |
+| **Parse** | One Julia expression per cell (`begin`/`end`, `let`/`end`, `md"…"`, `@bind`, `function`…) |
+| **Structure** | Group by **reactive role**; `begin`/`end` inside a cell for multi-statement blocks |
 
-**Split cells at reactive boundaries** (imports → widget → compute → output). **Do not** split every statement into its own cell when those statements share one reactive step.
-
----
-
-## Structure patterns
-
-### `imports_cell` — dedicated package loading
-
-One early cell owns all `using` / `import`, wrapped in `begin`/`end`:
-
-```julia
-begin
-    using Plots
-    using PlutoUI
-end
-```
-
-Add new packages here — not scattered through the notebook. Comma-import (`using A, B`) is one expression and also valid; prefer the block when the list may grow.
+**Split at reactive boundaries** (imports → widget → compute). Do not atomize every line when statements share one reactive step.
 
 ---
 
-### `widget_cell` — interactive input
+## Cell roles
 
-One reactive input per cell. **`@bind` must be the returning expression.**
+| Role | Shape | Examples doc |
+|------|--------|--------------|
+| **imports_cell** | `begin; using …; end` — one early cell for all packages | ex. 1, 2, 6, 7 |
+| **widget_cell** | `@bind var Widget(...)` or `md"…$(@bind …)…"` — one bond per input | ex. 1, 3, 4, 5, 6 |
+| **compute_cell** | `begin … end` — multi-statement block that re-runs together | ex. 1, 2, 3 |
+| **scoped_cell** | `let … end` — locals that must not leak to notebook scope | ex. 5 |
+| **output_cell** | Single expression: `plot`, `md`, bare value | ex. 7 |
 
-**Standalone:**
-
-```julia
-@bind xrange RangeSlider(-10:0.25:10; default=-5:5)
-```
-
-**Embedded in prose:**
-
-```julia
-md"""
-Range: $(@bind xrange RangeSlider(-10:0.25:10; default=-5:5))
-"""
-```
-
-**Multi-widget form** — prefer `PlutoUI.combine()` when controls belong to one form (see `PlutoUI.jl.jl`, `Combine.jl`).
-
-Do **not** put bare `using` and `@bind` as adjacent top-level statements — that is `pluto_multi_expression`. Imports belong in `imports_cell`; or wrap in `begin`/`end` if truly one self-contained widget cell.
+**`@bind`:** returning expression of its cell only. Bare `using` + `@bind` on adjacent lines → `pluto_multi_expression` → [agent-examples.md](agent-examples.md) ex. 8.
 
 ---
 
-### `compute_cell` — multi-step logic (default: `begin`/`end`)
+## Reactive boundaries
 
-When several statements must re-run **together** as one reactive step, prefer **one cell** with `begin`/`end` over many single-line cells:
-
-```julia
-begin
-    lo, hi = first(xrange), last(xrange)
-    plot(sinc, lo, hi, color=:red, xlabel="x", title="sinc")
-end
-```
-
-**Plot chains** — official pattern from `Plots.jl.jl`: `plot` + `plot!` + styling in one `begin` block so partial updates do not leave stale series.
-
-**Rule of thumb:** if editing one line would always require editing the others, keep them in one `begin` cell.
+| Boundary | Split? |
+|----------|--------|
+| Imports vs rest | **Yes** |
+| Each `@bind` / form | **Yes** |
+| Distinct derived steps | **Often** |
+| Plot chain / setup steps that must run atomically | **No** — one `compute_cell` |
+| Prose vs code | **Yes** — alternate `md` and code cells |
 
 ---
 
-### `output_cell` — display result
+## Agent vs pedagogy
 
-Single expression whose value is the cell output: `plot(...)`, `md"…$(x)…"`, bare variable name, `HTML(...)`.
-
-Pedagogy notebooks often use a bare `x` cell after `@bind x` — valid for teaching; agents may fold display into `compute_cell` when it is not a separate reactive step.
+Teaching notebooks use micro-cells and bare echo cells after `@bind`. **Agents do not copy that.** Use [agent-examples.md](agent-examples.md) only — not Pluto `sample/` notebooks.
 
 ---
 
-### `scoped_cell` — `let`/`end` for locals
-
-Use **`let`/`end`** (not `begin`/`end`) when temporaries must **not** become notebook globals:
-
-```julia
-let
-    url = "https://example.com/data.csv"
-    data = CSV.read(download(url), DataFrame)
-    nrow(data)
-end
-```
-
-**Button triggers** — `PlutoUI.jl.jl` pattern: `@bind go Button("Recompute")` in `widget_cell`, then:
-
-```julia
-let
-    go
-    md"Result: $(rand(1:100))"
-end
-```
-
-Prefer `let` over `begin` when the only goal is hiding intermediates.
-
----
-
-## Reactive boundaries (when to split cells)
-
-| Boundary | Split? | Why |
-|----------|--------|-----|
-| Imports vs rest of notebook | **Yes** | `imports_cell` runs once; clear dependency root |
-| Each `@bind` / form | **Yes** | Bond output is the cell value; downstream cells consume bound vars |
-| Derived computation vs input | **Often** | Separate reactive steps (e.g. `x` → `y = f(x)`) |
-| Statements in one plot/setup chain | **No** — use `begin` | Must re-run atomically (`Plots.jl.jl`) |
-| Prose vs code | **Yes** | `md"…"` cells alternate with executable cells (`Plots.jl.jl` rhythm) |
-
----
-
-## Agent vs pedagogy notebooks
-
-Official samples (`Pluto/d9Dpv/sample/`) often use **many tiny cells** so learners see each reactive step (`Basic.jl`, `PlutoUI.jl.jl` — `@bind` then `x` then consumer).
-
-**Agents should:**
-
-- Consolidate with `begin`/`end` inside a cell for cohesive blocks
-- Still split at **widget** and **import** boundaries
-- Not copy empty spacer cells or over-split identical logic unless teaching
-
----
-
-## Quick decision table
+## Quick decisions
 
 | Situation | Action |
 |-----------|--------|
-| Adding packages | Append to `imports_cell` (`begin`/`end`) |
-| Adding slider / control | New `widget_cell` (`@bind` or `md` + `@bind`) |
-| Multi-line plot or setup | One `compute_cell` with `begin`/`end` |
-| Local temps, no new globals | `let`/`end` |
-| `pluto_multi_expression` on existing cell | `begin`/`end` wrap in place **or** split at reactive boundaries — see [grammar.md](grammar.md) |
-| Unsure if steps share one reactive step | `read_notebook_code` for dependency order |
+| Add packages | Append to `imports_cell` |
+| Add control | New `widget_cell` |
+| Multi-step plot/setup | `compute_cell` with `begin`/`end` |
+| Local temps | `let`/`end` |
+| `pluto_multi_expression` | [grammar.md](grammar.md) + ex. 8 |
+| Dependency order unclear | `read_notebook_code` |

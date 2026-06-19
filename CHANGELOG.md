@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **D15** lazy warm lifecycle — [docs/specs/pluto-lifecycle.md](docs/specs/pluto-lifecycle.md); PlutoMCP lifecycle tools implemented
 - **Skills:** `pluto-session`, `pluto-workflow`, `pluto-semantics` with progressive-disclosure `reference/` files
-- **Skills:** progressive-disclosure `reference/` trees under `skills/pluto-*`
+- **pluto-semantics:** structure-first cell model (`cell-structure.md`) and curated `agent-examples.md` (replaces sample-notebook index)
 - **PlutoMCP:** `allow_execution` — exit safe preview on open notebook when user asks to run
 - `package-plugin.sh` — release tree without dev artifacts
 - Cursor plugin: rules, hooks, bundled `mcp.json`, eval harness, Design Mode (D13)
