@@ -7,6 +7,7 @@ DEST="${HOME}/.cursor/plugins/local/styx"
 
 mkdir -p "${HOME}/.cursor/plugins/local"
 rsync -a --delete \
+  --exclude dist \
   --exclude .git \
   --exclude .cursor \
   --exclude eval/node_modules \
