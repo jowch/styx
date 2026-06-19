@@ -1,35 +1,40 @@
 ---
 name: pluto-semantics
 description: >-
-  Use when fixing pluto_multi_expression or extra-token parse errors,
-  deciding begin/end wrap vs splitting cells, placing @bind, or reasoning
-  about Pluto reactivity and cell execution order.
+  Use when structuring Pluto notebook cells, fixing pluto_multi_expression
+  errors, placing @bind widgets, or choosing begin/end vs let/end vs cell splits.
 ---
 
 # Pluto cell semantics
 
-## One expression per cell (critical)
+## Parse rule (hard)
 
-Each code cell = **exactly one Julia expression**. Multiple statements → `pluto_multi_expression` or `extra token after end of expression`.
+Each cell = **exactly one Julia expression**. Bare multiple statements → `pluto_multi_expression`.
 
-### Fix errors: wrap `begin`/`end` (default)
+## Structure defaults (agent authoring)
 
-```julia
-begin
-    using Plots
-    plot(sin, 0, 2pi)
-end
-```
+| Primitive | Shape |
+|-----------|--------|
+| **imports_cell** | `begin; using …; end` — one dedicated early cell for all packages |
+| **widget_cell** | `@bind var Widget(...)` or `md"…$(@bind …)…"` — one bond per reactive input |
+| **compute_cell** | `begin … end` — multi-statement blocks that re-run together |
+| **scoped_cell** | `let … end` — locals that must not become globals |
+| **output_cell** | Single expression display (`plot`, `md`, bare value) |
 
-Default to **`begin`/`end`** in the **same cell** when fixing errors. Split only when separate reactive steps are intended.
+**Default:** prefer **`begin`/`end`** inside a cell for a conceptual block instead of many single-line cells.
 
-Use **`let`/`end`** when temporaries must not become notebook globals.
+**Still split** at reactive boundaries: imports | widgets | distinct downstream steps.
 
-## Quick rules
+Full patterns + decision table: [reference/cell-structure.md](reference/cell-structure.md). Sample notebooks: [reference/pluto-samples-index.md](reference/pluto-samples-index.md).
 
-- `@bind` must be the **returning expression** (last in cell, or inside `md"…"`)
-- Visual `cell_order` ≠ execution order — use `read_notebook_code`
-- `error.fixes` order: `wrap_begin_end` first, `split_cells` second
+## `@bind`
+
+- Must be the **returning expression** of its cell (standalone, in `md"…"`, or last in `begin`/`end`).
+- Bound variable is consumed in **downstream** cells — not followed by more statements unless wrapped.
+
+## Fixing `pluto_multi_expression`
+
+Wrap in **`begin`/`end`** in the same cell **or** split at reactive boundaries — both valid ([Getting started.jl](https://featured.plutojl.org) teaches both). Prefer wrap for minimal diff on edit; prefer split when separate reactive steps are intended.
 
 ## REQUIRED chain
 
@@ -38,7 +43,9 @@ Use **`let`/`end`** when temporaries must not become notebook globals.
 
 ## Additional resources
 
-- **Full grammar + `@bind`:** [reference/grammar.md](reference/grammar.md)
+- **Structure patterns:** [reference/cell-structure.md](reference/cell-structure.md)
+- **Sample notebooks index:** [reference/pluto-samples-index.md](reference/pluto-samples-index.md)
+- **Parse grammar:** [reference/grammar.md](reference/grammar.md)
 - **Reactivity + order:** [reference/reactivity.md](reference/reactivity.md)
 - **Error kinds:** [reference/error-kinds.md](reference/error-kinds.md)
 - **Pluto.jl source citations:** [reference/pluto-sources.md](reference/pluto-sources.md)

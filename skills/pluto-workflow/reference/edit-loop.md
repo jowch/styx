@@ -25,6 +25,10 @@ resolve notebook_id → read_cell (note safe preview; remind if active)
 - Re-read before overwriting if the user was typing in the browser.
 - Call **`submit_changes`** before ending the turn if edits were staged.
 
+## Cell structure
+
+Follow **pluto-semantics** [cell-structure.md](../../pluto-semantics/reference/cell-structure.md): `imports_cell`, `widget_cell`, `compute_cell` with `begin`/`end` by default, `let`/`end` for scoped temps.
+
 ## When fixing parse errors
 
-Default to **`begin`/`end`** in the same cell. See **pluto-semantics**.
+Wrap **`begin`/`end`** in place or split at reactive boundaries. See **pluto-semantics** [grammar.md](../../pluto-semantics/reference/grammar.md).

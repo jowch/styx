@@ -30,12 +30,12 @@ read → stage (run_after=false) → submit_changes → read (verify)
 
 **Safe preview:** still edit; remind user outputs won't update until **Run notebook code** in Glass. See [safe-preview.md](reference/safe-preview.md).
 
-**Parse errors:** default `begin`/`end` wrap → **pluto-semantics**.
+**Cell structure / parse errors:** **pluto-semantics** — [cell-structure.md](../pluto-semantics/reference/cell-structure.md).
 
 ## REQUIRED chain
 
 - Bootstrap → **pluto-session**
-- `pluto_multi_expression` / grammar → **pluto-semantics**
+- Cell layout, `@bind`, `pluto_multi_expression` → **pluto-semantics**
 
 ## Common mistakes
 
@@ -54,3 +54,4 @@ read → stage (run_after=false) → submit_changes → read (verify)
 - **Full edit pipeline:** [reference/edit-loop.md](reference/edit-loop.md)
 - **Error fields + kinds:** [reference/errors.md](reference/errors.md)
 - **Canonical MCP tool names:** [reference/tools.md](reference/tools.md)
+- **Notebook cell structure:** [pluto-semantics/reference/cell-structure.md](../pluto-semantics/reference/cell-structure.md)

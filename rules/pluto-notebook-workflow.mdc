@@ -11,7 +11,7 @@ alwaysApply: true
 
 - **pluto-session** — start Pluto, open notebook, Glass navigation
 - **pluto-workflow** — cell edits once a notebook is open
-- **pluto-semantics** — cell grammar and `pluto_multi_expression` fixes
+- **pluto-semantics** — cell structure (`imports_cell`, `begin`/`end` blocks, `@bind`) and parse-error fixes
 
 Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()` — call `start_pluto_session` / `open_notebook` **by name** even if not in the MCP tool picker.
 

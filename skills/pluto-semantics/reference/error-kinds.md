@@ -4,9 +4,11 @@
 
 **Symptom:** `extra token after end of expression` + `Boundaries: [...]`
 
-**Default fix:** `edit_cell` with `begin`/`end` wrap in same cell → `submit_changes`
+**Default fix (repair):** `edit_cell` with `begin`/`end` wrap in same cell → `submit_changes`
 
-**Alternative:** split cells using `error.boundaries` when separate reactive steps are intended
+**Alternative:** split at reactive boundaries using `error.boundaries` — see [cell-structure.md](cell-structure.md)
+
+**Authoring:** avoid the error by following structure patterns (`imports_cell`, `widget_cell`, `compute_cell`) in [cell-structure.md](cell-structure.md).
 
 **`error.fixes` order:** `wrap_begin_end` first, `split_cells` second
 
