@@ -24,6 +24,7 @@ Do not use legacy aliases (`get_cell`, `set_cell_code`, `run_cell`).
 - `start_pluto_session`
 - `stop_pluto_session`
 - `open_notebook`
+- `allow_execution`
 
 ## Projection rules
 

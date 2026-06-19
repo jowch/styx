@@ -34,8 +34,9 @@ Do **not** claim outputs/widgets are live until they have run. Do **not** preten
 
 If they say *run the notebook*, *execute cells*, *run it*, etc.:
 
-> I can't trigger **Run notebook code** from here — please click **Run notebook code** in Glass (top right). Until then, staged code won't execute.
+1. **`allow_execution(notebook_id=…)`** — exits safe preview and runs cells (default `run_notebook=true`).
+2. **Or** ask them to click **Run notebook code** in Glass if they prefer the UI.
 
-Do **not** use `run_all_cells` / `execute_cell` as a substitute.
+Do **not** call `run_all_cells` / `execute_cell` **before** `allow_execution` — they do not bypass safe preview.
 
 Use `open_notebook(..., run_notebook=true)` **only** when the user explicitly asked to open **and run** at open time.

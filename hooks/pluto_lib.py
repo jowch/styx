@@ -190,7 +190,9 @@ def mcp_call(
 def pending_run_notebooks() -> list[dict[str, Any]]:
     """Return notebooks with non-empty pending_run from the live bridge."""
     if not mcp_health_ok():
-        raise PendingRunError("Pluto MCP bridge not healthy")
+        # D15 deferred: HTTP bridge (:2346) is down until start_pluto_session.
+        # No server-side pending_run to inspect — not an error for non-notebook turns.
+        return []
     out: list[dict[str, Any]] = []
     try:
         notebooks = mcp_call("list_notebooks", timeout=3)

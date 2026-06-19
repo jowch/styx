@@ -23,5 +23,5 @@
 | Edit without read | `read_cell` first |
 | Patch `.jl` on disk | MCP only |
 | Forget safe preview reminder | See [safe-preview.md](safe-preview.md) |
-| User asks to run notebook | Direct to **Run notebook code** in Glass |
+| User asks to run notebook | `allow_execution` or direct to **Run notebook code** in Glass |
 | Claim `submit_changes` ran cells in safe preview | Remind user to run in Glass |

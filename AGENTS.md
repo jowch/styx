@@ -23,6 +23,6 @@
 - **Path C removed:** no `src/dom-resolver.js`, `inject.js`, or `bridge/server.js`; click parsing is Design Mode → MCP **`resolve_pluto_context`** + hook **`pluto_lib.py`**.
 - **Release/install:** nothing published yet; first release **0.1.0**; CHANGELOG **`[Unreleased]`** until first tag; dev install via **`sync-local-plugin.sh`** only (not user-facing).
 - **D15 session paths:** Path A = general Pluto intent → landing page in Agents Glass (not `cursor-ide-browser` MCP), user picks notebook, `notebook_id` on next prompt; Path B = named `.jl` path → landing (cookies) → **`open_notebook`** → notebook URL `http://127.0.0.1:1234/edit?id=<uuid>` (plain `/<uuid>` fails). Commands **`pluto-notebooks`** / **`pluto-open`** for session entry (`pluto-start` removed).
-- **`open_notebook`:** server-side notebook load; safe preview default (`execution_allowed=false`); **`run_notebook`** opt-in at open time; agent cannot exit safe preview on an already-open notebook via MCP.
+- **`open_notebook`:** server-side notebook load; safe preview default (`execution_allowed=false`); **`run_notebook`** opt-in at open time; **`allow_execution`** exits safe preview when user asks to run.
 - Phases 1–4c and Phase 5 safety complete; **D15 lifecycle implemented** (acceptance signed off 2026-06-18; Path A/B validated in Glass).
 - **Eval harness** (`eval/`): scenarios, fixtures, reference runner, SDK orchestrator; CI gate via `run_reference.jl --all --strict-trace`. PlutoMCP keeps optional `EvalLog.jl` hook only.

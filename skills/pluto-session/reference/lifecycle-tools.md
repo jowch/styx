@@ -8,6 +8,7 @@
 | `start_pluto_session` | Start deferred Pluto + HTTP bridge on `:2346` |
 | `stop_pluto_session` | Tear down Pluto stack |
 | `open_notebook` | Load a `.jl` file into the session (Path B) |
+| `allow_execution` | Exit safe preview on open notebook; optional `run_notebook` (default true) |
 
 ## MCP tool picker quirk
 
