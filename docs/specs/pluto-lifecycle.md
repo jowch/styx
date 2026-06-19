@@ -115,7 +115,7 @@ Loads a notebook **server-side** so MCP tools and Glass share the same session. 
 | Landing | `http://127.0.0.1:1234/` | Always after `start_pluto_session`; Path A stops here |
 | Notebook | `http://127.0.0.1:1234/edit?id=<notebook_id>` | Path B after `open_notebook`; Path A only on a later prompt once id is known |
 
-Use `open_resource` in Agents Glass. Path B: **landing first**, then notebook (cookie setup).
+Use **`cursor-ide-browser`** → `browser_navigate` (`position: "active"`). Path B: landing → `open_notebook` → `browser_click` notebook on landing (not pasted `/edit?id=`).
 
 ### Optional env
 
@@ -140,12 +140,12 @@ Use `open_resource` in Agents Glass. Path B: **landing first**, then notebook (c
 
 ### Glass navigation
 
-Agent opens Pluto in **Agents Glass** via `open_resource` (cursor-app-control MCP) when available:
+Agent opens Pluto in **Agents Glass** via **`cursor-ide-browser`**:
 
-- Home: `http://127.0.0.1:1234/`
-- Notebook: `http://127.0.0.1:1234/edit?id=<notebook_id>`
+1. `browser_navigate({ url: "http://127.0.0.1:1234/", position: "active" })` — confirm `glass-browser-*` view ID
+2. **Path B:** after `open_notebook`, `browser_click` notebook filename on landing — not cold `/edit?id=`
 
-Do not use `cursor-ide-browser` MCP for Pluto (D13).
+Do **not** use `plugin-browse-browser` for Pluto.
 
 ---
 
@@ -179,8 +179,8 @@ Agent does **not** ask which notebook in chat. Notebook id comes from the **seco
 | 2 | Agent | `start_pluto_session` |
 | 3 | Agent | Opens `http://127.0.0.1:1234/` in Glass *(cookies)* |
 | 4 | Agent | `open_notebook(path=…)` → `notebook_id` *(safe preview; run banner unless `run_notebook=true`)* |
-| 5 | Agent | Opens `http://127.0.0.1:1234/edit?id=<notebook_id>` in Glass |
-| 6 | User | Sees notebook directly; edits via Design Mode or chat |
+| 5 | Agent | `browser_click` notebook on landing in Glass *(not pasted `/edit?id=`)* |
+| 6 | User | Sees notebook; edits via Design Mode or chat |
 
 ---
 

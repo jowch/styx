@@ -118,7 +118,9 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 **Not primary:** inject+queue dom-bridge (Path D).
 
-**Do not use** `cursor-ide-browser` MCP for Pluto — use Agents Glass (`PlutoMCP.serve(require_secret_for_access=false)` for seamless loopback open).
+**Do not use** `plugin-browse-browser` for Pluto — separate automation daemon, not Agents Glass.
+
+**Glass navigation (D13, amended 2026-06-18):** **`cursor-ide-browser`** in **Agents Window** (`browser_navigate` / `browser_click`) — view IDs are `glass-browser-*`, same panel as Design Mode. Do not use `plugin-browse-browser`. Legacy spike: Editor-only chat hung on auth; Agents Window path is fine with `require_secret_for_access=false`.
 
 ---
 

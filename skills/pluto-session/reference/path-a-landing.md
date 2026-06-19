@@ -11,7 +11,7 @@ Use when the user wants Pluto/notebooks but **does not name a specific file**.
 ## Steps
 
 1. `pluto_session_status` → if stopped, `start_pluto_session`
-2. Open **Pluto landing page** in Agents Glass: `http://127.0.0.1:1234/`
+2. Open **Pluto landing page** in Agents Glass — see [glass-navigation.md](glass-navigation.md) (`cursor-ide-browser` → `browser_navigate` with `position: "active"`)
 3. Tell the user briefly:
 
    > Pluto is ready. Pick or create a notebook on this page. When you're in a notebook, send your next message — click a cell with **⌘⇧D** (Design Mode) or describe what you want.

@@ -34,9 +34,9 @@ Record baseline rationalizations verbatim in `eval/results/skill-baseline-<date>
 | | |
 |--|--|
 | **Skills** | **pluto-session** → **pluto-workflow** on edits |
-| **Expected** | `start_pluto_session` if needed; landing `http://127.0.0.1:1234/` **first**; `open_notebook(path=…)`; open `http://127.0.0.1:1234/edit?id=<id>`; safe-preview reminder |
-| **Must NOT** | Bare `/<notebook_id>` URL; skip landing; `run_all_cells` at open |
-| **Common rationalizations** | "I'll open notebook URL directly" → cookies fail; "I'll run cells to verify" → safe preview blocks |
+| **Expected** | `start_pluto_session` if needed; landing in Glass via `cursor-ide-browser`; `open_notebook(path=…)`; `browser_click` notebook on landing; safe-preview reminder |
+| **Must NOT** | Bare `/<notebook_id>` URL; skip landing; `run_all_cells` at open; pasted `/edit?id=` after MCP `open_notebook`; `plugin-browse-browser` |
+| **Common rationalizations** | "I'll paste the edit URL" → use landing click after MCP open; "I'll run cells to verify" → safe preview blocks |
 
 ---
 
@@ -50,7 +50,7 @@ Record baseline rationalizations verbatim in `eval/results/skill-baseline-<date>
 |--|--|
 | **Skills** | **pluto-workflow** |
 | **Expected** | Ask user to enable Design Mode (**⌘⇧D**) and re-click inside a cell; **not** `list_notebooks` first |
-| **Must NOT** | Guess cell from `list_notebooks`; use `cursor-ide-browser` |
+| **Must NOT** | Guess cell from `list_notebooks`; use `plugin-browse-browser` |
 | **Common rationalizations** | "list_notebooks is faster" → browser-first rule |
 
 ---

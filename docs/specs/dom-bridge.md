@@ -72,7 +72,7 @@ resolve_pluto_context(context=<browser_element block>)
 - `<pluto-notebook id="{notebook_id}">` container
 - Markdown, `@bind` (`<bond def="...">`), plots under `pluto-output`
 - Do not use `bond[def]` or variable span IDs as `cell_id`
-- Do not use `cursor-ide-browser` MCP for Pluto (D13) — use Agents Glass
+- Do not use `plugin-browse-browser` MCP for Pluto — use Agents Glass via **`cursor-ide-browser`** in Agents Window
 
 ## Constraints
 

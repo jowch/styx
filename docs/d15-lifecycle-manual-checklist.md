@@ -66,7 +66,7 @@ Ask: *"What is pluto_session_status?"*
 |------|-------|---------------|
 | A.1 | Agent | Calls `pluto_session_status` → `stopped` |
 | A.2 | Agent | Calls `start_pluto_session` |
-| A.3 | Agent | Opens `http://127.0.0.1:1234/` in **Agents Glass** (`open_resource`) |
+| A.3 | Agent | Opens `http://127.0.0.1:1234/` in **Agents Glass** (`cursor-ide-browser`) |
 | A.4 | Agent | Short message: pick notebook on page; **does not** ask which file in chat |
 | A.5 | Agent | Does **not** call `open_notebook` or `list_notebooks` during bootstrap |
 
@@ -199,7 +199,8 @@ Optional: agent `read_cell` on cell `11111111-1111-1111-1111-111111111111` — o
 | Hook says "reload MCP" | Old hook copy | Reinstall/sync plugin; hook should mention `start_pluto_session` |
 | `pluto_not_running` on edit | Session not started | Agent calls `start_pluto_session` first |
 | Design Mode click, no `pluto-cell#` | Design Mode off or bare `main` click | ⌘⇧D, re-click inside cell |
-| Notebook URL 403 / secret | Skipped landing (Path B) | Open `http://127.0.0.1:1234/` first, then `http://127.0.0.1:1234/edit?id=<notebook_id>` |
+| Notebook URL 403 / secret | Skipped landing (Path B) | Open `http://127.0.0.1:1234/` first, then click notebook on landing |
+| `Loading cells...` forever | Pasted `/edit?id=` after MCP `open_notebook` | Click notebook on landing instead — see [path-b-edit-url-loading.md](../known-issues/path-b-edit-url-loading.md) |
 | MCP tools fail after killing `serve()` | `connect()` was in **proxy** mode; bridge died | Toggle **pluto** MCP off/on in Cursor Settings (restart with no `serve()` running) |
 
 ---

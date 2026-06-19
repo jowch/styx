@@ -17,7 +17,7 @@ Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()` — call `start
 
 ## Bootstrap
 
-Notebook intent → **pluto-session** first. Glass URLs: landing `http://127.0.0.1:1234/`; notebook `http://127.0.0.1:1234/edit?id=<id>` (Path B: landing first for cookies). Prefer `open_resource`; if unavailable, direct user to open URL in Agents Glass.
+Notebook intent → **pluto-session** first. Glass: **`cursor-ide-browser`** (`position: "active"`; view ID `glass-browser-*`). Path B: after `open_notebook`, `browser_click` notebook on landing — not pasted `/edit?id=`. **Not** `plugin-browse-browser`.
 
 ## Safe preview
 

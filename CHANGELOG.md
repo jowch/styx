@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Marketplace install path
 - Lifecycle tools not always visible in Cursor MCP tool picker (invoke by name)
+- Path B: pasted `/edit?id=` after MCP `open_notebook` hangs — use `browser_click` on landing ([known issue](docs/known-issues/path-b-edit-url-loading.md))
 - Pure deferred Scenario 0 (stdio-only, no proxy `serve()`) — automated via `scripts/d15-validate-deferred.sh`; manual 0.2/C.1 agent chat checks remain
 
 [Unreleased]: https://github.com/jowch/styx/compare/HEAD...HEAD

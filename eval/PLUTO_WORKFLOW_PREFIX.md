@@ -6,7 +6,7 @@ Notebook work is **on demand**. If the user wants Pluto notebooks, use skill **p
 
 Lifecycle tools (`start_pluto_session`, `open_notebook`, etc.) may be hidden in the MCP picker — **invoke by name**.
 
-Glass notebook URL: `http://127.0.0.1:1234/edit?id=<notebook_id>` (not bare `/<id>`). Path B: landing `/` first for cookies.
+Glass: **`cursor-ide-browser`** in Agents Window (`glass-browser-*`). Path B: landing → `open_notebook` → `browser_click` notebook on landing (not pasted `/edit?id=`). Not `plugin-browse-browser`.
 
 ## Cell edits
 

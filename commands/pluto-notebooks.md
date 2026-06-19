@@ -6,7 +6,7 @@ description: User wants to work on Pluto notebooks — agent invokes pluto-sessi
 
 Invoke **pluto-session** and follow it.
 
-- **No specific notebook** (Path A): start session if needed → open `http://127.0.0.1:1234/` in Glass → user picks notebook on next prompt.
-- **Named notebook** (Path B): landing first (cookies) → `open_notebook(path=…)` → open `http://127.0.0.1:1234/edit?id=<notebook_id>` → safe-preview reminder.
+- **No specific notebook** (Path A): start session if needed → open landing in Glass → user picks notebook on next prompt.
+- **Named notebook** (Path B): landing in Glass → `open_notebook(path=…)` → agent clicks notebook on landing via `cursor-ide-browser` → safe-preview reminder.
 
-Lifecycle tools may be hidden in the MCP picker — invoke by name. Full steps: **pluto-session**. Cell edits: **pluto-workflow**.
+Glass navigation: **`cursor-ide-browser`** — not `plugin-browse-browser`. Full steps: **pluto-session**.

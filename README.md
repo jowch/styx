@@ -65,4 +65,4 @@ Optional: copy `.env.dev.example` → `.env.dev`, set `PLUTOMCP_SOURCE` to your 
 
 Toggle **Cmd+Shift+D** in Agents Glass, click a cell, send a prompt. Hook `prompt` includes `dom_path` with `pluto-notebook#…` and `pluto-cell#…`. Agent calls MCP **`resolve_pluto_context`** and **`read_cell`**.
 
-Do not use `cursor-ide-browser` MCP for Pluto.
+Do not use `plugin-browse-browser` for Pluto. Glass: **`cursor-ide-browser`** in Agents Window.
