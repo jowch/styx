@@ -1,7 +1,0 @@
-{
-  "name": "styx",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "description": "Styx — Cursor plugin bridging Pluto.jl notebooks and Cursor via PlutoMCP"
-}

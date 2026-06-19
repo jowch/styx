@@ -3,14 +3,10 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import sys
 import urllib.error
 import urllib.request
 from typing import Any
-
-RE_CELL_ID = re.compile(r"pluto-cell#([0-9a-f-]+)", re.I)
-RE_NOTEBOOK_ID = re.compile(r"pluto-notebook#([0-9a-f-]+)", re.I)
 
 EDIT_TOOLS_PRE = {
     "MCP:edit_cell",
@@ -48,44 +44,6 @@ def state_dir() -> str:
 
 def reads_path() -> str:
     return os.path.join(state_dir(), "pluto-reads.json")
-
-
-def parse_dom_path(dom_path: str) -> dict[str, Any]:
-    if not dom_path or not isinstance(dom_path, str):
-        return {"ok": False, "reason": "invalid_dom_path"}
-    cell = RE_CELL_ID.search(dom_path)
-    if not cell:
-        return {"ok": False, "reason": "no_pluto_cell_in_dom_path"}
-    notebook = RE_NOTEBOOK_ID.search(dom_path)
-    return {
-        "ok": True,
-        "cell_id": cell.group(1),
-        "notebook_id": notebook.group(1) if notebook else None,
-    }
-
-
-def parse_prompt_text(text: str) -> dict[str, Any]:
-    if not text:
-        return {"ok": False, "reason": "empty_prompt"}
-    dom_path = None
-    for line in text.splitlines():
-        if line.strip().lower().startswith("dom_path:"):
-            dom_path = line.split(":", 1)[1].strip()
-            break
-    if dom_path:
-        parsed = parse_dom_path(dom_path)
-        if parsed.get("ok"):
-            return {**parsed, "dom_path": dom_path}
-    cell = RE_CELL_ID.search(text)
-    if not cell:
-        return {"ok": False, "reason": "no_pluto_cell_in_prompt"}
-    notebook = RE_NOTEBOOK_ID.search(text)
-    return {
-        "ok": True,
-        "cell_id": cell.group(1),
-        "notebook_id": notebook.group(1) if notebook else None,
-        "dom_path": dom_path,
-    }
 
 
 def load_reads() -> list[dict[str, Any]]:

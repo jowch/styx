@@ -23,7 +23,7 @@ pluto-cell#([0-9a-f-]+)
 If `pluto-cell#` is missing (e.g. bare `main` click):
 
 - Ask user to enable Design Mode (**Cmd+Shift+D**) and re-click inside a cell
-- Or use `@pluto-context` if pasted
+- Or resolve `notebook_id` from Glass URL `/edit?id=<uuid>`
 
 Drawings/annotations in Design Mode are screenshot-only — no structured `dom_path`.
 
@@ -39,5 +39,4 @@ Notebook URL form: `http://127.0.0.1:1234/edit?id=<notebook_id>`
 |----------|--------|
 | 1 | Design Mode click → `resolve_pluto_context` |
 | 2 | Glass URL `/edit?id=<notebook_id>` |
-| 3 | `@pluto-context` block |
-| 4 | `list_notebooks` — only when no browser context |
+| 3 | `list_notebooks` — only when no browser context |

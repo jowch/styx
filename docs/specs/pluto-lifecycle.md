@@ -136,7 +136,6 @@ Use **`cursor-ide-browser`** → `browser_navigate` (`position: "active"`). Path
 | `commands/pluto-notebooks.md` | **New** — user says "work on notebooks" |
 | `commands/pluto-start.md` | **Remove** or redirect to pluto-notebooks |
 | `hooks/check-design-mode.py` | Gate on `pluto_session_status` / running, not raw `/health` alone |
-| `eval/PLUTO_WORKFLOW_PREFIX.md` | Point to pluto-session skill |
 
 ### Glass navigation
 
@@ -263,5 +262,5 @@ Automated gates: `Pkg.test()` (PlutoMCP), `eval/run_reference.jl --all --strict-
 ## Related
 
 - [D15 in DECISIONS.md](../DECISIONS.md)
-- [plutomcp-architecture.md](./plutomcp-architecture.md) — entry modes (amend after D15 ships)
-- [cursor-plugin.md](./cursor-plugin.md) — MCP lifecycle (amend § launcher)
+- [Path B loading hang](../known-issues/path-b-edit-url-loading.md)
+- MCP tool semantics: [PlutoMCP.jl AGENTS.md](https://github.com/jowch/PlutoMCP.jl/blob/main/AGENTS.md)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""preToolUse: deny Pluto write MCP tools without a prior read_cell receipt in this chat."""
+"""preToolUse + beforeMCPExecution: deny Pluto write tools without read receipt."""
 from __future__ import annotations
 
 import os
@@ -23,8 +23,8 @@ def main() -> int:
         return 0
 
     deny_edit(
-        "Pluto read-before-edit: call read_cell (or read_notebook_code) for this cell "
-        "before edit_cell / edit_cells / add_cell / delete_cell / move_cell."
+        "Pluto read-before-edit: call read_cell (or read_notebook_code) before "
+        "edit_cell / edit_cells / add_cell / delete_cell / move_cell."
     )
     return 0
 

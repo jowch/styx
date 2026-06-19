@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **D15** lazy warm lifecycle — [docs/specs/pluto-lifecycle.md](docs/specs/pluto-lifecycle.md); PlutoMCP lifecycle tools implemented
 - **Skills:** `pluto-session`, `pluto-workflow`, `pluto-semantics` with progressive-disclosure `reference/` files
-- **Docs:** [docs/skill-architecture.md](docs/skill-architecture.md), [eval/SKILL_BASELINE_SCENARIOS.md](eval/SKILL_BASELINE_SCENARIOS.md) (TDD pressure scenarios)
+- **Skills:** progressive-disclosure `reference/` trees under `skills/pluto-*`
 - **PlutoMCP:** `allow_execution` — exit safe preview on open notebook when user asks to run
 - `package-plugin.sh` — release tree without dev artifacts
 - Cursor plugin: rules, hooks, bundled `mcp.json`, eval harness, Design Mode (D13)
@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Path C DOM bridge (`bridge/`, `src/`)
 - `commands/pluto-start.md`, legacy `pluto-*-cell` commands — replaced by D15 agent lifecycle + skills
+- Historical planning docs (`docs/spikes/`, phase specs, `pluto-agent-primer.md`, SDK eval stack)
+- `commands/pluto-open.md` — folded into **pluto-notebooks**; `guard-edit`/`guard-mcp` → `guard-write.py`
 
 ### Known gaps before 0.1.0
 

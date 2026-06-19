@@ -20,8 +20,7 @@ Notebook open in Glass at `http://127.0.0.1:1234/edit?id=<notebook_id>`. If not 
 |----------|--------|
 | 1 | Design Mode (**⌘⇧D**) click → `resolve_pluto_context` → `read_cell` |
 | 2 | Glass URL `/edit?id=<notebook_id>` |
-| 3 | `@pluto-context` block |
-| 4 | `list_notebooks` — only when no browser context |
+| 3 | `list_notebooks` — only when no browser context |
 
 ## Edit loop
 

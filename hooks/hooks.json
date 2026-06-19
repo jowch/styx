@@ -16,14 +16,14 @@
     ],
     "preToolUse": [
       {
-        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/guard-edit.py",
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/guard-write.py",
         "matcher": "MCP:edit_cell|MCP:edit_cells|MCP:add_cell|MCP:delete_cell|MCP:move_cell",
         "timeout": 5
       }
     ],
     "beforeMCPExecution": [
       {
-        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/guard-mcp.py",
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/guard-write.py",
         "matcher": "edit_cell|edit_cells|add_cell|delete_cell|move_cell",
         "timeout": 5
       }

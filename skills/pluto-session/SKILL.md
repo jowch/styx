@@ -47,4 +47,4 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 - **Path B + cookies + safe preview:** [reference/path-b-open.md](reference/path-b-open.md)
 - **Glass navigation (`cursor-ide-browser`):** [reference/glass-navigation.md](reference/glass-navigation.md)
 - **Lifecycle tools + MCP picker quirk:** [reference/lifecycle-tools.md](reference/lifecycle-tools.md)
-- **Bootstrap errors:** [reference/errors.md](reference/errors.md)
+- **Bootstrap errors:** [pluto-workflow/reference/errors.md](../pluto-workflow/reference/errors.md)

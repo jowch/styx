@@ -42,4 +42,3 @@ Use **`let`/`end`** when temporaries must not become notebook globals.
 - **Reactivity + order:** [reference/reactivity.md](reference/reactivity.md)
 - **Error kinds:** [reference/error-kinds.md](reference/error-kinds.md)
 - **Pluto.jl source citations:** [reference/pluto-sources.md](reference/pluto-sources.md)
-- Human-readable mirror: `docs/pluto-semantics.md`
