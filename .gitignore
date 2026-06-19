@@ -10,3 +10,6 @@ eval/results/
 eval/.env
 *.jsonl
 pluto-click-queue.json
+
+# Pluto notebook backups (editor/browser saves, e.g. "notebook backup 1.jl")
+* backup *.jl
