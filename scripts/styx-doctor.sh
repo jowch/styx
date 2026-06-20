@@ -5,11 +5,91 @@ set -euo pipefail
 PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 MCP_PORT="${PLUTOMCP_MCP_PORT:-2346}"
 PLUTO_PORT="${PLUTOMCP_PLUTO_PORT:-1234}"
+STYX_REPO="${STYX_REPO:-jowch/styx}"
+CHECK_UPDATES=0
 FAIL=0
 
 say_ok() { echo "OK  $*"; }
 say_warn() { echo "WARN  $*"; }
 say_fail() { echo "FAIL  $*"; FAIL=1; }
+
+usage() {
+  cat <<'EOF'
+Usage: styx-doctor.sh [--check-updates]
+
+  --check-updates   Compare installed plugin.json version to latest GitHub release
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --check-updates) CHECK_UPDATES=1; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; usage >&2; exit 1 ;;
+  esac
+done
+
+# ponytail: strip optional leading v for semver-ish compare via sort -V
+normalize_version() {
+  echo "${1#v}"
+}
+
+read_plugin_version() {
+  local manifest="$1"
+  sed -n 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$manifest" | head -1
+}
+
+check_updates() {
+  local manifest="${PLUGIN_ROOT}/.cursor-plugin/plugin.json"
+  local installed latest api_url
+
+  if [[ ! -f "$manifest" ]]; then
+    say_warn "Update check skipped — missing .cursor-plugin/plugin.json"
+    return
+  fi
+  if ! command -v curl >/dev/null 2>&1; then
+    say_warn "Update check skipped — curl not found"
+    return
+  fi
+
+  installed="$(read_plugin_version "$manifest")"
+  if [[ -z "$installed" ]]; then
+    say_warn "Update check skipped — could not read installed version"
+    return
+  fi
+
+  latest=""
+  api_url="https://api.github.com/repos/${STYX_REPO}/releases/latest"
+  if raw="$(curl -sf --max-time 8 -H "Accept: application/vnd.github+json" "$api_url" 2>/dev/null)"; then
+    latest="$(echo "$raw" | sed -n 's/^[[:space:]]*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)"
+  fi
+
+  if [[ -z "$latest" ]]; then
+    if raw="$(curl -sf --max-time 8 \
+      "https://raw.githubusercontent.com/${STYX_REPO}/main/.cursor-plugin/plugin.json" 2>/dev/null)"; then
+      latest="$(echo "$raw" | sed -n 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)"
+    fi
+  fi
+
+  if [[ -z "$latest" ]]; then
+    say_warn "Update check skipped — could not reach GitHub (no release or network)"
+    return
+  fi
+
+  if [[ "$(normalize_version "$installed")" == "$(normalize_version "$latest")" ]]; then
+    say_ok "Styx up to date (${installed})"
+    return
+  fi
+
+  if [[ "$(printf '%s\n' "$(normalize_version "$installed")" "$(normalize_version "$latest")" | sort -V | tail -1)" == "$(normalize_version "$installed")" ]]; then
+    say_ok "Styx ${installed} (latest release: ${latest})"
+    return
+  fi
+
+  say_warn "Update available: installed ${installed}, latest ${latest}"
+  echo "      Re-run: curl -fsSL https://raw.githubusercontent.com/${STYX_REPO}/main/scripts/install.sh | bash"
+  echo "      Or: STYX_REF=${latest} curl -fsSL https://raw.githubusercontent.com/${STYX_REPO}/main/scripts/install.sh | bash"
+}
 
 echo "Styx doctor (plugin: ${PLUGIN_ROOT})"
 echo
@@ -53,6 +133,11 @@ if command -v lsof >/dev/null 2>&1; then
       say_ok "Port :${port} in use (Pluto session or MCP may be up)"
     fi
   done
+fi
+
+if [[ "$CHECK_UPDATES" -eq 1 ]]; then
+  echo
+  check_updates
 fi
 
 echo
