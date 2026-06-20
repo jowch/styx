@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Rule** — agent-driven lifecycle; thin router to skills (D15)
 - **Skills** — CSO descriptions (triggers only); Pluto.jl research in `reference/`; canonical Glass URL `/edit?id=`
+- **README** — lean install pointer; workflow via skills (planning docs removed for release)
 - Launcher — `connect()` only (D15); `pluto-serve.sh` dev-only
 - Version **0.1.0** pre-release; D15 acceptance signed off 2026-06-18
 
@@ -31,8 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Path C DOM bridge (`bridge/`, `src/`)
 - `commands/pluto-start.md`, legacy `pluto-*-cell` commands — replaced by D15 agent lifecycle + skills
-- Historical planning docs (`docs/spikes/`, phase specs, `pluto-agent-primer.md`, SDK eval stack)
+- Historical planning docs (`docs/spikes/`, `docs/DECISIONS.md`, `docs/PLAN.md`, `docs/specs/pluto-lifecycle.md`, phase specs, `pluto-agent-primer.md`, SDK eval stack)
 - `commands/pluto-open.md` — folded into **pluto-notebooks**; `guard-edit`/`guard-mcp` → `guard-write.py`
+- Duplicate skill refs (`tools.md`, `pluto-sources.md`) — consolidated into skills + `pluto-mental-model.md`
 
 ### Known gaps before 0.1.0
 

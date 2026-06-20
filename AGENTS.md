@@ -4,7 +4,7 @@
 - Plugin workflow rule should reference PlutoMCP.jl for MCP tool semantics (stage → `submit_changes`).
 - **Pluto cell authoring (structure-first):** dedicated `imports_cell` with `begin`/`end`; default `begin`/`end` for multi-statement conceptual blocks (`compute_cell`); `let`/`end` for locals; split at reactive boundaries (`widget_cell`, etc.); copy layouts from **pluto-semantics** `reference/agent-examples.md` + `cell-structure.md`.
 - Resolve `notebook_id` from Glass browser URL or Design Mode click before `list_notebooks`; skills **`styx-setup`** (install/Julia/MCP before notebook work), **`pluto-session`** / **`pluto-workflow`** / **`pluto-semantics`** are primary onboarding (lean SKILL.md + `reference/` deep-dives); no `@pluto-context` or **`pluto-open`** commands.
-- **Planning up front:** **DECISIONS.md** decision log + lean **PLAN.md** / **pluto-lifecycle.md** before implementation; prune stale historical specs before release; MCP-only details in fork (`AGENTS.md`); agent onboarding in skills only.
+- **Release docs:** planning artifacts (DECISIONS, PLAN, lifecycle specs) are pruned at release; shipped onboarding lives in skills + README; MCP-only details in fork (`AGENTS.md`).
 - 50/50 user+agent Pluto collaboration — user edits freely in browser; chat memory is not notebook ground truth.
 - **0.1.0 release:** marketplace install + onboarding UX (Julia prerequisite, **styx-setup**) are ship blockers — not post-release deferrals.
 - **Cursor 3 only (D16):** no Claude/Codex/OpenCode harness required; no `.claude-plugin/` distribution; do not document third-party-skills bridge as an install path.
@@ -17,7 +17,7 @@
 ## Learned Workspace Facts
 
 - **Styx** (this repo, [github.com/jowch/styx](https://github.com/jowch/styx)) — Cursor plugin bridging Pluto.jl and Cursor; MCP tools live in PlutoMCP.jl.
-- **PLAN.md** — phase status; **DECISIONS.md** — decision log; **docs/specs/pluto-lifecycle.md** — D15 lifecycle spec; MCP semantics in PlutoMCP.jl `AGENTS.md`.
+- MCP semantics in PlutoMCP.jl `AGENTS.md`; agent bootstrap/edits in `skills/pluto-session`, `pluto-workflow`, `pluto-semantics`.
 - **D15 lazy warm lifecycle:** MCP stdio `connect()` always via launcher when **pluto** MCP enabled; full Pluto deferred until `start_pluto_session` on notebook intent; lifecycle tools on HTTP `:2346` (not always in Cursor stdio MCP tool picker); Cursor caches `tools/list` at connect — toggle **pluto** MCP or Reload Window after PlutoMCP upgrade for new tools (e.g. `allow_execution`); auto-serve on connect off by default (amends D12); **`pending_run` stop hook** silent when bridge down.
 - **D13 Path A (spike):** Design Mode (**Cmd+Shift+D**, then click) — `browser_element` in hook `prompt` includes `pluto-cell#<uuid>` in `dom_path` for in-cell clicks (code lines, output, plot, bind widgets).
 - **Design Mode limits:** ambiguous clicks (no `pluto-cell#` in `dom_path`, e.g. bare `main`) — enable Design Mode (⌘⇧D) and re-click inside a cell; drawings/annotations are screenshot-only, no structured `dom_path`.

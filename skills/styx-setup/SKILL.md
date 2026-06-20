@@ -36,12 +36,7 @@ If Julia is missing, **stop** and give install steps from doctor output — do n
 
 ## Common issues
 
-| Symptom | Fix |
-|---------|-----|
-| pluto MCP red / won't start | `styx-doctor.sh`; install Julia; Reload Window |
-| `julia: command not found` | Install Julia, add to PATH, Reload Window |
-| New tool missing (e.g. `allow_execution`) | Toggle **pluto** MCP off/on or Reload Window (tools/list cache) |
-| Ports busy | Quit other Pluto sessions; toggle pluto MCP off before validation scripts |
+Run `styx-doctor.sh` first. Full troubleshooting: [reference/install.md](reference/install.md).
 
 ## Notebook work
 

@@ -6,12 +6,7 @@ Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
 
 ## Install
 
-### Prerequisites
-
-- **Cursor 3** with Plugins and MCP enabled
-- **Julia 1.9+** on your system `PATH` — [julialang.org/downloads](https://julialang.org/downloads/)
-
-### One-line install (local plugin)
+**Prerequisites:** Cursor 3 (Plugins + MCP) and **Julia 1.9+** on your `PATH`.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
@@ -19,25 +14,17 @@ curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh 
 
 Then **Reload Window** → **Settings → MCP** → enable **pluto**.
 
-Say **"Run Styx doctor"** in chat to verify setup, or **"styx-setup"** for the full checklist.
+Say **"Run Styx doctor"** or **"styx-setup"** to verify. **Update:** re-run the same command. **Uninstall:** Settings → Plugins → Styx → Uninstall.
 
-**Update:** re-run the same command, or `./scripts/update.sh` from a clone.
-
-**Uninstall:** **Settings → Plugins → Installed → Styx → Uninstall**, then Reload Window.
-
-Full steps: [skills/styx-setup/reference/install.md](skills/styx-setup/reference/install.md)
-
-### Without Julia
-
-If Julia is not installed, the **pluto** MCP server will not start. Install Julia first, then Reload Window. The agent's **styx-setup** skill walks through this — you never need to run shell scripts manually.
+Full guide: [skills/styx-setup/reference/install.md](skills/styx-setup/reference/install.md)
 
 ## Quick start
 
-1. Complete [Install](#install) above.
-2. Say **"I want to work on my notebooks"** — agent starts Pluto and opens the **landing page** in Glass; you pick a notebook (or name a specific `.jl` for direct open).
-3. **Next prompt:** ⌘⇧D → click a cell → describe edits.
+1. Complete [Install](#install).
+2. Say **"I want to work on my notebooks"** — the agent starts Pluto and opens the landing page in Glass; you pick a notebook (or name a `.jl` for direct open).
+3. **Next prompt:** ⌘⇧D (Design Mode) → click a cell → describe edits.
 
-Pluto starts only when you request notebook work (not at Cursor launch).
+Pluto starts only when you request notebook work, not at Cursor launch.
 
 ## What ships
 
@@ -52,17 +39,21 @@ Pluto starts only when you request notebook work (not at Cursor launch).
 | `hooks/` | Read-before-edit, `pending_run` warning, Design Mode hints |
 | `scripts/styx-doctor.sh` | Health check (Julia, env, ports) |
 
-## Workflow (D15)
+## Workflow
 
 ```
-User requests notebooks → pluto-session (agent)
+User requests notebooks → pluto-session
   → start_pluto_session → choose notebook → open Glass
   → Design Mode click → pluto-workflow (edit cells)
 ```
 
-See [docs/specs/pluto-lifecycle.md](docs/specs/pluto-lifecycle.md) for the full spec.
+Skills hold the full bootstrap and edit flows. MCP server key: **`pluto`**.
 
-MCP server key: **`pluto`**
+## Click context (Design Mode)
+
+Toggle **Cmd+Shift+D** in Agents Glass, click a cell, send a prompt. The hook `prompt` includes `dom_path` with `pluto-notebook#…` and `pluto-cell#…`. The agent calls **`resolve_pluto_context`** and **`read_cell`**.
+
+Glass navigation uses **`cursor-ide-browser`** in the Agents Window — not `plugin-browse-browser`.
 
 ## Development
 
@@ -81,16 +72,4 @@ Release-shaped tree:
 
 Optional: copy `.env.dev.example` → `.env.dev`, set `PLUTOMCP_SOURCE` to your PlutoMCP.jl fork.
 
-## Planning (contributors)
-
-| Doc | Purpose |
-|-----|---------|
-| [PLAN.md](docs/PLAN.md) | Phase map |
-| [DECISIONS.md](docs/DECISIONS.md) | Decision log |
-| [CHANGELOG.md](CHANGELOG.md) | Release notes |
-
-## Click context (Design Mode)
-
-Toggle **Cmd+Shift+D** in Agents Glass, click a cell, send a prompt. Hook `prompt` includes `dom_path` with `pluto-notebook#…` and `pluto-cell#…`. Agent calls MCP **`resolve_pluto_context`** and **`read_cell`**.
-
-Glass navigation: **`cursor-ide-browser`** in the Agents Window — not `plugin-browse-browser`.
+See [CHANGELOG.md](CHANGELOG.md) for release notes. Validation: `eval/run_reference.jl --all --strict-trace` and `scripts/validate-pluto-lifecycle.sh`.

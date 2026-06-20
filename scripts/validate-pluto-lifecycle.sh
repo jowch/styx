@@ -59,4 +59,4 @@ println("Scenario D OK")
 
 echo
 echo "All automated lifecycle checks passed."
-echo "Manual: Scenario 0.2 (non-notebook chat), C.1 (agent skips start_pluto_session) — see docs/d15-lifecycle-manual-checklist.md"
+echo "Manual (agent chat): 0.2 — non-notebook prompt must not start Pluto; C.1 — notebook intent must call start_pluto_session"

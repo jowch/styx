@@ -25,12 +25,22 @@ Editing a cell re-runs that cell and all **downstream** dependents in topologica
 
 ## Pluto source citations
 
-| Path (Pluto 0.20.x) | Topic |
-|---------------------|-------|
-| `src/analysis/Parse.jl` | `parse_custom`, `is_single_expression`, multi-expression error |
-| `src/evaluation/Run.jl` | `run_reactive!`, `will_run_code`, `set_output!` |
-| `src/notebook/Notebook.jl` | `ProcessStatus`, `cell_order` |
-| `src/webserver/SessionActions.jl` | Safe preview gate on `open` |
-| `src/runner/PlutoRunner/src/bonds.jl` | `@bind` macro, `Bond` HTML |
+Curated from Pluto 0.20.x. Local path: `~/.julia/packages/Pluto/*/`. Upstream: [JuliaPluto/Pluto.jl](https://github.com/JuliaPluto/Pluto.jl).
 
-Full citations: **pluto-semantics** → [pluto-sources.md](../../pluto-semantics/reference/pluto-sources.md).
+| Path | Topic |
+|------|-------|
+| `src/analysis/Parse.jl` | `parse_custom`, `is_single_expression`, multi-expression error |
+| `src/runner/PlutoRunner/src/bonds.jl` | `@bind` macro, `Bond`, `create_bond` |
+| `src/evaluation/Run.jl` | `run_reactive!`, `update_save_run!`, `will_run_code` |
+| `src/evaluation/RunBonds.jl` | Bond changes → downstream re-run |
+| `src/evaluation/WorkspaceManager.jl` | `bump_workspace_module`, workspace lifecycle |
+| `src/notebook/Notebook.jl` | `Notebook`, `ProcessStatus`, `cell_order` |
+| `src/notebook/Cell.jl` | `Cell`, `cell_id`, disabled metadata |
+| `src/webserver/SessionActions.jl` | Safe preview gate on `open` |
+| `src/webserver/Router.jl` | Routes, `execution_allowed` query param |
+| `src/webserver/Dynamic.jl` | State payload, Safe preview prerender |
+| `src/analysis/is_just_text.jl` | Cells runnable in Safe preview |
+
+**URL patterns:** `/` landing · `/edit?id=<notebook_id>` editor · `/open?path=…&execution_allowed=…` open file. Plain `/<notebook_id>` is not a documented route.
+
+**Style:** use **pluto-semantics** `agent-examples.md` — not Pluto bundled `sample/` notebooks.

@@ -48,4 +48,4 @@ Wrap in **`begin`/`end`** in the same cell **or** split at reactive boundaries â
 - **Parse grammar:** [reference/grammar.md](reference/grammar.md)
 - **Reactivity + order:** [reference/reactivity.md](reference/reactivity.md)
 - **Error kinds:** [reference/error-kinds.md](reference/error-kinds.md)
-- **Pluto.jl source citations:** [reference/pluto-sources.md](reference/pluto-sources.md)
+- **Pluto.jl source citations:** [pluto-workflow/reference/pluto-mental-model.md](../pluto-workflow/reference/pluto-mental-model.md)
