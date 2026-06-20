@@ -1,13 +1,7 @@
 {
   "id": "batch_edit",
   "version": "1.0",
-  "prompt": "The notebook has a=1, b=2, and c=a+b. Change a to 10 and b to 20, then run so c updates. Use Pluto MCP tools.",
   "fixture": "batch_abc.jl",
-  "orchestrator": {
-    "workflow_prefix": true,
-    "max_tool_calls": 40,
-    "max_duration_ms": 300000
-  },
   "setup": {
     "require_secret_for_access": false,
     "launch_browser": false

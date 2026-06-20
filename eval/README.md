@@ -26,7 +26,7 @@ julia run_reference.jl --all --strict-trace
 julia run_reference.jl --scenario stage_and_run
 ```
 
-Or: `npm run eval:reference` (optional convenience wrapper in `package.json`).
+Re-score an existing trace (dev): `julia score.jl --scenario <id> --log results/.../trace.jsonl`
 
 ## What gets measured
 

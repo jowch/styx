@@ -1,13 +1,7 @@
 {
   "id": "stage_and_run",
   "version": "1.0",
-  "prompt": "The notebook defines x=6 and y=x*7. Change x to 10 and run so y updates. Use Pluto MCP tools.",
   "fixture": "reactive_xy.jl",
-  "orchestrator": {
-    "workflow_prefix": true,
-    "max_tool_calls": 40,
-    "max_duration_ms": 300000
-  },
   "setup": {
     "require_secret_for_access": false,
     "launch_browser": false

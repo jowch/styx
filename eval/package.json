@@ -1,8 +1,0 @@
-{
-  "name": "styx-eval",
-  "private": true,
-  "scripts": {
-    "eval:reference": "julia run_reference.jl --all --strict-trace",
-    "eval:reference:stage": "julia run_reference.jl --scenario stage_and_run --strict-trace"
-  }
-}

@@ -1,13 +1,7 @@
 {
   "id": "add_cell_placement",
   "version": "1.0",
-  "prompt": "Add a new cell after x that defines z = x + 1. Stage and run the notebook. Use Pluto MCP tools.",
   "fixture": "single_anchor.jl",
-  "orchestrator": {
-    "workflow_prefix": true,
-    "max_tool_calls": 40,
-    "max_duration_ms": 300000
-  },
   "setup": {
     "require_secret_for_access": false,
     "launch_browser": false

@@ -1,5 +1,5 @@
 #!/usr/bin/env julia
-# Score a Pluto MCP eval run: outcome (strict) + trace (advisory by default).
+# Dev-only: re-score an existing trace.jsonl. CI uses run_reference.jl.
 
 using Pkg
 _root = get(ENV, "PLUTOMCP_ROOT", normpath(@__DIR__, "..", "..", "PlutoMCP.jl"))

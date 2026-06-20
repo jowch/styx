@@ -40,18 +40,11 @@ function load_scenario(path::String)
 end
 
 function validate_scenario!(scenario::Dict{String,Any})
-    for key in ("id", "version", "prompt", "fixture", "outcome")
+    for key in ("id", "version", "fixture", "outcome")
         haskey(scenario, key) || error("Scenario missing required key: $key")
     end
     outcome = scenario["outcome"]
     haskey(outcome, "claims") || error("Scenario outcome missing claims")
-    ref = get(scenario, "golden_trace_ref", nothing)
-    if ref !== nothing
-        golden = abspath(joinpath(EVAL_ROOT, string(ref)))
-        root = abspath(EVAL_ROOT)
-        startswith(golden, root) || error("golden_trace_ref escapes eval root: $ref")
-        isfile(golden) || error("golden_trace_ref missing file: $golden")
-    end
     return scenario
 end
 

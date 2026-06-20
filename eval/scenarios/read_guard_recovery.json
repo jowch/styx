@@ -1,13 +1,7 @@
 {
   "id": "read_guard_recovery",
   "version": "1.0",
-  "prompt": "Change x to 10 in the notebook and run so y updates. Do not read cells first — edit immediately, then recover if the server rejects the edit.",
   "fixture": "reactive_xy.jl",
-  "orchestrator": {
-    "workflow_prefix": false,
-    "max_tool_calls": 40,
-    "max_duration_ms": 300000
-  },
   "setup": {
     "require_secret_for_access": false,
     "launch_browser": false

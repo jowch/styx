@@ -2,20 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "PlutoMCP eval scenario",
   "type": "object",
-  "required": ["id", "version", "prompt", "fixture", "outcome"],
+  "required": ["id", "version", "fixture", "outcome"],
   "properties": {
     "id": { "type": "string" },
     "version": { "type": "string" },
-    "prompt": { "type": "string" },
     "fixture": { "type": "string" },
-    "orchestrator": {
-      "type": "object",
-      "properties": {
-        "workflow_prefix": { "type": "boolean", "default": true },
-        "max_tool_calls": { "type": "integer" },
-        "max_duration_ms": { "type": "integer" }
-      }
-    },
     "setup": {
       "type": "object",
       "properties": {
@@ -41,7 +32,6 @@
       }
     },
     "trace": { "type": "object" },
-    "golden_trace_ref": { "type": "string" },
     "reference_sequence": {
       "type": "array",
       "description": "Golden-path tool calls for run_reference.jl"
