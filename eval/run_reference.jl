@@ -42,6 +42,24 @@ function kill_proc!(proc)
     end
 end
 
+function health_timeout_sec()
+    if haskey(ENV, "EVAL_HEALTH_TIMEOUT")
+        return parse(Float64, ENV["EVAL_HEALTH_TIMEOUT"])
+    end
+    get(ENV, "CI", "") == "true" && return 180.0
+    return 60.0
+end
+
+function dump_serve_stderr!(stderr_path::String; tail_lines=80)
+    isfile(stderr_path) || return
+    lines = readlines(stderr_path)
+    start = max(1, length(lines) - tail_lines + 1)
+    println(stderr, "--- serve.stderr (last $(length(lines) - start + 1) lines) ---")
+    for line in lines[start:end]
+        println(stderr, line)
+    end
+end
+
 function execute_reference_sequence(base_url::String, notebook_id::String, sequence)
     id = 1
     for step in sequence
@@ -86,7 +104,10 @@ function run_one_scenario(scenario_file::String; strict_trace=false)
     proc = spawn_serve!(tmp; pluto_port, mcp_port, eval_log, run_id, setup,
         serve_stderr=joinpath(results_dir, "serve.stderr"))
     try
-        wait_health(mcp_url; timeout_sec=60) || error("Health check failed for $sid")
+        if !wait_health(mcp_url; timeout_sec=health_timeout_sec())
+            dump_serve_stderr!(joinpath(results_dir, "serve.stderr"))
+            error("Health check failed for $sid")
+        end
         notebook_id = wait_readiness(mcp_url, scenario)
 
         sequence = get(scenario, "reference_sequence", nothing)

@@ -35,9 +35,14 @@ jobs:
         with:
           version: "1.11"
 
+      - uses: julia-actions/cache@v2
+
       - uses: julia-actions/julia-buildpkg@v1
         with:
           project: PlutoMCP.jl
+
+      - name: Precompile Pluto stack for serve subprocess
+        run: julia --project=PlutoMCP.jl -e 'using PlutoMCP; using Pluto'
 
       - name: Run reference scenarios
         working-directory: styx/eval
