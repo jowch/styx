@@ -73,15 +73,13 @@ Local install (Cursor rejects symlinks for plugins):
 # Developer: Reload Window
 ```
 
-Release-shaped tree for marketplace review:
+Release-shaped tree:
 
 ```bash
 ./scripts/package-plugin.sh    # → dist/styx/
 ```
 
 Optional: copy `.env.dev.example` → `.env.dev`, set `PLUTOMCP_SOURCE` to your PlutoMCP.jl fork.
-
-**Release pin:** `STYX_REF=v0.1.0 curl -fsSL …/install.sh | bash`
 
 ## Planning (contributors)
 

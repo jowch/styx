@@ -1,56 +1,7 @@
-# D15 Lifecycle — Manual Validation Checklist
+# D15 lifecycle validation (superseded)
 
-After automated gates (`scripts/validate-pluto-lifecycle.sh`, `eval/run_reference.jl --all --strict-trace`). Spec: [pluto-lifecycle.md](./specs/pluto-lifecycle.md).
+Manual Path A/B checklist removed after 2026-06-18 sign-off.
 
-## Preflight
+**Automated validation:** `scripts/pluto-lifecycle-preflight.sh --require-ports-free` then `scripts/validate-pluto-lifecycle.sh` (toggle **pluto** MCP off first).
 
-```bash
-./scripts/ensure-julia-env.sh          # first run
-./scripts/pluto-lifecycle-preflight.sh --require-ports-free   # :2346 and :1234 must be down
-./scripts/validate-pluto-lifecycle.sh  # Scenarios 0, C.2, D, E
-```
-
-Toggle **pluto** MCP off in Cursor Settings before the validation script if ports are in use.
-
-Styx at `~/.cursor/plugins/local/styx/`; **pluto** MCP enabled for manual checks.
-
-## Scenario A — Landing (Path A)
-
-**Prompt:** *"I want to work on my Pluto notebooks"* (or **pluto-notebooks**)
-
-| Pass criteria |
-|---------------|
-| `start_pluto_session` → landing `http://127.0.0.1:1234/` in Glass via `cursor-ide-browser` |
-| No chat prompt for which notebook; no `open_notebook` on bootstrap |
-| **Next prompt:** ⌘⇧D → click cell → `resolve_pluto_context` → `read_cell` → edit works |
-
-## Scenario B — Named notebook (Path B)
-
-**Prompt:** *"Open `eval/fixtures/reactive_xy.jl` in Pluto"* (or **pluto-notebooks** with path)
-
-| Pass criteria |
-|---------------|
-| Landing in Glass → `open_notebook` → **`browser_click` notebook on landing** (not pasted `/edit?id=`) |
-| Safe-preview banner; agent reminds **Run notebook code** for outputs |
-| Design Mode edit on opened notebook |
-
-See [path-b-edit-url-loading.md](./known-issues/path-b-edit-url-loading.md) if `Loading cells...` hangs.
-
-## Scenario C — Already running
-
-After A or B: *"Add a cell at the end"* → agent skips `start_pluto_session`; `pluto_session_status` → `running`.
-
-## Failure triage
-
-| Symptom | Fix |
-|---------|-----|
-| MCP won't connect | `./scripts/ensure-julia-env.sh`; toggle **pluto** MCP |
-| No `pluto-cell#` in click | ⌘⇧D, re-click inside cell |
-| `Loading cells...` forever | Click notebook on landing — [path-b-edit-url-loading.md](./known-issues/path-b-edit-url-loading.md) |
-| Bridge dead after killing `serve()` | Toggle **pluto** MCP off/on |
-
-## Validation log
-
-| Date | 0 | A | B | C | D | Notes |
-|------|---|---|---|---|---|-------|
-| 2026-06-18 | ☑ | ☑ | ☑ | ☑ | ☑ | Automated 0/C/D/E + live Glass Path A/B |
+**Agent playbooks:** `skills/pluto-session`, `skills/pluto-workflow`.

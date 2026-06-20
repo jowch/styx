@@ -153,7 +153,7 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 **Amends D12:** Launcher targets standalone `connect()` only; lifecycle via MCP tools replaces shell `serve()` + proxy as the primary user path.
 
-**PlutoMCP (implemented):** `pluto_session_status`, `start_pluto_session`, `stop_pluto_session`, `open_notebook`; deferred standalone `connect()` until `start_pluto_session`. Acceptance signed off 2026-06-18 ([d15-lifecycle-manual-checklist.md](./d15-lifecycle-manual-checklist.md)).
+**PlutoMCP (implemented):** `pluto_session_status`, `start_pluto_session`, `stop_pluto_session`, `open_notebook`; deferred standalone `connect()` until `start_pluto_session`. Acceptance signed off 2026-06-18 (`scripts/validate-pluto-lifecycle.sh`).
 
 ---
 
@@ -163,7 +163,7 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 | Principle | Choice |
 |-----------|--------|
-| Install surface | Official Cursor marketplace and/or `~/.cursor/plugins/local/styx/` — not Claude `/plugin marketplace add` |
+| Install surface | `curl \| bash` / `scripts/install-styx.sh` → `~/.cursor/plugins/local/styx/` — not Claude `/plugin marketplace add` |
 | Manifest | `.cursor-plugin/plugin.json` only — no `.claude-plugin/` sidecar for distribution |
 | Runtime | All behavior via Cursor-native components: `mcp.json`, `hooks/hooks.json`, rules, skills, `cursor-ide-browser` |
 | Third-party skills | **Not** a supported install path — Cursor may load `~/.claude/plugins/cache/` when that toggle is on; we do not document or depend on it |
@@ -171,34 +171,4 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 **Rationale:** Cursor's third-party-skills bridge can make Claude-installed plugins appear to work in Cursor, but that is undocumented, partial (hooks/skills ≠ full MCP bundle), and creates a false "install once, use everywhere" story. Styx ships a complete Cursor plugin bundle; distribution and support assume Cursor alone.
 
-**Amends D6:** Plugin target is explicitly Cursor 3 marketplace + local install — not multi-harness marketplace repos.
-
----
-
-## Resolved questions (formerly open)
-
-| Was | Resolution |
-|-----|------------|
-| O1 `submit_changes` API | Dirty set → `update_save_run!` on subset + deps (PlutoMCP.jl) |
-| O2 Draft buffer | D9 |
-| O3 Context delivery | Design Mode + skills (`pluto-session`, `pluto-workflow`) |
-| O4 Upstream rename | D8 hard break |
-| O5 Rich output | D10 |
-| O6 Intent UX | D11 |
-
----
-
-## Status snapshot (2026-06-18)
-
-| Component | State |
-|-----------|-------|
-| Planning docs | ✅ [PLAN.md](./PLAN.md) + [pluto-lifecycle.md](./specs/pluto-lifecycle.md) |
-| PlutoMCP fork — Phase 1 | ✅ Implemented |
-| PlutoMCP fork — Phase 2 | ✅ Graph tools |
-| Bridge — DOM resolver (Phase 3) | ✅ **Gated** |
-| Cursor plugin Phase 4a–4b | ✅ **Gated** — Design Mode Path A, MCP staging workflow |
-| Cursor plugin Phase 4c | ✅ `resolve_pluto_context`; `pending_run` stop hook |
-| D15 lazy warm lifecycle | ✅ Implemented — automated validation `scripts/validate-pluto-lifecycle.sh` |
-| Reference eval (CI) | ✅ `run_reference.jl --all --strict-trace` |
-| Structural cell_order sync | PlutoMCP: assign new `cell_order` vector before `_notify_browser` on add/delete/move |
-| Upstream PRs (#6/#7) | 📋 open on mthelm85/PlutoMCP.jl |
+**Amends D6:** Plugin target is Cursor 3 local install via `scripts/install.sh` — not multi-harness marketplace repos.
