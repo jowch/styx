@@ -7,27 +7,25 @@ REF="${STYX_REF:-main}"
 DEST="${STYX_DEST:-${HOME}/.cursor/plugins/local/styx}"
 SRC=""
 FROM_DEV=0
-ACTION=install
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=lib/copy-plugin-tree.sh
+source "${SCRIPT_DIR}/lib/copy-plugin-tree.sh"
 
 usage() {
-  cat <<'EOF'
+  cat <<EOF
 Usage: install-styx.sh [options]
 
 Options:
-  --src PATH     Install from a local tree (dev); default clones from GitHub
-  --update       Same as default; kept for update.sh wrapper
-  -h, --help     Show this help
+  --src PATH   Install from a local tree (dev); default clones from GitHub
+  -h, --help   Show this help
 
 Environment:
   STYX_REPO   GitHub repo (default: jowch/styx)
   STYX_REF    Branch or tag (default: main)
   STYX_DEST   Install path (default: ~/.cursor/plugins/local/styx)
 
-One-liner (fresh install or update):
-  curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
-
-Pin a release:
-  STYX_REF=v0.1.0 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
+Install docs: skills/styx-setup/reference/install.md (in repo) or README on GitHub.
 EOF
 }
 
@@ -38,7 +36,7 @@ while [[ $# -gt 0 ]]; do
       FROM_DEV=1
       shift 2
       ;;
-    --update) ACTION=update; shift ;;
+    --update) shift ;; # ponytail: no-op; update.sh wrapper only
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 1 ;;
   esac
@@ -51,12 +49,14 @@ need() {
   }
 }
 
-need rsync
+need tar
 need chmod
 
 TMP=""
 cleanup() {
-  [[ -n "$TMP" && -d "$TMP" ]] && rm -rf "$TMP"
+  if [[ -n "$TMP" && -d "$TMP" ]]; then
+    rm -rf "$TMP"
+  fi
 }
 trap cleanup EXIT
 
@@ -77,34 +77,8 @@ fi
 
 mkdir -p "$(dirname "$DEST")"
 
-# ponytail: P rules keep dest-only runtime files when --delete runs on update.
-RSYNC_FILTERS=(
-  --filter 'P .julia-env-instantiated'
-  --filter 'P hooks/state/pluto-reads.json'
-)
-
-echo "$([[ "$ACTION" == update ]] && echo Updating || echo Installing) Styx → ${DEST}"
-
-rsync -a --delete \
-  "${RSYNC_FILTERS[@]}" \
-  --exclude .git \
-  --exclude .cursor \
-  --exclude .github \
-  --exclude .git-template \
-  --exclude dist \
-  --exclude eval \
-  --exclude AGENTS.md \
-  --exclude .env.dev \
-  --exclude .env.dev.example \
-  --exclude docs/PLAN.md \
-  --exclude docs/DECISIONS.md \
-  --exclude docs/spikes \
-  --exclude docs/upstream \
-  --exclude node_modules \
-  --exclude 'hooks/__pycache__' \
-  --exclude scripts/sync-local-plugin.sh \
-  --exclude scripts/package-plugin.sh \
-  "${SRC}/" "${DEST}/"
+echo "Installing Styx → ${DEST}"
+copy_plugin_tree "$SRC" "$DEST" 1
 
 chmod +x "${DEST}/scripts/"*.sh "${DEST}/hooks/"*.sh 2>/dev/null || true
 
@@ -116,14 +90,10 @@ fi
 
 cat <<EOF
 
-Styx ${ACTION} complete: ${DEST}
+Styx installed: ${DEST}
 
-Next steps:
-  1. Reload Window (Cmd+Shift+P → Developer: Reload Window)
-  2. Settings → MCP → enable **pluto**
-  3. In chat: "Run Styx doctor"
-
-Uninstall: Settings → Plugins → Installed → Styx → Uninstall, then Reload Window.
-  (If Uninstall misbehaves, remove the folder above manually.)
+Next: Reload Window → Settings → MCP → enable **pluto** → "Run Styx doctor"
+Uninstall: Settings → Plugins → Installed → Styx → Uninstall (see install.md)
 
 EOF
+exit 0

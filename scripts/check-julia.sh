@@ -7,22 +7,8 @@ JULIA="${JULIA:-julia}"
 MIN_VERSION="1.9"
 
 install_help() {
-  cat >&2 <<'EOF'
-
-Styx needs Julia 1.9+ on your PATH.
-
-Install:
-  • All platforms: https://julialang.org/downloads/
-  • macOS (Homebrew): brew install julia
-  • Windows: run the installer and enable "Add Julia to PATH"
-
-Then:
-  1. Verify in a terminal: julia --version
-  2. In Cursor: Reload Window
-  3. Settings → MCP → enable the **pluto** server (bundled with Styx)
-
-First MCP connect downloads PlutoMCP.jl (one-time; needs network).
-EOF
+  echo "Styx needs Julia ${MIN_VERSION}+ on PATH — https://julialang.org/downloads/" >&2
+  echo "Then Reload Window and enable **pluto** MCP. See styx-setup skill for full steps." >&2
 }
 
 if ! command -v "$JULIA" >/dev/null 2>&1; then

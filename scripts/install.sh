@@ -17,8 +17,10 @@ need() {
 need curl
 need bash
 
-CORE_URL="https://raw.githubusercontent.com/${REPO}/${REF}/scripts/install-styx.sh"
-echo "Fetching install-styx.sh from ${REPO}@${REF}..."
-curl -fsSL "$CORE_URL" -o "${TMP}/install-styx.sh"
+BASE="https://raw.githubusercontent.com/${REPO}/${REF}/scripts"
+echo "Fetching install scripts from ${REPO}@${REF}..."
+mkdir -p "${TMP}/lib"
+curl -fsSL "${BASE}/install-styx.sh" -o "${TMP}/install-styx.sh"
+curl -fsSL "${BASE}/lib/copy-plugin-tree.sh" -o "${TMP}/lib/copy-plugin-tree.sh"
 chmod +x "${TMP}/install-styx.sh"
 exec bash "${TMP}/install-styx.sh" "$@"

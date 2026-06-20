@@ -9,6 +9,9 @@ STYX_REPO="${STYX_REPO:-jowch/styx}"
 CHECK_UPDATES=0
 FAIL=0
 
+# shellcheck source=lib/port-probe.sh
+source "$(cd "$(dirname "$0")" && pwd)/lib/port-probe.sh"
+
 say_ok() { echo "OK  $*"; }
 say_warn() { echo "WARN  $*"; }
 say_fail() { echo "FAIL  $*"; FAIL=1; }
@@ -118,7 +121,7 @@ else
 fi
 
 if command -v curl >/dev/null 2>&1; then
-  if curl -sf --max-time 2 "http://127.0.0.1:${MCP_PORT}/health" >/dev/null 2>&1; then
+  if mcp_health_ok; then
     say_ok "MCP bridge listening on :${MCP_PORT}"
   else
     say_ok "MCP bridge not running on :${MCP_PORT} (normal until notebook work or MCP connects)"
@@ -133,6 +136,8 @@ if command -v lsof >/dev/null 2>&1; then
       say_ok "Port :${port} in use (Pluto session or MCP may be up)"
     fi
   done
+elif command -v curl >/dev/null 2>&1 && pluto_ui_ok; then
+  say_ok "Port :${PLUTO_PORT} in use (Pluto UI responding)"
 fi
 
 if [[ "$CHECK_UPDATES" -eq 1 ]]; then

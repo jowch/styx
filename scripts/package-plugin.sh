@@ -4,32 +4,15 @@ set -euo pipefail
 
 SRC="$(cd "$(dirname "$0")/.." && pwd)"
 DEST="${1:-${SRC}/dist/styx}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-rm -rf "${DEST}"
+# shellcheck source=lib/copy-plugin-tree.sh
+source "${SCRIPT_DIR}/lib/copy-plugin-tree.sh"
+
 mkdir -p "$(dirname "${DEST}")"
-
-rsync -a \
-  --exclude .git \
-  --exclude .cursor \
-  --exclude .github \
-  --exclude .git-template \
-  --exclude dist \
-  --exclude eval \
-  --exclude AGENTS.md \
-  --exclude .env.dev \
-  --exclude .env.dev.example \
-  --exclude docs/PLAN.md \
-  --exclude docs/DECISIONS.md \
-  --exclude docs/spikes \
-  --exclude docs/upstream \
-  --exclude scripts/sync-local-plugin.sh \
-  --exclude scripts/package-plugin.sh \
-  --exclude 'hooks/__pycache__' \
-  --exclude .julia-env-instantiated \
-  --exclude node_modules \
-  "${SRC}/" "${DEST}/"
+copy_plugin_tree "$SRC" "$DEST" 0
 
 chmod +x "${DEST}/scripts/"*.sh "${DEST}/hooks/"*.sh 2>/dev/null || true
 
 echo "Release tree: ${DEST}"
-echo "Install manually to ~/.cursor/plugins/local/styx/ or publish via marketplace."
+echo "Install: curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash"

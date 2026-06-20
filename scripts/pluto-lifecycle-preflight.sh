@@ -6,6 +6,9 @@ PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 MCP_PORT="${PLUTOMCP_MCP_PORT:-2346}"
 PLUTO_PORT="${PLUTOMCP_PLUTO_PORT:-1234}"
 
+# shellcheck source=lib/port-probe.sh
+source "$(cd "$(dirname "$0")" && pwd)/lib/port-probe.sh"
+
 EXPECT_RUNNING=0
 REQUIRE_PORTS_FREE=0
 NOTEBOOK_ID=""
@@ -40,14 +43,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-health_ok() {
-  curl -sf --max-time 2 "http://127.0.0.1:${MCP_PORT}/health" >/dev/null 2>&1
-}
-
-pluto_ui_up() {
-  curl -sf --max-time 2 -o /dev/null "http://127.0.0.1:${PLUTO_PORT}/" 2>/dev/null
-}
-
 mcp_call() {
   local name="$1"
   curl -sf --max-time 5 -X POST "http://127.0.0.1:${MCP_PORT}/call" \
@@ -74,14 +69,14 @@ done
 
 bridge_up=0
 pluto_up=0
-if health_ok; then
+if mcp_health_ok; then
   bridge_up=1
   echo "OK  MCP bridge :${MCP_PORT}/health"
 else
   echo "—   MCP bridge :${MCP_PORT}/health (down)"
 fi
 
-if pluto_ui_up; then
+if pluto_ui_ok; then
   pluto_up=1
   echo "OK  Pluto UI   :${PLUTO_PORT}/"
 else
@@ -99,7 +94,7 @@ if [[ "$REQUIRE_PORTS_FREE" -eq 1 ]]; then
 fi
 
 if [[ "$EXPECT_RUNNING" -eq 1 ]]; then
-  if ! health_ok; then
+  if ! mcp_health_ok; then
     echo "FAIL expected bridge up (--expect-running)" >&2
     fail=1
   else
