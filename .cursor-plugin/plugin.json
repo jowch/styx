@@ -9,5 +9,7 @@
   },
   "license": "MIT",
   "keywords": ["styx", "pluto", "julia", "notebook", "mcp", "cursor", "design-mode"],
-  "repository": "https://github.com/jowch/styx"
+  "repository": "https://github.com/jowch/styx",
+  "logo": "assets/styx-logo.svg",
+  "primaryColor": "#945bb0"
 }

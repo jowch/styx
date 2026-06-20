@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Styx">
+  <!-- Diamond: N/E/S/W = green / purple / red / Julia blue -->
+  <circle cx="24" cy="11.4" r="8.5" fill="#3b972e" />
+  <circle cx="36.6" cy="24" r="8.5" fill="#945bb0" />
+  <circle cx="24" cy="36.6" r="8.5" fill="#c93d39" />
+  <circle cx="11.4" cy="24" r="8.5" fill="#4063D8" />
+</svg>

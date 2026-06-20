@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Known gaps before 0.1.0
 
 - **Marketplace submission** at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish) (manual review; open-source repo)
-- Plugin logo for marketplace listing (optional SVG)
+- Plugin logo: `assets/styx-logo.svg` (diamond four-dot mark: N/E/S/W green/purple/red/Julia blue)
 - **MCP tool cache:** after upgrading PlutoMCP, toggle **pluto** MCP off/on (or Reload Window) so new tools like `allow_execution` appear in the agent tool list
 - Lifecycle tools may be hidden in Cursor's MCP tool picker — invoke by name when listed in `tools/list`
 - Path B: pasted `/edit?id=` after MCP `open_notebook` hangs — use `browser_click` on landing ([known issue](docs/known-issues/path-b-edit-url-loading.md))
