@@ -25,7 +25,6 @@ rsync -a \
   --exclude scripts/sync-local-plugin.sh \
   --exclude scripts/package-plugin.sh \
   --exclude 'hooks/__pycache__' \
-  --exclude Manifest.toml \
   --exclude .julia-env-instantiated \
   --exclude node_modules \
   "${SRC}/" "${DEST}/"

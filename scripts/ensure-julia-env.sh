@@ -10,6 +10,8 @@ load_env_dev "$PLUGIN_ROOT"
 JULIA="${JULIA:-julia}"
 MARKER="${PLUGIN_ROOT}/.julia-env-instantiated"
 
+"${PLUGIN_ROOT}/scripts/check-julia.sh"
+
 if [[ ! -f "${PLUGIN_ROOT}/Project.toml" ]]; then
   echo "Missing ${PLUGIN_ROOT}/Project.toml" >&2
   exit 1
@@ -38,7 +40,7 @@ LOCAL=""
 if LOCAL="$(resolve_local_plutomcp)"; then
   echo "Pluto MCP env: developing local PlutoMCP at ${LOCAL}" >&2
 else
-  echo "Pluto MCP env: installing PlutoMCP from git (first run)" >&2
+  echo "Styx: first MCP connect — installing PlutoMCP (network; may take several minutes)…" >&2
 fi
 
 PLUTOMCP_LOCAL="${LOCAL}" "$JULIA" --project="$PLUGIN_ROOT" -e '

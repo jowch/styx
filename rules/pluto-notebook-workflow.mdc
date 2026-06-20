@@ -9,6 +9,7 @@ alwaysApply: true
 
 ## Skills
 
+- **styx-setup** — install, Julia prerequisite, MCP troubleshooting (before notebook work)
 - **pluto-session** — start Pluto, open notebook, Glass navigation
 - **pluto-workflow** — cell edits once a notebook is open
 - **pluto-semantics** — cell structure (`imports_cell`, `begin`/`end` blocks, `@bind`) and parse-error fixes

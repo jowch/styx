@@ -1,28 +1,51 @@
 # Styx
 
-**Styx** is a Cursor plugin that bridges [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebooks and Cursor agent workflows via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) and Glass Design Mode click context.
+**Styx** bridges [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebooks and Cursor agent workflows via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) and Glass Design Mode click context.
 
 Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
 
+## Install
+
+### Prerequisites
+
+- **Julia 1.9+** on your system `PATH` — [julialang.org/downloads](https://julialang.org/downloads/)
+- **Cursor** with Plugins and MCP enabled
+
+### From the marketplace
+
+1. **Cursor Settings → Plugins** → search **Styx** → **Install**
+2. **Reload Window**
+3. **Settings → MCP** → enable **pluto** (bundled with Styx)
+4. First MCP connect installs PlutoMCP (network; may take a few minutes)
+
+Say **"Run Styx doctor"** in chat to verify setup, or **"styx-setup"** for the full checklist.
+
+Detailed steps: [skills/styx-setup/reference/install.md](skills/styx-setup/reference/install.md)
+
+### Without Julia
+
+If Julia is not installed, the **pluto** MCP server will not start. Install Julia first, then Reload Window. The agent's **styx-setup** skill walks through this — you never need to run shell scripts manually.
+
 ## Quick start
 
-1. Install the plugin (see **Development** below until marketplace publish).
-2. Enable the **pluto** MCP server in Cursor Settings.
-3. Say **"I want to work on my notebooks"** — agent starts Pluto and opens the **landing page** in Glass; you pick a notebook there (or name a specific file for direct open).
-4. **Next prompt:** ⌘⇧D → click a cell → describe edits.
+1. Complete [Install](#install) above.
+2. Say **"I want to work on my notebooks"** — agent starts Pluto and opens the **landing page** in Glass; you pick a notebook (or name a specific `.jl` for direct open).
+3. **Next prompt:** ⌘⇧D → click a cell → describe edits.
 
-No shell scripts required (D15). Pluto starts only when you request notebook work.
+Pluto starts only when you request notebook work (not at Cursor launch).
 
 ## What ships
 
 | Component | Role |
 |-----------|------|
+| `skills/styx-setup` | Install, Julia prerequisite, MCP troubleshooting |
 | `skills/pluto-session` | Agent bootstrap: start Pluto, choose notebook, open Glass |
 | `skills/pluto-workflow`, `pluto-semantics` | Cell editing and grammar |
-| `commands/pluto-notebooks` | User entry: "work on notebooks" |
-| `mcp.json` + launcher | MCP stdio (D15: standalone `connect()` when implemented) |
+| `commands/pluto-notebooks`, `styx-setup` | User entry points |
+| `mcp.json` + launcher | Deferred Pluto MCP (`connect()` until notebook intent) |
 | `rules/pluto-notebook-workflow.mdc` | Short guardrails |
-| `hooks/` | Health gate, read-before-edit, `pending_run` warning |
+| `hooks/` | Read-before-edit, `pending_run` warning, Design Mode hints |
+| `scripts/styx-doctor.sh` | Health check (Julia, env, ports) |
 
 ## Workflow (D15)
 
@@ -32,26 +55,28 @@ User requests notebooks → pluto-session (agent)
   → Design Mode click → pluto-workflow (edit cells)
 ```
 
-See [docs/specs/pluto-lifecycle.md](docs/specs/pluto-lifecycle.md) for full spec and simulated UX.
+See [docs/specs/pluto-lifecycle.md](docs/specs/pluto-lifecycle.md) for the full spec.
 
 MCP server key: **`pluto`**
 
 ## Development
 
-Local install (Cursor 3.x — symlinks rejected):
+Local install (Cursor rejects symlinks for plugins):
 
 ```bash
-./scripts/sync-local-plugin.sh   # full dev copy → ~/.cursor/plugins/local/styx/
+./scripts/sync-local-plugin.sh   # copy → ~/.cursor/plugins/local/styx/
 # Developer: Reload Window
 ```
 
-Release-shaped tree (excludes `eval/`, planning docs):
+Release-shaped tree for marketplace review:
 
 ```bash
 ./scripts/package-plugin.sh    # → dist/styx/
 ```
 
 Optional: copy `.env.dev.example` → `.env.dev`, set `PLUTOMCP_SOURCE` to your PlutoMCP.jl fork.
+
+**Marketplace submit:** [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish) (public repo, manual review).
 
 ## Planning (contributors)
 
@@ -65,4 +90,4 @@ Optional: copy `.env.dev.example` → `.env.dev`, set `PLUTOMCP_SOURCE` to your 
 
 Toggle **Cmd+Shift+D** in Agents Glass, click a cell, send a prompt. Hook `prompt` includes `dom_path` with `pluto-notebook#…` and `pluto-cell#…`. Agent calls MCP **`resolve_pluto_context`** and **`read_cell`**.
 
-Do not use `plugin-browse-browser` for Pluto. Glass: **`cursor-ide-browser`** in Agents Window.
+Glass navigation: **`cursor-ide-browser`** in the Agents Window — not `plugin-browse-browser`.

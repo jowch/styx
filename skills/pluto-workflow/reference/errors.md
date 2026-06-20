@@ -7,6 +7,7 @@
 | `pluto_not_running` | `start_pluto_session` |
 | `notebook_not_found` | Confirm path with user |
 | MCP unreachable | Enable **pluto** MCP in Cursor Settings → retry |
+| `julia: command not found` / MCP exits immediately | Install Julia 1.9+ (https://julialang.org/downloads/), Reload Window → **styx-setup** |
 
 If cell edits fail before bootstrap, return to **pluto-session** first.
 

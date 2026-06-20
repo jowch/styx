@@ -11,6 +11,7 @@ MCP_PORT="${PLUTOMCP_MCP_PORT:-2346}"
 PLUTO_PORT="${PLUTOMCP_PLUTO_PORT:-1234}"
 JULIA="${JULIA:-julia}"
 
+"${PLUGIN_ROOT}/scripts/check-julia.sh"
 "${PLUGIN_ROOT}/scripts/ensure-julia-env.sh"
 
 exec "$JULIA" --project="$PLUGIN_ROOT" -e \
