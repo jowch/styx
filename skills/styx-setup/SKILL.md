@@ -7,7 +7,7 @@ description: >-
 
 # Styx setup and onboarding
 
-Marketplace install is **Settings → Plugins → search Styx → Install**. No shell scripts required for normal use.
+**Install:** one-liner `curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash` → Reload Window → enable **pluto** MCP. Details: [reference/install.md](reference/install.md).
 
 ## Prerequisites
 

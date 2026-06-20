@@ -8,19 +8,24 @@ Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
 
 ### Prerequisites
 
+- **Cursor 3** with Plugins and MCP enabled
 - **Julia 1.9+** on your system `PATH` — [julialang.org/downloads](https://julialang.org/downloads/)
-- **Cursor** with Plugins and MCP enabled
 
-### From the marketplace
+### One-line install (local plugin)
 
-1. **Cursor Settings → Plugins** → search **Styx** → **Install**
-2. **Reload Window**
-3. **Settings → MCP** → enable **pluto** (bundled with Styx)
-4. First MCP connect installs PlutoMCP (network; may take a few minutes)
+```bash
+curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
+```
+
+Then **Reload Window** → **Settings → MCP** → enable **pluto**.
 
 Say **"Run Styx doctor"** in chat to verify setup, or **"styx-setup"** for the full checklist.
 
-Detailed steps: [skills/styx-setup/reference/install.md](skills/styx-setup/reference/install.md)
+**Update:** re-run the same command, or `./scripts/update.sh` from a clone.
+
+**Uninstall:** **Settings → Plugins → Installed → Styx → Uninstall**, then Reload Window.
+
+Full steps: [skills/styx-setup/reference/install.md](skills/styx-setup/reference/install.md)
 
 ### Without Julia
 
@@ -76,7 +81,7 @@ Release-shaped tree for marketplace review:
 
 Optional: copy `.env.dev.example` → `.env.dev`, set `PLUTOMCP_SOURCE` to your PlutoMCP.jl fork.
 
-**Marketplace submit:** [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish) (public repo, manual review).
+**Release pin:** `STYX_REF=v0.1.0 curl -fsSL …/install.sh | bash`
 
 ## Planning (contributors)
 

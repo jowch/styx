@@ -157,6 +157,24 @@ MCP returns text placeholders for images/HTML in Phase 1. Click bridge provides 
 
 ---
 
+## D16 — Cursor 3 only; no cross-harness dependency (2026-06-20)
+
+**Decision:** Styx is a **Cursor 3 plugin only**. Users must not need Claude Code, Codex, OpenCode, or any other agent harness installed or configured.
+
+| Principle | Choice |
+|-----------|--------|
+| Install surface | Official Cursor marketplace and/or `~/.cursor/plugins/local/styx/` — not Claude `/plugin marketplace add` |
+| Manifest | `.cursor-plugin/plugin.json` only — no `.claude-plugin/` sidecar for distribution |
+| Runtime | All behavior via Cursor-native components: `mcp.json`, `hooks/hooks.json`, rules, skills, `cursor-ide-browser` |
+| Third-party skills | **Not** a supported install path — Cursor may load `~/.claude/plugins/cache/` when that toggle is on; we do not document or depend on it |
+| Prerequisites | **Cursor 3** + **Julia 1.9+** on PATH — nothing else |
+
+**Rationale:** Cursor's third-party-skills bridge can make Claude-installed plugins appear to work in Cursor, but that is undocumented, partial (hooks/skills ≠ full MCP bundle), and creates a false "install once, use everywhere" story. Styx ships a complete Cursor plugin bundle; distribution and support assume Cursor alone.
+
+**Amends D6:** Plugin target is explicitly Cursor 3 marketplace + local install — not multi-harness marketplace repos.
+
+---
+
 ## Resolved questions (formerly open)
 
 | Was | Resolution |
