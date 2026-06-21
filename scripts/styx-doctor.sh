@@ -130,14 +130,10 @@ else
   say_warn "curl not found — skipped MCP health probe"
 fi
 
-if command -v lsof >/dev/null 2>&1; then
-  for port in "$PLUTO_PORT" "$MCP_PORT"; do
-    if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
-      say_ok "Port :${port} in use (Pluto session or MCP may be up)"
-    fi
-  done
-elif command -v curl >/dev/null 2>&1 && pluto_ui_ok; then
-  say_ok "Port :${PLUTO_PORT} in use (Pluto UI responding)"
+if command -v curl >/dev/null 2>&1; then
+  if pluto_ui_ok; then
+    say_ok "Pluto UI responding on :${PLUTO_PORT}"
+  fi
 fi
 
 if [[ "$CHECK_UPDATES" -eq 1 ]]; then
