@@ -6,6 +6,10 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-06-21
+
+First release. Cursor 3 plugin for Pluto.jl notebooks via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl).
+
 ### Added
 
 - **Install:** `curl | bash` → `~/.cursor/plugins/local/styx/`; re-run or `scripts/update.sh` to update
@@ -22,4 +26,5 @@ All notable changes to **Styx** are documented here.
 - Lifecycle MCP tools may be hidden in the tool picker — agents invoke by name
 - After a PlutoMCP upgrade, toggle **pluto** MCP or Reload Window to refresh the cached tool list
 
-[Unreleased]: https://github.com/jowch/styx/commits/main
+[Unreleased]: https://github.com/jowch/styx/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/jowch/styx/releases/tag/v0.1.0
