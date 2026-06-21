@@ -70,6 +70,6 @@ Release-shaped tree:
 ./scripts/package-plugin.sh    # → dist/styx/
 ```
 
-Optional: copy `.env.dev.example` → `.env.dev`, set `PLUTOMCP_SOURCE` to your PlutoMCP.jl fork.
+Optional local fork (non-sibling path): `echo 'PLUTOMCP_SOURCE=/path/to/PlutoMCP.jl' > .env.dev` in the plugin root (gitignored).
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes. Validation: `eval/run_reference.jl --all --strict-trace` and `scripts/validate-pluto-lifecycle.sh`.

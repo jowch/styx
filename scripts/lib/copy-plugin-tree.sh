@@ -2,7 +2,7 @@
 # shellcheck shell=bash
 COPY_PLUGIN_TREE_EXCLUDES=(
   .git .cursor .github .git-template dist eval AGENTS.md
-  .env.dev .env.dev.example node_modules hooks/__pycache__
+  .env.dev node_modules hooks/__pycache__
   scripts/sync-local-plugin.sh scripts/package-plugin.sh
 )
 

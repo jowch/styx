@@ -14,7 +14,7 @@ Use when the user names a **specific notebook** (path, name, or clear reference)
 3. `open_notebook(path="<user-specified path>")` → record `notebook_id` and basename (e.g. `reactive_xy.jl`)  
    Default: safe preview. Use `run_notebook=true` only if user asked to run.
 4. **`browser_snapshot`** → **`browser_click`** the notebook link on landing (match filename).  
-   **Do not** navigate to `/edit?id=` directly after MCP open — hangs on `Loading cells...` ([known issue](../../../docs/known-issues/path-b-edit-url-loading.md)).
+   **Do not** `browser_navigate` to `/edit?id=` right after MCP `open_notebook` — Glass often sticks on `Loading cells...`. The landing page has a live WebSocket; clicking the notebook uses in-app navigation that hydrates correctly. A cold `/edit?id=` load waits for WebSocket hydration and often never completes in Glass.
 5. Safe-preview reminder:
 
    > Your notebook is open in **Safe preview** — code won't run until you click **Run notebook code** in Glass (top right). I can still edit cells; you won't see outputs or widgets update until you run.
@@ -25,6 +25,7 @@ Use when the user names a **specific notebook** (path, name, or clear reference)
 
 - **Never** `open_notebook` without a user-specified path.
 - If target may already be open: `list_notebooks` — if open, skip `open_notebook`; click it on landing.
+- **`/edit?id=` after MCP open:** always use landing click (step 4). **`/edit?id=` is fine** when the user opened the notebook from landing in Glass (Path A) or the editor loaded entirely through the browser without a prior MCP `open_notebook` for that navigation.
 
 ## Safe preview
 

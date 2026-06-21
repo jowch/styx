@@ -35,7 +35,7 @@ open_notebook({ path: "…" })
 browser_snapshot → browser_click({ ref: "<notebook filename link>" })
 ```
 
-**Do not** `browser_navigate` to pasted `/edit?id=` after MCP `open_notebook` — cold loads hang on `Loading cells...`. Click the notebook on landing instead. See [path-b-edit-url-loading.md](../../../docs/known-issues/path-b-edit-url-loading.md).
+**Do not** `browser_navigate` to pasted `/edit?id=` after MCP `open_notebook` — cold loads hang on `Loading cells...`. Click the notebook on landing instead. Details: [path-b-open.md](path-b-open.md).
 
 ## User handoff (last resort)
 
