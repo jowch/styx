@@ -44,17 +44,28 @@ else
 fi
 
 PLUTOMCP_LOCAL="${LOCAL}" "$JULIA" --project="$PLUGIN_ROOT" -e '
-using Pkg
+using Pkg, TOML
 local_path = get(ENV, "PLUTOMCP_LOCAL", "")
-if !isempty(local_path) && isdir(local_path)
-    Pkg.develop(PackageSpec(path=local_path))
-else
-    manifest = joinpath(dirname(Base.active_project()), "Manifest.toml")
-    if !isfile(manifest)
-        Pkg.add(PackageSpec(url="https://github.com/jowch/PlutoMCP.jl.git"))
+project_file = Base.active_project()
+project = TOML.parsefile(project_file)
+saved = deepcopy(project)
+try
+    if !isempty(local_path) && isdir(local_path)
+        # url and path cannot coexist in [sources]; swap to path for resolve, restore after.
+        project["sources"]["PlutoMCP"] = Dict("path" => local_path)
+        open(project_file, "w") do io
+            TOML.print(io, project)
+        end
+    end
+    Pkg.resolve()
+    Pkg.instantiate()
+finally
+    if !isempty(local_path) && isdir(local_path)
+        open(project_file, "w") do io
+            TOML.print(io, saved)
+        end
     end
 end
-Pkg.instantiate()
 '
 
 touch "$MARKER"

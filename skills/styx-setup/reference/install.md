@@ -4,7 +4,7 @@ Styx installs as a **Cursor 3 local plugin** at `~/.cursor/plugins/local/styx/`.
 
 ## 1. Install Julia
 
-Styx requires **Julia 1.9 or newer** on your system `PATH`.
+Styx requires **Julia 1.11 or newer** on your system `PATH` (`[sources]` in the plugin `Project.toml` needs Julia 1.11+).
 
 - **Download:** https://julialang.org/downloads/
 - **macOS:** `brew install julia` (or use the official `.dmg`)
@@ -44,7 +44,7 @@ First MCP connect downloads **PlutoMCP.jl** into the plugin Julia environment (n
 ## 4. Verify
 
 ```bash
-julia --version   # must be 1.9+
+julia --version   # must be 1.11+
 ```
 
 In Cursor chat: **"Run Styx doctor"** — the agent runs `scripts/styx-doctor.sh`.

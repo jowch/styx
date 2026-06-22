@@ -6,6 +6,17 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **Julia env:** `Project.toml` `[sources]` pins **PlutoMCP** to [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) **`main`**; `Manifest.toml` is gitignored (fresh `Pkg.resolve` on first MCP connect)
+- **Julia prerequisite:** 1.11+ (required for `[sources]`)
+
+### Added
+
+- **Demo notebook:** `examples/styx-demo.jl` — reactive sinc plot for README and hero recording
+- **README:** B-primary curation, hero video embed, demo notebook section
+- **Recording guide:** `scripts/record-hero-demo.md`
+
 ## [0.1.0] — 2026-06-21
 
 First release. Cursor 3 plugin for Pluto.jl notebooks via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl).

@@ -1,12 +1,16 @@
 # Styx
 
-**Styx** bridges [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebooks and Cursor agent workflows via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) and Glass Design Mode click context.
+<video src="assets/hero-demo.mp4" autoplay loop muted playsinline width="100%"></video>
+
+*Hero video: record with [scripts/record-hero-demo.md](scripts/record-hero-demo.md) and commit `assets/hero-demo.mp4`.*
+
+Edit live [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebooks from [Cursor](https://cursor.com) — click a cell in Glass Design Mode, describe the change, and the agent stages it via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl).
 
 Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
 
 ## Install
 
-**Prerequisites:** Cursor 3 (Plugins + MCP) and **Julia 1.9+** on your `PATH`.
+**Prerequisites:** Cursor 3 (Plugins + MCP) and **Julia 1.11+** on your `PATH`.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
@@ -18,18 +22,29 @@ Say **"Run Styx doctor"** or **"styx-setup"** to verify. **Update:** re-run the 
 
 Full guide: [skills/styx-setup/reference/install.md](skills/styx-setup/reference/install.md)
 
+## Demo notebook
+
+Try the included demo after install:
+
+- **File:** [`examples/styx-demo.jl`](examples/styx-demo.jl) — reactive sinc plot with a range slider, laid out for agent edits.
+- **Open:** ask the agent to *"open the Styx demo notebook"*, or pick it from the Pluto landing page in Glass.
+- **Safe preview:** click **Run notebook code** in Glass if widgets or plots look stale.
+
+Then **⌘⇧D** (Design Mode) → click the plot cell → describe an edit (e.g. change color or title).
+
 ## Quick start
 
 1. Complete [Install](#install).
-2. Say **"I want to work on my notebooks"** — the agent starts Pluto and opens the landing page in Glass; you pick a notebook (or name a `.jl` for direct open).
-3. **Next prompt:** ⌘⇧D (Design Mode) → click a cell → describe edits.
+2. Open a notebook in Glass — the demo above, your own `.jl`, or say *"I want to work on my notebooks"* to start Pluto and choose one.
+3. **⌘⇧D** → click a cell → describe edits in chat. The agent reads the cell, stages changes, and runs them when you ask.
 
-Pluto starts only when you request notebook work, not at Cursor launch.
+Pluto starts when you request notebook work, not at Cursor launch.
 
 ## What ships
 
 | Component | Role |
 |-----------|------|
+| `examples/styx-demo.jl` | Demo notebook (reactive plot + agent cell layout) |
 | `skills/styx-setup` | Install, Julia prerequisite, MCP troubleshooting |
 | `skills/pluto-session` | Agent bootstrap: start Pluto, choose notebook, open Glass |
 | `skills/pluto-workflow`, `pluto-semantics` | Cell editing and grammar |
@@ -42,12 +57,10 @@ Pluto starts only when you request notebook work, not at Cursor launch.
 ## Workflow
 
 ```
-User requests notebooks → pluto-session
-  → start_pluto_session → choose notebook → open Glass
-  → Design Mode click → pluto-workflow (edit cells)
+Open notebook in Glass → Design Mode click → pluto-workflow (read → stage → submit_changes)
 ```
 
-Skills hold the full bootstrap and edit flows. MCP server key: **`pluto`**.
+On first notebook intent, the agent runs **pluto-session** (`start_pluto_session`, open Glass). Skills hold the full bootstrap and edit flows. MCP server key: **`pluto`**.
 
 ## Click context (Design Mode)
 

@@ -29,6 +29,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: jowch/PlutoMCP.jl
+          ref: main
           path: PlutoMCP.jl
 
       - uses: julia-actions/setup-julia@v2

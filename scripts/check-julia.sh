@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ponytail: PATH-only probe; does not resolve JULIAUP or custom install dirs beyond JULIA env.
-# Exit 0 when Julia >= 1.9 is invocable; otherwise print install guidance and exit 1.
+# Exit 0 when Julia >= 1.11 is invocable; otherwise print install guidance and exit 1.
 set -euo pipefail
 
 JULIA="${JULIA:-julia}"
-MIN_VERSION="1.9"
+MIN_VERSION="1.11"
 
 install_help() {
   echo "Styx needs Julia ${MIN_VERSION}+ on PATH — https://julialang.org/downloads/" >&2

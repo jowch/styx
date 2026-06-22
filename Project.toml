@@ -3,4 +3,8 @@
 PlutoMCP = "22d0dc7c-8f49-4890-9bf9-be4a32466a36"
 
 [compat]
-julia = "1.9"
+julia = "1.11"
+PlutoMCP = "1"
+
+[sources]
+PlutoMCP = {url = "https://github.com/jowch/PlutoMCP.jl.git", rev = "main"}

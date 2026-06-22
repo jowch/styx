@@ -3,6 +3,7 @@ dist/
 hooks/state/*.json
 hooks/__pycache__/
 .julia-env-instantiated
+Manifest.toml
 .env.dev
 eval/node_modules/
 eval/results/
