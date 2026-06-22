@@ -2,8 +2,6 @@
 
 <video src="assets/hero-demo.mp4" autoplay loop muted playsinline width="100%"></video>
 
-*Hero video: record with [scripts/record-hero-demo.md](scripts/record-hero-demo.md) and commit `assets/hero-demo.mp4`.*
-
 Edit live [Pluto.jl](https://github.com/fonsp/Pluto.jl) notebooks from [Cursor](https://cursor.com) — click a cell in Glass Design Mode, describe the change, and the agent stages it via [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl).
 
 Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
@@ -83,6 +81,8 @@ Release-shaped tree:
 ./scripts/package-plugin.sh    # → dist/styx/
 ```
 
+**Repo-only scripts** (not copied by install/package): `pluto-serve.sh`, `pluto-lifecycle-preflight.sh`, `validate-pluto-lifecycle.sh`, `record-hero-demo.md` (hero video recording guide). Fresh Julia lockfile: `rm -f .julia-env-instantiated Manifest.toml && PLUTOMCP_ENV_FORCE=1 ./scripts/ensure-julia-env.sh`.
+
 Optional local fork (non-sibling path): `echo 'PLUTOMCP_SOURCE=/path/to/PlutoMCP.jl' > .env.dev` in the plugin root (gitignored).
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes. Validation: `eval/run_reference.jl --all --strict-trace` and `scripts/validate-pluto-lifecycle.sh`.
+See [CHANGELOG.md](CHANGELOG.md) for release notes. **Contributors:** `eval/run_reference.jl --all --strict-trace` and `scripts/validate-pluto-lifecycle.sh` (toggle **pluto** MCP off first).

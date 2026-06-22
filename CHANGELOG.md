@@ -8,6 +8,7 @@ All notable changes to **Styx** are documented here.
 
 ### Changed
 
+- **Install tree:** drop `generate-manifest.sh`; exclude dev/maintainer scripts from shipped plugin (`pluto-serve`, lifecycle validate/preflight, `record-hero-demo.md`)
 - **Julia env:** `Project.toml` `[sources]` pins **PlutoMCP** to [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) **`main`**; `Manifest.toml` is gitignored (fresh `Pkg.resolve` on first MCP connect)
 - **Julia prerequisite:** 1.11+ (required for `[sources]`)
 

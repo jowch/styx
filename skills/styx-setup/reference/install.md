@@ -92,4 +92,4 @@ Styx does not remove Julia packages from `~/.julia/` (shared with other Julia wo
 | Outputs don't update | Click **Run notebook code** in Glass (safe preview) |
 | Plugin hidden in Settings | **Include third-party Plugins…** toggle can hide local plugins in some builds — turn on and Reload Window |
 
-Contributors: `./scripts/sync-local-plugin.sh` copies this repo into the same local path for dev iteration.
+Contributors: `./scripts/sync-local-plugin.sh` copies this repo into the same local path for dev iteration. Lifecycle validation and other maintainer scripts stay repo-only (see README **Development**).

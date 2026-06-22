@@ -1,9 +1,13 @@
 # Portable plugin tree copy (tar; rsync not required).
 # shellcheck shell=bash
+# Shipped scripts: install*, update, check-julia, ensure-julia-env, pluto-mcp-launcher,
+# styx-doctor, load-env-dev, lib/*. Dev/maintainer scripts below stay repo-only.
 COPY_PLUGIN_TREE_EXCLUDES=(
   .git .cursor .github .git-template dist eval AGENTS.md
   .env.dev node_modules hooks/__pycache__
   scripts/sync-local-plugin.sh scripts/package-plugin.sh
+  scripts/pluto-serve.sh scripts/pluto-lifecycle-preflight.sh
+  scripts/validate-pluto-lifecycle.sh scripts/record-hero-demo.md
 )
 
 COPY_PLUGIN_PROTECTED=(
