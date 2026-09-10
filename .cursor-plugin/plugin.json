@@ -1,7 +1,7 @@
 {
   "name": "styx",
   "displayName": "Styx",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Bridge Pluto.jl notebooks and Cursor — Design Mode click context, staged MCP edits, and agent-driven Pluto lifecycle.",
   "author": {
     "name": "Jonathan Chen",

@@ -110,7 +110,7 @@ if [[ -f "${PLUGIN_ROOT}/.julia-env-instantiated" ]] && command -v "${JULIA:-jul
   if "${JULIA:-julia}" --project="$PLUGIN_ROOT" -e 'using PlutoMCP; hasmethod(PlutoMCP.connect, Tuple{}, (:binding_file,)) || error("no bound connect")' >/dev/null 2>&1; then
     say_ok "PlutoMCP env ready (bound connect)"
   else
-    say_warn "PlutoMCP env incomplete or missing bound mode — need PlutoMCP ≥ 1.5.0"
+    say_warn "PlutoMCP env incomplete or missing bound mode — use sibling PlutoMCP.jl or fork main with bound connect()"
     FAIL=1
   fi
 else
