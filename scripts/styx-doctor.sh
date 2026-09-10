@@ -3,8 +3,6 @@
 set -euo pipefail
 
 PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
-MCP_PORT="${PLUTOMCP_MCP_PORT:-2346}"
-PLUTO_PORT="${PLUTOMCP_PLUTO_PORT:-1234}"
 STYX_REPO="${STYX_REPO:-jowch/styx}"
 CHECK_UPDATES=0
 FAIL=0
@@ -32,7 +30,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# ponytail: strip optional leading v for semver-ish compare via sort -V
 normalize_version() {
   echo "${1#v}"
 }
@@ -110,30 +107,33 @@ else
 fi
 
 if [[ -f "${PLUGIN_ROOT}/.julia-env-instantiated" ]] && command -v "${JULIA:-julia}" >/dev/null 2>&1; then
-  if "${JULIA:-julia}" --project="$PLUGIN_ROOT" -e 'using PlutoMCP' >/dev/null 2>&1; then
-    say_ok "PlutoMCP env ready"
+  if "${JULIA:-julia}" --project="$PLUGIN_ROOT" -e 'using PlutoMCP; hasmethod(PlutoMCP.connect, Tuple{}, (:binding_file,)) || error("no bound connect")' >/dev/null 2>&1; then
+    say_ok "PlutoMCP env ready (bound connect)"
   else
-    say_warn "PlutoMCP env incomplete — re-enable **pluto** MCP or delete .julia-env-instantiated"
+    say_warn "PlutoMCP env incomplete or missing bound mode — need PlutoMCP ≥ 1.5.0"
     FAIL=1
   fi
 else
   say_ok "PlutoMCP not installed yet — normal until first **pluto** MCP connect"
 fi
 
-if command -v curl >/dev/null 2>&1; then
-  if mcp_health_ok; then
-    say_ok "MCP bridge listening on :${MCP_PORT}"
+if [[ -n "${VSCODE_PID:-}" ]]; then
+  say_ok "VSCODE_PID=${VSCODE_PID} (window lookup key)"
+  if binding="$(load_styx_binding 2>/dev/null)"; then
+    sid="$(python3 -c 'import json,sys; print(json.load(sys.stdin)["session_id"][:8])' <<<"$binding")"
+    mcp="$(python3 -c 'import json,sys; print(json.load(sys.stdin)["mcp_port"])' <<<"$binding")"
+    pluto="$(python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("pluto_port"))' <<<"$binding")"
+    state="$(python3 -c 'import json,sys; print(json.load(sys.stdin).get("pluto","?"))' <<<"$binding")"
+    if mcp_health_ok; then
+      say_ok "Bound session ${sid}… control :${mcp} pluto=${pluto} (${state})"
+    else
+      say_warn "Binding file present for session ${sid}… but /health nonce mismatch (stale?)"
+    fi
   else
-    say_ok "MCP bridge not running on :${MCP_PORT} (normal until notebook work or MCP connects)"
+    say_ok "No window binding yet (normal until pluto MCP connects)"
   fi
 else
-  say_warn "curl not found — skipped MCP health probe"
-fi
-
-if command -v curl >/dev/null 2>&1; then
-  if pluto_ui_ok; then
-    say_ok "Pluto UI responding on :${PLUTO_PORT}"
-  fi
+  say_warn "VSCODE_PID unset — hooks cannot resolve a window binding outside Cursor"
 fi
 
 if [[ "$CHECK_UPDATES" -eq 1 ]]; then
