@@ -36,7 +36,7 @@ Then **⌘⇧D** (Design Mode) → click the plot cell → describe an edit (e.g
 2. Open a notebook in Glass — the demo above, your own `.jl`, or say *"I want to work on my notebooks"* to start Pluto and choose one.
 3. **⌘⇧D** → click a cell → describe edits in chat. The agent reads the cell, stages changes, and runs them when you ask.
 
-Pluto starts when you request notebook work, not at Cursor launch.
+Pluto starts when you request notebook work, not at Cursor launch. Each Cursor window owns its own Pluto session (concurrent windows get distinct ports). Navigate Glass with the URL from `pluto_session_status` — ports are dynamic.
 
 ## What ships
 
@@ -50,7 +50,7 @@ Pluto starts when you request notebook work, not at Cursor launch.
 | `mcp.json` + launcher | Deferred Pluto MCP (`connect()` until notebook intent) |
 | `rules/pluto-notebook-workflow.mdc` | Short guardrails |
 | `hooks/` | Read-before-edit, `pending_run` warning, Design Mode hints |
-| `scripts/styx-doctor.sh` | Health check (Julia, env, ports) |
+| `scripts/styx-doctor.sh` | Health check (Julia, env, session binding) |
 
 ## Workflow
 

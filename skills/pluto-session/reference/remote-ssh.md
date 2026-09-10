@@ -1,27 +1,20 @@
 # Remote SSH workspaces
 
-Cursor owns the SSH session and **auto-forwards** ports when Pluto listens on the host (same as a remote `:3000` app). Styx does not create `ssh -L` tunnels.
+Cursor owns the SSH session and **auto-forwards** ports when Pluto listens on the host. Styx does not create `ssh -L` tunnels.
 
-Pluto must run **on the SSH host**, next to the files. Do not start a laptop Pluto against the remote mount.
+**Local XOR remote:** this Cursor window's Styx launcher and runtime directory live where the extension host runs. Never probe a laptop `:2346` hoping to find the SSH session, and never start a laptop Pluto against a remote mount.
 
 ## Bootstrap
 
 1. **Julia 1.11+** must be on the **remote** `PATH` (workspace terminal). If missing → **styx-setup**.
-2. `pluto_session_status`. If `pluto` is `running` and `open_notebook` accepts a **workspace path**, MCP is already on the host — continue Path A/B as usual.
-3. If stopped, start on the host:
-   - Prefer **`start_pluto_session`** (correct when plugin MCP stdio runs on the SSH host).
-   - If that would bind laptop ports or `open_notebook` cannot see workspace files: **stop** it, then start the HTTP stack in the **workspace Shell** (remote PTY):
-
-     ```julia
-     using PlutoMCP
-     PlutoMCP.serve(launch_browser=false, require_secret_for_access=false)
-     ```
-
-     Wait until `http://127.0.0.1:2346/health` answers. Stdio `connect()` attaches per call once the bridge is up (Cursor forwards `:2346` if MCP is on the laptop).
-4. Glass: `http://127.0.0.1:1234/`. If that fails, use the **Ports** panel URL (auto-forward remaps when laptop `:1234` is taken). Do not ask the user for `LocalForward` unless Ports/auto-forward is off (`remote.autoForwardPorts: false`) or broken.
+2. `pluto_session_status`. Read `pluto_url` / `mcp_port` from the result — ports are dynamic.
+3. If stopped → **`start_pluto_session`** (bound MCP stdio on the SSH host owns the stack). Do **not** fall back to `PlutoMCP.serve()` or fixed `:1234`/`:2346`.
+4. Glass: navigate to **`pluto_session_status.pluto_url`**. If that fails because Cursor remapped the laptop-side port, use the **Ports** panel URL (`remote_forward_unresolved`). Do not try another localhost Pluto or adopt a page that merely responds.
+5. Local Task children inherit this window's `plugin-styx-pluto` MCP — do not pass ports in prompts.
 
 ## Never
 
-- `start_pluto_session` on the laptop as a fallback when the workspace is Remote SSH and host Pluto is not up yet — that starts the wrong Julia.
+- `PlutoMCP.serve()` / `pluto-serve.sh` / curl discovery as an alternate transport.
 - Bind Pluto on `0.0.0.0`.
 - Treat Cloud Agent forwarding as this path.
+- Open the same canonical notebook path in two Styx sessions (`notebook_in_use`).

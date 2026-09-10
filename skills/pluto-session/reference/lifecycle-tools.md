@@ -1,30 +1,32 @@
 # Lifecycle MCP tools
 
+## Ownership
+
+One Cursor window = one Styx/PlutoMCP/Pluto. Parent + local Task children share that MCP stdio connection. Chat switches keep the same session; Reload Window mints a new `session_id`.
+
 ## Tools (invoke by name)
 
 | Tool | Purpose |
 |------|---------|
-| `pluto_session_status` | Check if Pluto stack is running |
-| `start_pluto_session` | Start deferred Pluto + HTTP bridge on `:2346` |
-| `stop_pluto_session` | Tear down Pluto stack |
-| `open_notebook` | Load a `.jl` file into the session (Path B) |
-| `allow_execution` | Exit safe preview on open notebook; optional `run_notebook` (default true) |
+| `pluto_session_status` | `pluto`, `session_id`, `managed`, `mcp_port`/`mcp_url`, `pluto_port`/`pluto_url`, notebooks |
+| `start_pluto_session` | Start deferred Pluto (bound mode allocates UI port; ignore port args) |
+| `stop_pluto_session` | Tear down Pluto; bound mode keeps the control bridge |
+| `open_notebook` | Load a `.jl` file (Path B); may return `notebook_in_use` |
+| `allow_execution` | Exit safe preview; optional `run_notebook` (default true) |
 
 ## MCP tool picker quirk
 
-Lifecycle tools are registered on the **pluto** MCP server but **may not appear in Cursor's MCP tool picker UI**.
+Lifecycle tools may be **hidden** in Cursor's MCP tool picker. **Invoke by name anyway.**
 
-**Invoke by name anyway** — the agent can call `start_pluto_session`, `open_notebook`, etc. even when they are hidden from the picker.
+**After upgrading PlutoMCP:** toggle **pluto** MCP off/on (or Reload Window) so `tools/list` and the launcher refresh.
 
-**After upgrading PlutoMCP:** toggle **pluto** MCP off/on in Cursor Settings (or Reload Window) so `tools/list` refreshes — e.g. `allow_execution` won't be callable until the cache updates.
+## Glass URL
 
-After `start_pluto_session`, the HTTP bridge on `:2346` is up (hooks use this for health checks).
-
-Stdio `connect()` **re-checks** `/health` on each tool call. If this process has not started Pluto but a bridge is already up (including one Cursor forwarded from a Remote SSH host), calls go to that bridge.
+Always navigate with **`pluto_url` from status/start** — never hardcode `:1234`.
 
 ## Never ask the user to run
 
 - `scripts/pluto-serve.sh` (dev-only)
-- `PlutoMCP.serve()` **themselves**
+- `PlutoMCP.serve()` / curl port probes
 
-Use lifecycle tools instead. On Remote SSH the **agent** may run `PlutoMCP.serve()` in the workspace Shell — [remote-ssh.md](remote-ssh.md).
+Use lifecycle tools. Local children must not discover bridges over HTTP or start shell servers.

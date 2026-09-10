@@ -12,7 +12,9 @@ Live reactive session — not a `.jl` file to patch. See [pluto-mental-model.md]
 
 ## Prerequisites
 
-Notebook open in Glass at `http://127.0.0.1:1234/edit?id=<notebook_id>`. If not bootstrapped, use **pluto-session** first.
+Notebook open in Glass at the session's `pluto_url` (`…/edit?id=<notebook_id>`). Resolve URL from `pluto_session_status` — never assume `:1234`. If not bootstrapped, use **pluto-session** first.
+
+Local Task children use the parent's MCP server; do not curl bridges or run `PlutoMCP.serve()`.
 
 ## Find the notebook (browser first)
 

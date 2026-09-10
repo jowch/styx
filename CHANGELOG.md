@@ -6,18 +6,21 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
-### Changed
-
-- **Install tree:** drop `generate-manifest.sh`; exclude dev/maintainer scripts from shipped plugin (`pluto-serve`, lifecycle validate/preflight, `record-hero-demo.md`)
-- **Julia env:** `Project.toml` `[sources]` pins **PlutoMCP** to [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) **`main`** at **1.4.1** (`compat = "1.4.1"`); `Manifest.toml` is gitignored (fresh `Pkg.resolve` on first MCP connect)
-- **Julia prerequisite:** 1.11+ (required for `[sources]`)
+## [0.2.0] — 2026-09-10
 
 ### Added
 
-- **Demo notebook:** `examples/styx-demo.jl` — reactive sinc plot for README and hero recording
-- **README:** B-primary curation, hero video embed, demo notebook section
-- **Recording guide:** `scripts/record-hero-demo.md`
-- **Remote SSH:** start Pluto on the SSH host; Cursor auto-forwards Ports. Skill: `skills/pluto-session/reference/remote-ssh.md`. Requires PlutoMCP **1.4.1** (stdio attaches to a bridge that appears after `connect()`).
+- **Independent Styx sessions:** one Cursor window owns one PlutoMCP/Pluto; concurrent windows get distinct ports and session nonces
+- **Window binding:** launcher requires `VSCODE_PID`; hooks resolve `STYX_RUNTIME_DIR/windows/<pid>.json` and send `X-Styx-Session-ID`
+- **Notebook path leases:** two bound sessions cannot open the same canonical `.jl` (`notebook_in_use`)
+- **Hook tests:** `eval/test_session_binding.py`
+
+### Changed
+
+- **PlutoMCP ≥ 1.5:** bound `connect()` — no foreign-bridge proxy; dynamic `listenany` ports; JSON `/health`
+- **Glass URL:** agents must use `pluto_session_status.pluto_url` (no hardcoded `:1234`)
+- **Remote SSH:** remove `PlutoMCP.serve()` / late-attach fallback; local XOR remote
+- **Doctor / lifecycle validation:** binding-aware; two-session concurrency checks
 
 ## [0.1.0] — 2026-06-21
 

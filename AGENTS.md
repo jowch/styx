@@ -6,11 +6,10 @@
 - Resolve `notebook_id` from Glass browser URL or Design Mode click before `list_notebooks`; skills **`styx-setup`** (install/Julia/MCP before notebook work), **`pluto-session`** / **`pluto-workflow`** / **`pluto-semantics`** are primary onboarding (lean SKILL.md + `reference/` deep-dives); no `@pluto-context` or **`pluto-open`** commands.
 - **Release docs:** no `docs/` folder at release — planning artifacts (DECISIONS, PLAN, lifecycle specs) and `docs/known-issues/` removed; runtime guidance lives in skills + README; MCP-only details in fork (`AGENTS.md`).
 - 50/50 user+agent Pluto collaboration — user edits freely in browser; chat memory is not notebook ground truth.
-- **0.1.0 shipped:** **local plugin** install (`install.sh` curl one-liner) + onboarding UX (Julia prerequisite, **styx-setup**) remain primary delivery; official Cursor marketplace deferred.
-- **Cursor 3 only (D16):** no Claude/Codex/OpenCode harness required; no `.claude-plugin/` distribution; do not document third-party-skills bridge as an install path.
-- **Freshness + read-before-edit:** freshness at write boundaries and user handoffs (click/command), not background polling; read-before-edit enforced at MCP layer (Claude Code style), not rules-only.
-- Click delivery: **D13 Path A** — Glass Design Mode `dom_path` in hook `prompt` → MCP **`resolve_pluto_context`** / **`read_cell`**.
+- **0.1.0 / Cursor 3 only (D16):** **local plugin** install (`install.sh` curl one-liner) + onboarding (**styx-setup**) remain primary; marketplace deferred; no Claude/Codex/OpenCode harness, `.claude-plugin/`, or third-party-skills install path.
+- **Freshness + click delivery (D13 Path A):** freshness at write boundaries and user handoffs (click/command), not background polling; read-before-edit at MCP layer; Glass Design Mode `dom_path` in hook `prompt` → MCP **`resolve_pluto_context`** / **`read_cell`**.
 - **Cursor-first:** no background Pluto for non-notebook work; agent bootstraps session on notebook intent — not user shell scripts; **`scripts/pluto-serve.sh` dev-only**; deferred `connect()` launcher is default; agent opens Glass via **`cursor-ide-browser`** in Agents Window (`glass-browser-*` view IDs) — **not** `plugin-browse-browser` or `cursor-app-control` **`open_resource`**.
+- **One session = one Pluto:** one Cursor chat owns one Styx / PlutoMCP / Pluto; local XOR remote (never both — where Pluto starts follows the environment); one session may drive multiple notebooks on that Pluto; multiple sessions must not share a notebook.
 - **Safe preview:** remind user to **Run notebook code** in Glass for live outputs/reactivity — not a hard edit gate; still stage edits when asked.
 - **Commit hygiene:** commit at logical boundaries as you go — one focused commit per feature/doc slice, not large uncommitted batches. Split mixed files when needed (e.g. eval harness vs graph tools). Ask before pushing.
 
