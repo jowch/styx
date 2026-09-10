@@ -20,9 +20,11 @@ Lifecycle tools are registered on the **pluto** MCP server but **may not appear 
 
 After `start_pluto_session`, the HTTP bridge on `:2346` is up (hooks use this for health checks).
 
+Stdio `connect()` **re-checks** `/health` on each tool call. If this process has not started Pluto but a bridge is already up (including one Cursor forwarded from a Remote SSH host), calls go to that bridge.
+
 ## Never ask the user to run
 
 - `scripts/pluto-serve.sh` (dev-only)
-- `PlutoMCP.serve()` manually
+- `PlutoMCP.serve()` **themselves**
 
-Use lifecycle tools instead.
+Use lifecycle tools instead. On Remote SSH the **agent** may run `PlutoMCP.serve()` in the workspace Shell — [remote-ssh.md](remote-ssh.md).

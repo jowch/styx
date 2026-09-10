@@ -27,6 +27,8 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 
 **Already running:** Path A → landing only. Path B → `list_notebooks`; skip `open_notebook` if target is open.
 
+**Remote SSH:** Pluto on the SSH host; Cursor forwards ports. See [reference/remote-ssh.md](reference/remote-ssh.md).
+
 ## REQUIRED chain
 
 - Cell edits → **pluto-workflow**
@@ -48,3 +50,4 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 - **Glass navigation (`cursor-ide-browser`):** [reference/glass-navigation.md](reference/glass-navigation.md)
 - **Lifecycle tools + MCP picker quirk:** [reference/lifecycle-tools.md](reference/lifecycle-tools.md)
 - **Bootstrap errors:** [pluto-workflow/reference/errors.md](../pluto-workflow/reference/errors.md)
+- **Remote SSH:** [reference/remote-ssh.md](reference/remote-ssh.md)

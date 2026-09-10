@@ -13,7 +13,7 @@ description: >-
 
 | Requirement | Notes |
 |-------------|--------|
-| **Julia 1.11+** on `PATH` | https://julialang.org/downloads/ |
+| **Julia 1.11+** on `PATH` | https://julialang.org/downloads/ — on **Remote SSH**, this is the **remote** PATH |
 | **Cursor** with Plugins + MCP | Enable bundled **pluto** MCP after install |
 | Network (first run) | First MCP connect installs PlutoMCP.jl into the plugin env |
 

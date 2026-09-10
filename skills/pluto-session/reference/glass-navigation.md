@@ -17,6 +17,8 @@ Only Agents Glass participates in Design Mode → `resolve_pluto_context` → `r
 2. Confirm view ID starts with **`glass-browser-`**
 3. **`browser_snapshot`** → **`browser_click`** on links (Path B: notebook filename on landing)
 
+If landing fails on Remote SSH, Cursor may have remapped the port — use the **Ports** panel URL. See [remote-ssh.md](remote-ssh.md).
+
 Do **not** use `plugin-browse-browser`.
 
 ### Path A — landing only

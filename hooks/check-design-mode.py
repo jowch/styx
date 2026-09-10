@@ -13,7 +13,7 @@ from pluto_lib import pluto_session_running
 
 def _has_pluto_context(prompt: str) -> bool:
     lower = prompt.lower()
-    return "pluto-notebook#" in lower or "localhost:1234" in lower
+    return "pluto-notebook#" in lower or "localhost:1234" in lower or "127.0.0.1:1234" in lower
 
 
 def main() -> int:

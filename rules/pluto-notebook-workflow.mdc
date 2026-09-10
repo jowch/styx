@@ -14,11 +14,11 @@ alwaysApply: true
 - **pluto-workflow** — cell edits once a notebook is open
 - **pluto-semantics** — cell structure (`imports_cell`, `begin`/`end` blocks, `@bind`) and parse-error fixes
 
-Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()` — call `start_pluto_session` / `open_notebook` **by name** even if not in the MCP tool picker.
+Never ask the user to run `pluto-serve.sh`. Prefer `start_pluto_session` / `open_notebook` **by name** even if not in the MCP tool picker. On **Remote SSH**, if that would start a laptop Pluto, the agent starts `PlutoMCP.serve()` in the **workspace Shell** instead (see **pluto-session** `remote-ssh.md`).
 
 ## Bootstrap
 
-Notebook intent → **pluto-session** first. Glass: **`cursor-ide-browser`** (`position: "active"`; view ID `glass-browser-*`). Path B: after `open_notebook`, `browser_click` notebook on landing — not pasted `/edit?id=`. **Not** `plugin-browse-browser`.
+Notebook intent → **pluto-session** first. Glass: **`cursor-ide-browser`** (`position: "active"`; view ID `glass-browser-*`). Path B: after `open_notebook`, `browser_click` notebook on landing — not pasted `/edit?id=`. **Not** `plugin-browse-browser`. **Remote SSH:** start Pluto on the SSH host (see **pluto-session** `remote-ssh.md`); Cursor auto-forwards ports — do not boot a laptop Pluto.
 
 ## Safe preview
 

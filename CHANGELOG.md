@@ -9,7 +9,7 @@ All notable changes to **Styx** are documented here.
 ### Changed
 
 - **Install tree:** drop `generate-manifest.sh`; exclude dev/maintainer scripts from shipped plugin (`pluto-serve`, lifecycle validate/preflight, `record-hero-demo.md`)
-- **Julia env:** `Project.toml` `[sources]` pins **PlutoMCP** to [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) **`main`**; `Manifest.toml` is gitignored (fresh `Pkg.resolve` on first MCP connect)
+- **Julia env:** `Project.toml` `[sources]` pins **PlutoMCP** to [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) **`main`** at **1.4.1** (`compat = "1.4.1"`); `Manifest.toml` is gitignored (fresh `Pkg.resolve` on first MCP connect)
 - **Julia prerequisite:** 1.11+ (required for `[sources]`)
 
 ### Added
@@ -17,6 +17,7 @@ All notable changes to **Styx** are documented here.
 - **Demo notebook:** `examples/styx-demo.jl` — reactive sinc plot for README and hero recording
 - **README:** B-primary curation, hero video embed, demo notebook section
 - **Recording guide:** `scripts/record-hero-demo.md`
+- **Remote SSH:** start Pluto on the SSH host; Cursor auto-forwards Ports. Skill: `skills/pluto-session/reference/remote-ssh.md`. Requires PlutoMCP **1.4.1** (stdio attaches to a bridge that appears after `connect()`).
 
 ## [0.1.0] — 2026-06-21
 

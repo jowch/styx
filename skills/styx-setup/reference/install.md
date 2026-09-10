@@ -58,6 +58,10 @@ Say **"I want to work on my Pluto notebooks"**. The agent starts Pluto when you 
 
 Design Mode (**⌘⇧D**) → click a cell → describe edits.
 
+## Remote SSH
+
+Cursor forwards ports when Pluto listens on the host. Install Julia **on the SSH machine**, enable Styx, then ask to work on notebooks — the agent starts Pluto **there**. Glass is still `http://127.0.0.1:1234/` (or a remapped Ports URL). Details: `skills/pluto-session/reference/remote-ssh.md`.
+
 ## Update
 
 Re-run the one-liner (or `./scripts/update.sh` from a clone). The installer preserves your Julia env marker (`.julia-env-instantiated`) so you are not forced to re-download packages.
