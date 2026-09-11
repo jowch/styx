@@ -1,6 +1,9 @@
 # Shared binding-aware health probes for styx-doctor and lifecycle scripts.
 # shellcheck shell=bash
 
+# shellcheck source=styx-window-key.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/styx-window-key.sh"
+
 styx_runtime_dir() {
   if [[ -n "${STYX_RUNTIME_DIR:-}" ]]; then
     echo "${STYX_RUNTIME_DIR}"
@@ -12,11 +15,9 @@ styx_runtime_dir() {
 }
 
 styx_binding_file() {
-  local pid="${VSCODE_PID:-}"
-  if [[ -z "$pid" ]]; then
-    return 1
-  fi
-  echo "$(styx_runtime_dir)/windows/${pid}.json"
+  local key
+  key="$(resolve_styx_window_key 2>/dev/null)" || return 1
+  echo "$(styx_runtime_dir)/windows/${key}.json"
 }
 
 # Prints binding JSON on stdout when present and schema-valid; else returns 1.

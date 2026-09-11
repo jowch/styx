@@ -22,11 +22,11 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "${ROOT}/scripts/lib/port-probe.sh"
 
 if [[ "$REQUIRE_CLEAN" -eq 1 ]]; then
-  if [[ -n "${VSCODE_PID:-}" ]] && load_styx_binding >/dev/null 2>&1 && mcp_health_ok; then
-    echo "FAIL: live Styx binding for VSCODE_PID=${VSCODE_PID} — toggle pluto MCP off first" >&2
+  if resolve_styx_window_key >/dev/null && load_styx_binding >/dev/null 2>&1 && mcp_health_ok; then
+    echo "FAIL: live Styx binding for window key ${STYX_WINDOW_KEY} (${STYX_WINDOW_KEY_SOURCE}) — toggle pluto MCP off first" >&2
     exit 1
   fi
-  echo "OK: no live binding for this VSCODE_PID (or VSCODE_PID unset)"
+  echo "OK: no live binding for this window key (or identity unset)"
 else
   echo "OK: preflight (binding-aware; fixed ports not required)"
 fi
