@@ -8,6 +8,8 @@ All notable changes to **Styx** are documented here.
 
 ### Added
 
+- **Agent control rubric:** `eval/agent-control/` checklist + scored rubric + scorecard; parent→subagent protocol and skill-improvement feedback loop for grading Pluto skill/MCP use
+
 - **Independent Styx sessions:** one Cursor window owns one PlutoMCP/Pluto; concurrent windows get distinct ports and session nonces
 - **Window binding:** launcher requires `VSCODE_PID`; hooks resolve `STYX_RUNTIME_DIR/windows/<pid>.json` and send `X-Styx-Session-ID`
 - **Notebook path leases:** two bound sessions cannot open the same canonical `.jl` (`notebook_in_use`)
@@ -19,6 +21,8 @@ All notable changes to **Styx** are documented here.
 
 ### Changed
 
+- **Glass / Remote SSH ([#4](https://github.com/jowch/styx/issues/4)):** tab reuse (no `newTab` by default); host `pluto_url` vs Ports client URL; scrub leftover hardcoded `:1234` guidance in `AGENTS.md`
+- **pluto-workflow:** prefer `submit_changes(wait_for_completion=false)` on stdio-bound sessions ([#3](https://github.com/jowch/styx/issues/3) mitigation)
 - **Bound PlutoMCP:** launcher passes binding kwargs; no foreign-bridge proxy; dynamic `listenany` ports; JSON `/health` (requires PlutoMCP with bound `connect()` on fork `main` / sibling checkout)
 - **Glass URL:** agents must use `pluto_session_status.pluto_url` (no hardcoded `:1234`)
 - **Remote SSH:** remove `PlutoMCP.serve()` / late-attach fallback; local XOR remote

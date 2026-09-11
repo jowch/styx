@@ -44,6 +44,14 @@ Re-score an existing trace (dev): `julia score.jl --scenario <id> --log results/
 
 PlutoMCP provides the optional `EvalLog.jl` hook (`serve(eval_log=...)`). This repo owns scenarios, fixtures, runners, and scoring.
 
+## Agent control (behavioral grading)
+
+Deterministic CI above does **not** score how agents use skills/Glass. For parent→subagent review of Pluto MCP work, use:
+
+- [`agent-control/CHECKLIST.md`](agent-control/CHECKLIST.md) — must-pass gate
+- [`agent-control/RUBRIC.md`](agent-control/RUBRIC.md) — scored dimensions + parent protocol
+- [`agent-control/SCORECARD.template.md`](agent-control/SCORECARD.template.md) — per-run scorecard
+
 ## Data handling
 
 - `results/` and `*.jsonl` may contain notebook code — **do not commit**

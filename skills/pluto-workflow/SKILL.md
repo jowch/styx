@@ -27,8 +27,10 @@ Local Task children use the parent's MCP server; do not curl bridges or run `Plu
 ## Edit loop
 
 ```
-read → stage (run_after=false) → submit_changes → read (verify)
+read → stage (run_after=false) → submit_changes(wait_for_completion=false) → read (verify)
 ```
+
+Default **`wait_for_completion=false`** on `submit_changes` for stdio-bound sessions so MCP stays responsive ([issue #3](https://github.com/jowch/styx/issues/3)). Only block when the user explicitly needs a synchronous result and the session is known durable.
 
 **Safe preview:** still edit; remind user outputs won't update until **Run notebook code** in Glass. See [safe-preview.md](reference/safe-preview.md).
 
@@ -47,6 +49,7 @@ read → stage (run_after=false) → submit_changes → read (verify)
 | Edit without `read_cell` | Read first (MCP enforces) |
 | `run_all_cells` in safe preview | Direct user to Glass button |
 | End turn with staged edits | `submit_changes` first |
+| `submit_changes(wait_for_completion=true)` on stdio | Prefer `false` — blocking wait can kill in-process Pluto |
 
 ## Additional resources
 
@@ -57,3 +60,4 @@ read → stage (run_after=false) → submit_changes → read (verify)
 - **Error fields + kinds:** [reference/errors.md](reference/errors.md)
 - **Canonical MCP tool names:** [PlutoMCP.jl AGENTS.md](https://github.com/jowch/PlutoMCP.jl/blob/main/AGENTS.md)
 - **Notebook cell structure:** [pluto-semantics/reference/cell-structure.md](../pluto-semantics/reference/cell-structure.md)
+- **Parent/subagent grading:** [../../eval/agent-control/README.md](../../eval/agent-control/README.md)
