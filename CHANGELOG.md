@@ -6,6 +6,10 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Remote SSH Glass tab reuse ([#4](https://github.com/jowch/styx/issues/4)):** housekeeping close — work shipped in [#7](https://github.com/jowch/styx/pull/7)
+
 ### Added
 
 - **Agent control rubric:** `eval/agent-control/` checklist + scored rubric + scorecard; parent→subagent protocol and skill-improvement feedback loop for grading Pluto skill/MCP use
