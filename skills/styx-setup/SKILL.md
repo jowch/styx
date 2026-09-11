@@ -7,7 +7,9 @@ description: >-
 
 # Styx setup and onboarding
 
-**Install:** one-liner `curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash` → Reload Window → enable **pluto** MCP. Details: [reference/install.md](reference/install.md).
+**Install:** one-liner `curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash` → Reload Window → enable **pluto** MCP.
+
+**Update:** re-run that one-liner (or `./scripts/update.sh` from a clone). Plugin files refresh; Julia/PlutoMCP env may need `rm -f .julia-env-instantiated Manifest.toml` then `PLUTOMCP_ENV_FORCE=1 ./scripts/ensure-julia-env.sh` in `~/.cursor/plugins/local/styx`. Details: [reference/install.md](reference/install.md#update).
 
 ## Prerequisites
 

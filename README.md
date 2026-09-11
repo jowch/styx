@@ -18,9 +18,36 @@ curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh 
 
 Then **Reload Window** → **Settings → MCP** → enable **pluto**.
 
-Say **"Run Styx doctor"** or **"styx-setup"** to verify. **Update:** re-run the same command (then force Julia env refresh if you need the pinned PlutoMCP SHA: `PLUTOMCP_ENV_FORCE=1`). **Uninstall:** Settings → Plugins → Styx → Uninstall.
+Say **"Run Styx doctor"** or **"styx-setup"** to verify.
+
+**Uninstall:** Settings → Plugins → Styx → Uninstall.
 
 Full guide: [skills/styx-setup/reference/install.md](skills/styx-setup/reference/install.md)
+
+## Update
+
+Cursor does **not** auto-update local plugins. Refresh Styx with the same one-liner (or `./scripts/update.sh` from a clone):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
+```
+
+```bash
+# From a clone of this repo:
+./scripts/update.sh
+```
+
+That refreshes plugin files under `~/.cursor/plugins/local/styx/`. The installer **preserves** `.julia-env-instantiated`, so the Julia / PlutoMCP env is **not** re-resolved by default.
+
+When the PlutoMCP commit pin in `Project.toml` changed (or MCP tools look stale after upgrade), force a re-resolve in the plugin root:
+
+```bash
+cd ~/.cursor/plugins/local/styx
+rm -f .julia-env-instantiated Manifest.toml
+PLUTOMCP_ENV_FORCE=1 ./scripts/ensure-julia-env.sh
+```
+
+Then **Reload Window**, and toggle **pluto** MCP off/on if new tools were added.
 
 ## Demo notebook
 

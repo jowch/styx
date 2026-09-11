@@ -8,6 +8,7 @@ All notable changes to **Styx** are documented here.
 
 ### Changed
 
+- **Docs:** dedicated README **Update** section (curl one-liner / `./scripts/update.sh`) plus force Julia env refresh (`rm` marker/Manifest + `PLUTOMCP_ENV_FORCE=1`); install guide + styx-setup skill aligned
 - **Safe preview fast path:** prefer `allow_execution(run_notebook=false)` then `submit_changes` / `execute_cell` for staged cells when exiting Safe preview after edits (avoids default full-notebook restart/run); Glass **Run notebook code** and default `allow_execution` still valid ([#3](https://github.com/jowch/styx/issues/3) polish)
 
 ## [0.2.0] — 2026-09-11
