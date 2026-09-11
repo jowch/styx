@@ -7,5 +7,4 @@ julia = "1.11"
 PlutoMCP = "1.4.1"
 
 [sources]
-# Session binding lives on PlutoMCP feat/session-binding until that lands on main.
-PlutoMCP = {url = "https://github.com/jowch/PlutoMCP.jl.git", rev = "feat/session-binding"}
+PlutoMCP = {url = "https://github.com/jowch/PlutoMCP.jl.git", rev = "main"}
