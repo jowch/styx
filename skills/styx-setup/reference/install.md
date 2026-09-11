@@ -25,7 +25,7 @@ Optional historical pin (0.1.0 tag only):
 STYX_REF=v0.1.0 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
 ```
 
-Plugin `Project.toml` pins PlutoMCP to a **commit SHA** on [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) (not floating `main`). After updating Styx, force a Julia env refresh if the pin changed: `PLUTOMCP_ENV_FORCE=1` or wipe `.julia-env-instantiated` + `Manifest.toml` in the plugin root.
+Plugin `Project.toml` pins PlutoMCP to a **commit SHA** on [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) (not floating `main`). After updating Styx, see [Update](#update) if the pin changed.
 
 **Already cloned the repo:**
 
@@ -66,7 +66,30 @@ Cursor forwards ports when Pluto listens on the host. Install Julia **on the SSH
 
 ## Update
 
-Re-run the one-liner (or `./scripts/update.sh` from a clone). The installer preserves your Julia env marker (`.julia-env-instantiated`) so you are not forced to re-download packages.
+Cursor does **not** auto-update local plugins under `~/.cursor/plugins/local/`.
+
+**Refresh plugin files** (same as install — either works):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
+```
+
+```bash
+# From a clone:
+./scripts/update.sh
+```
+
+`update.sh` calls `install-styx.sh --update`. The installer preserves `.julia-env-instantiated`, so plugin files refresh but the Julia / PlutoMCP env is **not** re-resolved by default.
+
+**Force Julia / PlutoMCP re-resolve** when the pinned PlutoMCP SHA in `Project.toml` changed (or MCP looks stale after upgrade):
+
+```bash
+cd ~/.cursor/plugins/local/styx
+rm -f .julia-env-instantiated Manifest.toml
+PLUTOMCP_ENV_FORCE=1 ./scripts/ensure-julia-env.sh
+```
+
+(`PLUTOMCP_ENV_FORCE=1` alone also bypasses the marker skip in `ensure-julia-env.sh`; wiping the marker and `Manifest.toml` is the reliable full refresh.)
 
 After updating:
 
