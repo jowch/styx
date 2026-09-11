@@ -44,7 +44,7 @@ When a parent dispatches Pluto notebook work to a subagent:
    - `pluto_session_status` / `pluto_url` / Ports URL
    - Glass tab actions / view ids
    - `read_cell` → `edit_cell`/`add_cell` → `submit_changes` arg values (`run_after`, `wait_for_completion`, ids)
-   - `pending_run` / safe-preview reminders
+   - `pending_run` / Safe preview exit (Glass **Run notebook code** or `allow_execution`)
 4. If parent grade < 10 or any checklist **No**, run the **skill-improvement loop** below before more notebook work.
 5. File durable product gaps as Styx issues (PlutoMCP fork issues disabled) — e.g. tab-list reliability is upstream Cursor; stdio wait death is [#3](https://github.com/jowch/styx/issues/3).
 

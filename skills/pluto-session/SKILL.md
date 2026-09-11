@@ -23,7 +23,7 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 
 **Path A:** `pluto_session_status` → `start_pluto_session` if stopped → `cursor-ide-browser` → **reuse Glass** → **`pluto_url`** landing (`position: "active"`) → tell user to pick a notebook → **stop**.
 
-**Path B:** `start_pluto_session` if needed → **reuse Glass** → landing via **`pluto_url`** → `open_notebook(path=…)` → **`browser_click` notebook on landing** (not pasted `/edit?id=`) → safe-preview reminder → **pluto-workflow** for edits.
+**Path B:** `start_pluto_session` if needed → **reuse Glass** → landing via **`pluto_url`** → `open_notebook(path=…)` → **`browser_click` notebook on landing** (not pasted `/edit?id=`) → exit Safe preview when outputs need to be live (Glass **Run notebook code** or `allow_execution`) → **pluto-workflow** for edits.
 
 Glass: never hardcode `:1234`; never `newTab` by default — see [reference/glass-navigation.md](reference/glass-navigation.md).
 
