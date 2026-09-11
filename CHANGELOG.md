@@ -6,6 +6,10 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-09-11
+
+Install channel: default curl uses **`STYX_REF=main`** (no `v0.2.0` git tag / no GitHub Release). Fresh installs from `main` after this merge get 0.2.0 content. PlutoMCP is pinned by commit SHA (no PlutoMCP tag).
+
 ### Fixed
 
 - **Remote SSH Glass tab reuse ([#4](https://github.com/jowch/styx/issues/4)):** housekeeping close — work shipped in [#7](https://github.com/jowch/styx/pull/7)
@@ -29,13 +33,19 @@ All notable changes to **Styx** are documented here.
 - **Safe preview:** agents exit the gate themselves (Glass **Run notebook code** or `allow_execution`) when outputs need to be live — not remind-only; skills + workflow rule + AGENTS aligned
 - **Glass / Remote SSH ([#4](https://github.com/jowch/styx/issues/4)):** tab reuse (no `newTab` by default); host `pluto_url` vs Ports client URL; scrub leftover hardcoded `:1234` guidance in `AGENTS.md`
 - **pluto-workflow:** prefer `submit_changes(wait_for_completion=false)` on stdio-bound sessions ([#3](https://github.com/jowch/styx/issues/3) mitigation)
-- **Bound PlutoMCP:** launcher passes binding kwargs; no foreign-bridge proxy; dynamic `listenany` ports; JSON `/health` (requires PlutoMCP with bound `connect()` on fork `main` / sibling checkout)
+- **Bound PlutoMCP:** launcher passes binding kwargs; no foreign-bridge proxy; dynamic `listenany` ports; JSON `/health` (requires PlutoMCP with bound `connect()` at the pinned fork SHA / sibling checkout)
 - **Glass URL:** agents must use `pluto_session_status.pluto_url` (no hardcoded `:1234`)
 - **Remote SSH:** remove `PlutoMCP.serve()` / late-attach fallback; local XOR remote
 - **Doctor / lifecycle validation:** binding-aware; two-session concurrency checks
 - **Install tree:** drop `generate-manifest.sh`; exclude dev/maintainer scripts from shipped plugin (`pluto-serve`, lifecycle validate/preflight, `record-hero-demo.md`)
-- **Julia env:** `Project.toml` `[sources]` pins **PlutoMCP** to [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) **`main`** at **1.4.1** (`compat = "1.4.1"`); `Manifest.toml` is gitignored (fresh `Pkg.resolve` on first MCP connect)
+- **Julia env:** `Project.toml` `[sources]` pins **PlutoMCP** to [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) commit **`26c4cfbc4a852fadce409dbe94862d14637a175a`** (fork tip at cut; package still **1.4.1**, `compat = "1.4.1"`); `Manifest.toml` is gitignored (fresh `Pkg.resolve` on first MCP connect)
 - **Julia prerequisite:** 1.11+ (required for `[sources]`)
+
+### Notes
+
+- **No Styx `v0.2.0` tag / no GitHub Release** — `main` is the install channel for this content.
+- **No PlutoMCP tag** — pin by SHA only; includes session binding, wait defaults flip, and PlutoMCP #4 stdio-stall polish.
+- Upgraders: re-run the install one-liner, then force Julia env refresh (`PLUTOMCP_ENV_FORCE=1` or wipe `.julia-env-instantiated` + `Manifest.toml`) to pick up the new pin. Toggle **pluto** MCP or Reload Window after upgrade.
 
 ## [0.1.0] — 2026-06-21
 
@@ -53,6 +63,6 @@ First release. Cursor 3 plugin for Pluto.jl notebooks via [PlutoMCP.jl](https://
 
 ### Notes
 
-- Requires **Cursor 3** and **Julia 1.9+** on `PATH`
+- Shipped requiring **Cursor 3** and Julia on `PATH` (historical note said 1.9+; **current tree requires Julia 1.11+** for `[sources]`)
 - Lifecycle MCP tools may be hidden in the tool picker — agents invoke by name
 - After a PlutoMCP upgrade, toggle **pluto** MCP or Reload Window to refresh the cached tool list

@@ -10,13 +10,15 @@ Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
 
 **Prerequisites:** Cursor 3 (Plugins + MCP) and **Julia 1.11+** on your `PATH`.
 
+**Latest (0.2.0 content):** default install tracks **`main`** — no `v0.2.0` git tag / GitHub Release.
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
 ```
 
 Then **Reload Window** → **Settings → MCP** → enable **pluto**.
 
-Say **"Run Styx doctor"** or **"styx-setup"** to verify. **Update:** re-run the same command. **Uninstall:** Settings → Plugins → Styx → Uninstall.
+Say **"Run Styx doctor"** or **"styx-setup"** to verify. **Update:** re-run the same command (then force Julia env refresh if you need the pinned PlutoMCP SHA: `PLUTOMCP_ENV_FORCE=1`). **Uninstall:** Settings → Plugins → Styx → Uninstall.
 
 Full guide: [skills/styx-setup/reference/install.md](skills/styx-setup/reference/install.md)
 

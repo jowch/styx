@@ -13,17 +13,19 @@ Styx requires **Julia 1.11 or newer** on your system `PATH` (`[sources]` in the 
 
 ## 2. Install Styx
 
-**One line** (fresh install or update):
+**One line** (fresh install or update) — **`main` is the install channel** for current **0.2.0** content (no `v0.2.0` tag):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
 ```
 
-Pin a release:
+Optional historical pin (0.1.0 tag only):
 
 ```bash
 STYX_REF=v0.1.0 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
 ```
+
+Plugin `Project.toml` pins PlutoMCP to a **commit SHA** on [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) (not floating `main`). After updating Styx, force a Julia env refresh if the pin changed: `PLUTOMCP_ENV_FORCE=1` or wipe `.julia-env-instantiated` + `Manifest.toml` in the plugin root.
 
 **Already cloned the repo:**
 
