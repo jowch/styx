@@ -14,11 +14,11 @@ alwaysApply: true
 - **pluto-workflow** — cell edits once a notebook is open
 - **pluto-semantics** — cell structure (`imports_cell`, `begin`/`end` blocks, `@bind`) and parse-error fixes
 
-Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()`. Call `start_pluto_session` / `open_notebook` **by name** even if not in the MCP tool picker. Navigate Glass with `pluto_session_status.pluto_url` — never hardcode `:1234`/`:2346`.
+Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()`. Call `start_pluto_session` / `open_notebook` **by name** even if not in the MCP tool picker. Navigate Glass with `pluto_session_status.pluto_url` — never hardcode `:1234`/`:2346`. **Reuse** existing Glass tabs (`position: "active"`); do not `newTab` by default. Prefer `submit_changes(wait_for_completion=false)` on stdio-bound sessions.
 
 ## Bootstrap
 
-Notebook intent → **pluto-session** first. Glass: **`cursor-ide-browser`** (`position: "active"`; view ID `glass-browser-*`). Path B: after `open_notebook`, `browser_click` notebook on landing — not pasted `/edit?id=`. **Not** `plugin-browse-browser`. One window owns one Pluto; local Task children share that MCP. **Remote SSH:** stack runs on the SSH host (see **pluto-session** `remote-ssh.md`); local XOR remote.
+Notebook intent → **pluto-session** first. Glass: **`cursor-ide-browser`** (`position: "active"`; view ID `glass-browser-*`; reuse tabs — see **pluto-session** `glass-navigation.md`). Path B: after `open_notebook`, `browser_click` notebook on landing — not pasted `/edit?id=`. **Not** `plugin-browse-browser`. One window owns one Pluto; local Task children share that MCP. **Remote SSH:** stack runs on the SSH host (see **pluto-session** `remote-ssh.md`); local XOR remote; Ports client URL when laptop remap breaks host `pluto_url`. Parent agents grading subagents: `eval/agent-control/`.
 
 ## Safe preview
 
