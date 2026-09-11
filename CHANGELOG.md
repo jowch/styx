@@ -22,6 +22,7 @@ All notable changes to **Styx** are documented here.
 ### Changed
 
 - **pluto-workflow / pluto-semantics:** `edit-loop.md` and related skill examples show `submit_changes(wait_for_completion=false)` (align with SKILL prefer-false / [#3](https://github.com/jowch/styx/issues/3))
+- **Safe preview:** agents exit the gate themselves (Glass **Run notebook code** or `allow_execution`) when outputs need to be live — not remind-only; skills + workflow rule + AGENTS aligned
 - **Glass / Remote SSH ([#4](https://github.com/jowch/styx/issues/4)):** tab reuse (no `newTab` by default); host `pluto_url` vs Ports client URL; scrub leftover hardcoded `:1234` guidance in `AGENTS.md`
 - **pluto-workflow:** prefer `submit_changes(wait_for_completion=false)` on stdio-bound sessions ([#3](https://github.com/jowch/styx/issues/3) mitigation)
 - **Bound PlutoMCP:** launcher passes binding kwargs; no foreign-bridge proxy; dynamic `listenany` ports; JSON `/health` (requires PlutoMCP with bound `connect()` on fork `main` / sibling checkout)

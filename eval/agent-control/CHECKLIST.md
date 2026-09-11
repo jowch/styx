@@ -16,7 +16,7 @@ Canonical MCP names (PlutoMCP): `pluto_session_status`, `start_pluto_session`, `
 | C8 | **Stage → submit** | Stage with `run_after=false`; call `submit_changes` before end of turn when work should land; batch stages then one submit | Staged-only drift; “done” without submit; per-cell `run_after=true` spam |
 | C9 | **Wait / stdio safety** | `submit_changes(wait_for_completion=false)` on stdio-bound sessions; never block MCP stdio for long runs | Blocking wait starves stdio / kills in-process Pluto ([#3](https://github.com/jowch/styx/issues/3)) |
 | C10 | **Pending run honesty** | Tracks `pending_run` / dirty state from tools or hooks; does not claim clean when staged | Ignores pending_run; parent/child handoff leaves silent staged cells |
-| C11 | **Safe preview honesty** | Reminds user outputs/widgets need **Run notebook code** in Glass when execution is not allowed | Claims live outputs while still in safe preview |
+| C11 | **Safe preview honesty** | When outputs aren't live, exits Safe preview (**Run notebook code** in Glass or `allow_execution`) rather than stopping at staged edits; does not claim live outputs while still gated | Claims live outputs while still in safe preview; only reminds and leaves the gate on |
 | C12 | **Notebook lease / sharing** | Does not reopen a path already owned; respects `notebook_in_use` / leases | Re-`open_notebook` mints new id / resets safe preview |
 | C13 | **Cell grammar** | Structure-first cells per `pluto-semantics` (`imports_cell`, `begin`/`end`, `@bind` last) | Multi-statement soup / Jupyter mutation assumptions |
 | C14 | **Ground truth** | Re-reads via MCP after submit (`read_cell` / `read_notebook_code`); chat memory ≠ notebook state | “Already changed” without notebook evidence |

@@ -32,7 +32,7 @@ read → stage (run_after=false) → submit_changes(wait_for_completion=false) �
 
 Default **`wait_for_completion=false`** on `submit_changes` for stdio-bound sessions so MCP stays responsive ([issue #3](https://github.com/jowch/styx/issues/3)). Only block when the user explicitly needs a synchronous result and the session is known durable.
 
-**Safe preview:** still edit; remind user outputs won't update until **Run notebook code** in Glass. See [safe-preview.md](reference/safe-preview.md).
+**Safe preview:** still edit + `submit_changes(wait_for_completion=false)`. When outputs aren't live, **exit Safe preview yourself** — Glass **Run notebook code** (`browser_click`) or MCP `allow_execution` — don't stop at staged edits with the gate still on. See [safe-preview.md](reference/safe-preview.md).
 
 **Cell structure / parse errors:** **pluto-semantics** — [cell-structure.md](../pluto-semantics/reference/cell-structure.md).
 
@@ -47,7 +47,8 @@ Default **`wait_for_completion=false`** on `submit_changes` for stdio-bound sess
 |---------|-----|
 | `list_notebooks` before browser context | Design Mode or Glass URL |
 | Edit without `read_cell` | Read first (MCP enforces) |
-| `run_all_cells` in safe preview | Direct user to Glass button |
+| Leave Safe preview on after edits needing outputs | Exit yourself: Glass **Run notebook code** or `allow_execution` |
+| `run_all_cells` / `execute_cell` before exit | Exit Safe preview first — they do not bypass the gate |
 | End turn with staged edits | `submit_changes(wait_for_completion=false)` first |
 | `submit_changes(wait_for_completion=true)` on stdio | Prefer `false` — blocking wait can kill in-process Pluto |
 

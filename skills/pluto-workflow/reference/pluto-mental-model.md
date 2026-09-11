@@ -21,7 +21,7 @@ Editing a cell re-runs that cell and all **downstream** dependents in topologica
 2. Assuming visual `cell_order` = execution order
 3. Defining the same global in multiple cells — `MultipleDefinitionsError`
 4. Expecting Jupyter-style mutable kernel state — Pluto deletes stale globals
-5. Ignoring Safe preview — staged edits won't execute until user runs in Glass
+5. Leaving Safe preview on — staged edits won't execute until **you** exit via Glass **Run notebook code** or `allow_execution`
 
 ## Pluto source citations
 

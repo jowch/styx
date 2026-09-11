@@ -35,6 +35,6 @@ If cell edits fail before bootstrap, return to **pluto-session** first.
 | `list_notebooks` before browser context | Design Mode click or Glass URL |
 | Edit without read | `read_cell` first |
 | Patch `.jl` on disk | MCP only |
-| Forget safe preview reminder | See [safe-preview.md](safe-preview.md) |
-| User asks to run notebook | `allow_execution` or direct to **Run notebook code** in Glass |
-| Claim `submit_changes` ran cells in safe preview | Remind user to run in Glass |
+| Leave Safe preview on when outputs are needed | Exit yourself: Glass **Run notebook code** or `allow_execution` — [safe-preview.md](safe-preview.md) |
+| User asks to run / needs live widgets | Same — agent exits; don't only remind |
+| Claim `submit_changes` ran cells while still gated | Exit Safe preview first; then poll for outputs |
