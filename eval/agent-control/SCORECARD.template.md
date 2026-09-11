@@ -15,12 +15,14 @@
 | C4 Tab reuse |  |  |
 | C5 Path B open |  |  |
 | C6 Identity before edit |  |  |
-| C7 Stage → submit |  |  |
-| C8 Wait policy |  |  |
-| C9 Safe preview honesty |  |  |
-| C10 Lease / sharing |  |  |
-| C11 Cell grammar |  |  |
-| C12 Ground truth |  |  |
+| C7 MCP read receipt |  |  |
+| C8 Stage → submit |  |  |
+| C9 Wait / stdio safety |  |  |
+| C10 Pending run honesty |  |  |
+| C11 Safe preview honesty |  |  |
+| C12 Lease / sharing |  |  |
+| C13 Cell grammar |  |  |
+| C14 Ground truth |  |  |
 
 Checklist gate: **Pass / Fail**
 
@@ -30,20 +32,26 @@ Checklist gate: **Pass / Fail**
 |----|-----------:|----------|
 | D1 Skill selection |  |  |
 | D2 MCP sequencing |  |  |
-| D3 Glass hygiene |  |  |
-| D4 Edit discipline |  |  |
-| D5 Session safety |  |  |
-| D6 Recovery & honesty |  |  |
+| D3 MCP arg hygiene |  |  |
+| D4 Glass hygiene |  |  |
+| D5 Edit discipline |  |  |
+| D6 Session safety |  |  |
+| D7 Recovery & honesty |  |  |
 
-**Total ( /12 ):**  
-**Grade:**  
+**Total ( /14 ):**  
+**Self-grade:**  
+**Parent grade (authoritative):**  
 
-## Skill / product gaps observed
+## Skill / product gaps → patches
 
-- (What should change in `pluto-session` / `pluto-workflow` / PlutoMCP?)
+| Fail (C# / D#) | Skill or doc to patch | Change (one line) | Done? |
+|----------------|----------------------|-------------------|-------|
+|  |  |  | [ ] |
+|  |  |  | [ ] |
 
 ## Next action
 
-- [ ] Re-run with constraints  
-- [ ] Patch skill/docs  
+- [ ] Re-run with constraints (no `newTab`; `wait_for_completion=false`; reuse Glass)  
+- [ ] Patch skill/docs (same PR or follow-up)  
 - [ ] Open/update GitHub issue  
+- [ ] Re-score after patch  

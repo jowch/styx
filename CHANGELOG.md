@@ -8,7 +8,7 @@ All notable changes to **Styx** are documented here.
 
 ### Added
 
-- **Agent control rubric:** `eval/agent-control/` checklist + scored rubric + scorecard for parents grading subagent Pluto skill/MCP use
+- **Agent control rubric:** `eval/agent-control/` checklist + scored rubric + scorecard; parent→subagent protocol and skill-improvement feedback loop for grading Pluto skill/MCP use
 
 - **Independent Styx sessions:** one Cursor window owns one PlutoMCP/Pluto; concurrent windows get distinct ports and session nonces
 - **Window binding:** launcher requires `VSCODE_PID`; hooks resolve `STYX_RUNTIME_DIR/windows/<pid>.json` and send `X-Styx-Session-ID`
