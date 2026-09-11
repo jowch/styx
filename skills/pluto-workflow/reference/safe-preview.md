@@ -31,9 +31,10 @@ When Safe preview is active and outputs/reactivity are needed (user expects live
 | Path | When |
 |------|------|
 | **Glass:** `browser_snapshot` → `browser_click` **Run notebook code** (Agents Glass / `cursor-ide-browser`) | Prefer when Glass is already open; required for **risky remote sources** (`risky_source` from `allow_execution`) |
-| **MCP:** `allow_execution(notebook_id=…)` (default `run_notebook=true`) | Fine when the tool is available; invoke **by name** even if hidden in the picker |
+| **MCP (fast path):** `allow_execution(notebook_id=…, run_notebook=false)` then `submit_changes(wait_for_completion=false)` / `execute_cell` for the staged cells | Prefer when you already staged edits and only need those cells — exits the gate without queueing a full-notebook restart/run |
+| **MCP (full run):** `allow_execution(notebook_id=…)` (default `run_notebook=true`) | When the whole notebook should run after exit; invoke **by name** even if hidden in the picker |
 
-After exit, the full run is **non-blocking** by default (PlutoMCP wait defaults / [#3](https://github.com/jowch/styx/issues/3)). Poll `read_cell` / `read_notebook_code` until `!running && !queued` if you need outputs. Prefer `submit_changes(wait_for_completion=false)` for staged batches.
+After exit, runs are **non-blocking** by default (PlutoMCP wait defaults / [#3](https://github.com/jowch/styx/issues/3)). Poll `read_cell` / `read_notebook_code` until `!running && !queued` if you need outputs. Prefer `submit_changes(wait_for_completion=false)` for staged batches.
 
 Do **not** call `run_all_cells` / `execute_cell` **before** exiting Safe preview — they do not bypass the gate.
 

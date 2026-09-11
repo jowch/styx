@@ -6,6 +6,10 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **Safe preview fast path:** prefer `allow_execution(run_notebook=false)` then `submit_changes` / `execute_cell` for staged cells when exiting Safe preview after edits (avoids default full-notebook restart/run); Glass **Run notebook code** and default `allow_execution` still valid ([#3](https://github.com/jowch/styx/issues/3) polish)
+
 ## [0.2.0] — 2026-09-11
 
 Install channel: default curl uses **`STYX_REF=main`** (no `v0.2.0` git tag / no GitHub Release). Fresh installs from `main` after this merge get 0.2.0 content. PlutoMCP is pinned by commit SHA (no PlutoMCP tag).
