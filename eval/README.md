@@ -16,14 +16,21 @@ eval/
 
 ## Prerequisites
 
-- Julia with [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) at `PLUTOMCP_ROOT` (default: sibling `../../PlutoMCP.jl`)
+- Julia 1.11+ with a **combined** project at `PLUTOMCP_ROOT` that develops [PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) and adds `JSON3`, `HTTP`, and `UUIDs` (PlutoMCP alone is not enough — the harness imports `JSON3`, which PlutoMCP does not depend on):
+
+```bash
+mkdir -p ~/.styx-eval-env
+julia --project=$HOME/.styx-eval-env -e 'using Pkg; Pkg.develop(path="/path/to/PlutoMCP.jl"); Pkg.add(["JSON3","HTTP","UUIDs"])'
+```
+
+CI builds the same combined env in `.github/workflows/eval-reference.yml`.
 
 ## Reference runner (CI)
 
 ```bash
 cd eval
-julia run_reference.jl --all --strict-trace
-julia run_reference.jl --scenario stage_and_run
+PLUTOMCP_ROOT=$HOME/.styx-eval-env julia run_reference.jl --all --strict-trace
+PLUTOMCP_ROOT=$HOME/.styx-eval-env julia run_reference.jl --scenario stage_and_run
 ```
 
 Re-score an existing trace (dev): `julia score.jl --scenario <id> --log results/.../trace.jsonl`
