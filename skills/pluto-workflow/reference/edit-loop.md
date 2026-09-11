@@ -9,7 +9,7 @@ resolve notebook_id → read_cell (note Safe preview if active)
   → read_cell / read_notebook_code
   → edit_cell / edit_cells / add_cell  (run_after=false)
   → submit_changes(wait_for_completion=false)
-  → if Safe preview and outputs needed: exit it (Glass Run notebook code or allow_execution)
+  → if Safe preview and outputs needed: exit it (Glass Run notebook code, or allow_execution(run_notebook=false) then submit/execute staged cells)
   → read_cell (verify; poll until !running && !queued if you need outputs)
 ```
 
