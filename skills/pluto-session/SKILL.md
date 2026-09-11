@@ -21,13 +21,15 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 
 ## Quick start
 
-**Path A:** `pluto_session_status` → `start_pluto_session` if stopped → `cursor-ide-browser` → landing in Glass → tell user to pick a notebook → **stop**.
+**Path A:** `pluto_session_status` → `start_pluto_session` if stopped → `cursor-ide-browser` → **`pluto_url`** landing in Glass → tell user to pick a notebook → **stop**.
 
-**Path B:** `start_pluto_session` if needed → landing in Glass → `open_notebook(path=…)` → **`browser_click` notebook on landing** (not pasted `/edit?id=`) → safe-preview reminder → **pluto-workflow** for edits.
+**Path B:** `start_pluto_session` if needed → landing via **`pluto_url`** → `open_notebook(path=…)` → **`browser_click` notebook on landing** (not pasted `/edit?id=`) → safe-preview reminder → **pluto-workflow** for edits.
 
-**Already running:** Path A → landing only. Path B → `list_notebooks`; skip `open_notebook` if target is open.
+**Already running:** Path A → landing only. Path B → `list_notebooks`; skip `open_notebook` if target is open. Same path open in another Styx session → `notebook_in_use`.
 
-**Remote SSH:** Pluto on the SSH host; Cursor forwards ports. See [reference/remote-ssh.md](reference/remote-ssh.md).
+**Remote SSH:** this window owns Pluto on the SSH host (local XOR remote). See [reference/remote-ssh.md](reference/remote-ssh.md).
+
+**Local Task child:** use the inherited `plugin-styx-pluto` server — do not pass ports or binding paths in prompts.
 
 ## REQUIRED chain
 

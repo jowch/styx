@@ -4,16 +4,31 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from pluto_lib import pluto_session_running
+from pluto_lib import pluto_session_running, verified_binding
+
+_LOCALHOST_URL = re.compile(
+    r"(?:localhost|127\.0\.0\.1):\d+",
+    re.IGNORECASE,
+)
 
 
 def _has_pluto_context(prompt: str) -> bool:
     lower = prompt.lower()
-    return "pluto-notebook#" in lower or "localhost:1234" in lower or "127.0.0.1:1234" in lower
+    if "pluto-notebook#" in lower or "pluto-cell#" in lower:
+        return True
+    if _LOCALHOST_URL.search(prompt):
+        return True
+    binding = verified_binding()
+    if binding and binding.get("pluto_port"):
+        port = str(binding["pluto_port"])
+        if f":{port}" in prompt:
+            return True
+    return False
 
 
 def main() -> int:
@@ -27,8 +42,9 @@ def main() -> int:
                     "continue": True,
                     "user_message": (
                         "Pluto notebook context detected, but the Pluto session is not running yet. "
-                        "Ask the agent to start Pluto (pluto-notebooks command or say you want to work on notebooks). "
-                        "Do not reload MCP or run pluto-serve.sh — the agent calls start_pluto_session."
+                        "Ask the agent to start Pluto (say you want to work on notebooks). "
+                        "Do not reload MCP or run pluto-serve.sh — the agent calls start_pluto_session "
+                        "and navigates using pluto_session_status.pluto_url."
                     ),
                 }
             )

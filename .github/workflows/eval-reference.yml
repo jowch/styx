@@ -38,16 +38,31 @@ jobs:
 
       - uses: julia-actions/cache@v2
 
+      # EvalShared/run_reference import JSON3; PlutoMCP itself depends on JSON.jl only.
+      # A bare PlutoMCP checkout therefore fails with "Package JSON3 not found".
+      # Resolve PlutoMCP + JSON3 (+ HTTP/UUIDs) in one env so Parsers versions stay compatible.
+      - name: Create combined eval env (PlutoMCP + JSON3 + HTTP)
+        run: |
+          mkdir -p styx-eval-env
+          julia --project="${{ github.workspace }}/styx-eval-env" -e '
+            using Pkg
+            Pkg.develop(path=joinpath(ENV["GITHUB_WORKSPACE"], "PlutoMCP.jl"))
+            Pkg.add(["JSON3", "HTTP", "UUIDs"])
+          '
+
       - uses: julia-actions/julia-buildpkg@v1
         with:
-          project: PlutoMCP.jl
+          project: styx-eval-env
 
       - name: Precompile Pluto stack for serve subprocess
-        run: julia --project=PlutoMCP.jl -e 'using PlutoMCP; using Pluto'
+        # Pluto is a PlutoMCP dependency (not a direct dep of the combined env);
+        # `using Pluto` here fails with Package Pluto not found.
+        run: julia --project=styx-eval-env -e 'using PlutoMCP; using JSON3; using HTTP'
 
       - name: Run reference scenarios
         working-directory: styx/eval
         env:
-          PLUTOMCP_ROOT: ${{ github.workspace }}/PlutoMCP.jl
+          PLUTOMCP_ROOT: ${{ github.workspace }}/styx-eval-env
           JULIA_PRECOMPILE: "0"
+          EVAL_HEALTH_TIMEOUT: "180"
         run: julia run_reference.jl --all --strict-trace

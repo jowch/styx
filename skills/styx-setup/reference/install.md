@@ -60,7 +60,7 @@ Design Mode (**⌘⇧D**) → click a cell → describe edits.
 
 ## Remote SSH
 
-Cursor forwards ports when Pluto listens on the host. Install Julia **on the SSH machine**, enable Styx, then ask to work on notebooks — the agent starts Pluto **there**. Glass is still `http://127.0.0.1:1234/` (or a remapped Ports URL). Details: `skills/pluto-session/reference/remote-ssh.md`.
+Cursor forwards ports when Pluto listens on the host. Install Julia **on the SSH machine**, enable Styx, then ask to work on notebooks — the agent starts Pluto **there**. Glass uses `pluto_session_status.pluto_url` (or a remapped Ports URL). Details: `skills/pluto-session/reference/remote-ssh.md`.
 
 ## Update
 

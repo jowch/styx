@@ -23,7 +23,7 @@ Use when the user wants Pluto/notebooks but **does not name a specific file**.
 Resolve context via **pluto-workflow**:
 
 - Design Mode click → `resolve_pluto_context` → `read_cell`
-- Glass URL `http://127.0.0.1:1234/edit?id=<notebook_id>`
+- Glass URL `<pluto_url>/edit?id=<notebook_id>` (from `pluto_session_status`)
 - `list_notebooks` only if needed
 
 ## If Pluto is already running

@@ -12,7 +12,6 @@ COPY_PLUGIN_TREE_EXCLUDES=(
 
 COPY_PLUGIN_PROTECTED=(
   .julia-env-instantiated
-  hooks/state/pluto-reads.json
 )
 
 copy_plugin_tree() {
