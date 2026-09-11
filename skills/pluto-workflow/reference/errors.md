@@ -24,7 +24,7 @@ If cell edits fail before bootstrap, return to **pluto-session** first.
 
 | `error.kind` | Default action |
 |--------------|----------------|
-| `pluto_multi_expression` | `edit_cell` with `begin`/`end`, then `submit_changes` |
+| `pluto_multi_expression` | `edit_cell` with `begin`/`end`, then `submit_changes(wait_for_completion=false)` |
 | `runtime` | Read `msg`, fix code |
 
 ## Common mistakes

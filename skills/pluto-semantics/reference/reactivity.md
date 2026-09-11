@@ -29,7 +29,7 @@ Non-function dependency cycles → cyclic reference error.
 | Tool | Behavior |
 |------|----------|
 | `edit_cell` | Replaces entire body; default `run_after=false` |
-| `submit_changes` | Batch run staged cells (Cmd+S) |
+| `submit_changes` | Batch run staged cells (Cmd+S); prefer `wait_for_completion=false` |
 | `validate_cell` | Pre-check; returns `multi_expression` when invalid |
 
 ## Pluto source

@@ -48,7 +48,7 @@ Default **`wait_for_completion=false`** on `submit_changes` for stdio-bound sess
 | `list_notebooks` before browser context | Design Mode or Glass URL |
 | Edit without `read_cell` | Read first (MCP enforces) |
 | `run_all_cells` in safe preview | Direct user to Glass button |
-| End turn with staged edits | `submit_changes` first |
+| End turn with staged edits | `submit_changes(wait_for_completion=false)` first |
 | `submit_changes(wait_for_completion=true)` on stdio | Prefer `false` — blocking wait can kill in-process Pluto |
 
 ## Additional resources

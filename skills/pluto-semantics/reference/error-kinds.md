@@ -4,7 +4,7 @@
 
 **Symptom:** `extra token after end of expression` + `Boundaries: [...]`
 
-**Default fix (repair):** `edit_cell` with `begin`/`end` wrap in same cell → `submit_changes`
+**Default fix (repair):** `edit_cell` with `begin`/`end` wrap in same cell → `submit_changes(wait_for_completion=false)`
 
 **Alternative:** split at reactive boundaries using `error.boundaries` — see [cell-structure.md](cell-structure.md)
 
@@ -14,7 +14,7 @@
 
 ## `runtime`
 
-Read `error.msg`, fix code, `submit_changes`, re-read.
+Read `error.msg`, fix code, `submit_changes(wait_for_completion=false)`, re-read.
 
 ## Other Pluto errors agents see
 
