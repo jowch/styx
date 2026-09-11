@@ -15,9 +15,7 @@ Use when the user names a **specific notebook** (path, name, or clear reference)
    Default: safe preview. Use `run_notebook=true` only if user asked to run.
 4. **`browser_snapshot`** → **`browser_click`** the notebook link on landing (match filename).  
    **Do not** `browser_navigate` to `/edit?id=` right after MCP `open_notebook` — Glass often sticks on `Loading cells...`. The landing page has a live WebSocket; clicking the notebook uses in-app navigation that hydrates correctly. A cold `/edit?id=` load waits for WebSocket hydration and often never completes in Glass.
-5. Safe-preview reminder:
-
-   > Your notebook is open in **Safe preview** — code won't run until you click **Run notebook code** in Glass (top right). I can still edit cells; you won't see outputs or widgets update until you run.
+5. **Safe preview:** default is gated. Still proceed to edits. When the user needs live outputs/widgets (or after staging when verify needs them), **exit Safe preview yourself** — Glass `browser_click` **Run notebook code**, or MCP `allow_execution` — see **pluto-workflow** [safe-preview.md](../../pluto-workflow/reference/safe-preview.md). Don't leave the gate on and only remind.
 
 6. Proceed to **pluto-workflow** when they ask for edits.
 

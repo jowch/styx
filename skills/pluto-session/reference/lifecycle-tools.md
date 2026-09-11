@@ -12,7 +12,7 @@ One Cursor window = one Styx/PlutoMCP/Pluto. Parent + local Task children share 
 | `start_pluto_session` | Start deferred Pluto (bound mode allocates UI port; ignore port args) |
 | `stop_pluto_session` | Tear down Pluto; bound mode keeps the control bridge |
 | `open_notebook` | Load a `.jl` file (Path B); may return `notebook_in_use` |
-| `allow_execution` | Exit safe preview; optional `run_notebook` (default true) |
+| `allow_execution` | Exit Safe preview (agent should call this or Glass **Run notebook code** when outputs need to be live); optional `run_notebook` (default true, non-blocking) |
 
 ## MCP tool picker quirk
 

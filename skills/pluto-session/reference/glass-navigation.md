@@ -57,6 +57,16 @@ browser_snapshot → browser_click({ ref: "<notebook filename link>" })
 
 **Do not** `browser_navigate` to pasted `/edit?id=` after MCP `open_notebook` — cold loads hang on `Loading cells...`. Click the notebook on landing instead. Details: [path-b-open.md](path-b-open.md).
 
+### Exit Safe preview in Glass
+
+When the editor shows **Safe preview** / *Code not executed in Safe preview* and live outputs are needed:
+
+1. `browser_snapshot` the open notebook tab (reuse existing Glass — no `newTab`)
+2. `browser_click` **Run notebook code** (top right)
+3. Or call MCP `allow_execution` instead when appropriate (risky remote sources need the Glass button)
+
+Do not leave Safe preview on after staging edits that need live results. Details: **pluto-workflow** [safe-preview.md](../../pluto-workflow/reference/safe-preview.md).
+
 ## User handoff (last resort)
 
 If `cursor-ide-browser` is unavailable:

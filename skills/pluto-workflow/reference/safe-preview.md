@@ -2,13 +2,15 @@
 
 Path B `open_notebook` defaults to **Safe preview** (`run_notebook=false`). Pluto sets `process_status = waiting_for_permission` — cells load but **do not execute**.
 
-**You cannot exit safe preview via MCP.** Do not call `run_all_cells` or `execute_cell` expecting execution — they do not bypass safe preview.
+**Not an edit gate:** still stage and `submit_changes(wait_for_completion=false)`. Do **not** stop the turn with Safe preview still on when the user needs live outputs, widgets, or plots.
+
+`run_all_cells` / `execute_cell` alone do **not** bypass Safe preview — exit first (below).
 
 ## Pluto source (durable)
 
 - `SessionActions.open` sets `process_status = waiting_for_permission` when `execution_allowed=false`
 - `will_run_code(notebook)` returns false in Safe preview
-- User grants permission via **Run notebook code** in Glass → `restart_process` WebSocket message
+- Permission via Glass **Run notebook code** (`restart_process`) or MCP **`allow_execution`**
 
 ## Detect safe preview
 
@@ -22,21 +24,25 @@ On first `read_cell` / notebook contact (and when relevant after Path B open):
 
 No dedicated MCP field flags `execution_allowed=false` — infer from context above.
 
-## Remind the user — do not block edits
+## Exit Safe preview yourself (preferred)
 
-When safe preview is active, **still stage edits** as usual. **Also** tell the user (once per notebook session, or when they expect live output):
+When Safe preview is active and outputs/reactivity are needed (user expects live results, or you need to verify after staging), **exit it yourself** — do not only remind and leave the gate on.
 
-> This notebook is in **Safe preview** — I can change code, but cells won't run and you won't see outputs, sliders, or plots update until you click **Run notebook code** in Glass (top right).
+| Path | When |
+|------|------|
+| **Glass:** `browser_snapshot` → `browser_click` **Run notebook code** (Agents Glass / `cursor-ide-browser`) | Prefer when Glass is already open; required for **risky remote sources** (`risky_source` from `allow_execution`) |
+| **MCP:** `allow_execution(notebook_id=…)` (default `run_notebook=true`) | Fine when the tool is available; invoke **by name** even if hidden in the picker |
 
-Do **not** claim outputs/widgets are live until they have run. Do **not** pretend `submit_changes` or `run_all_cells` executed anything in preview mode.
+After exit, the full run is **non-blocking** by default (PlutoMCP wait defaults / [#3](https://github.com/jowch/styx/issues/3)). Poll `read_cell` / `read_notebook_code` until `!running && !queued` if you need outputs. Prefer `submit_changes(wait_for_completion=false)` for staged batches.
 
-## When the user asks you to run
-
-If they say *run the notebook*, *execute cells*, *run it*, etc.:
-
-1. **`allow_execution(notebook_id=…)`** — exits safe preview and runs cells (default `run_notebook=true`).
-2. **Or** ask them to click **Run notebook code** in Glass if they prefer the UI.
-
-Do **not** call `run_all_cells` / `execute_cell` **before** `allow_execution` — they do not bypass safe preview.
+Do **not** call `run_all_cells` / `execute_cell` **before** exiting Safe preview — they do not bypass the gate.
 
 Use `open_notebook(..., run_notebook=true)` **only** when the user explicitly asked to open **and run** at open time.
+
+## Still edit; stay honest
+
+When Safe preview is active, **still stage edits** as usual. Briefly note Safe preview once if relevant, then **exit it** (table above) before claiming live outputs:
+
+> Notebook was in **Safe preview** — exiting so cells can run (Glass **Run notebook code** or `allow_execution`).
+
+Do **not** claim outputs/widgets are live until execution is allowed and cells have actually run. Do **not** pretend `submit_changes` executed anything while still gated.
