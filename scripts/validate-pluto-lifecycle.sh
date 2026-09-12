@@ -155,7 +155,7 @@ PY
 
 echo
 echo "--- Python session binding unit tests ---"
-python3 -m unittest eval.test_session_binding -v
+python3 -m unittest eval.test_session_binding eval.test_pending_run_hook -v
 
 echo
 echo "All automated lifecycle checks passed."
