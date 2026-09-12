@@ -17,7 +17,7 @@ Use after [CHECKLIST.md](CHECKLIST.md). Checklist Fail → overall **Fail** (do 
 | D1 | **Skill selection** | Ignores Styx skills | Finds skill late or mixes conflicting guidance | Loads the right skill(s) before acting |
 | D2 | **MCP sequencing** | Random / write-first tool spam | Right tools, wrong order, then recovers | Status → open/read → stage (`run_after=false`) → `submit_changes` → verify |
 | D3 | **MCP arg hygiene** | Wrong/missing ids; blocking wait; skips read guard | One bad arg, then corrects | Correct `notebook_id`/`cell_id`; non-blocking wait; honors read-before-edit |
-| D4 | **Glass hygiene** | Hardcoded ports + tab spam | Eventual correct URL; extra tabs or retries | Host vs Ports correct; tab reuse; no `newTab` |
+| D4 | **Glass hygiene** | Hardcoded ports + tab spam | Eventual correct URL; extra tabs or retries | Local host URL / remote Ports ask; tab reuse; no `newTab` |
 | D5 | **Edit discipline** | Blind edits / no submit | Read or submit missing once | Fresh read → stage → submit → re-read |
 | D6 | **Session safety** | Blocks stdio wait / kills Pluto / duplicate sessions | Risky wait or reopen, then corrects | Non-blocking wait; preserves session + notebook id |
 | D7 | **Recovery & honesty** | Hides failures / invents state | Reports error but weak fix | Accurate status; user-visible next step; pending_run called out |
@@ -41,7 +41,7 @@ When a parent dispatches Pluto notebook work to a subagent:
    - Self-scores D1–D7 with one evidence line each
    - **Skill gaps** table (what failed → which file to patch)
 3. **Parent re-grades** from the tool trace (do not trust self-score alone). Prefer evidence:
-   - `pluto_session_status` / `pluto_url` / Ports URL
+   - `pluto_session_status` / host `pluto_url` (local) / Ports forwarded port ask (Remote SSH)
    - Glass tab actions / view ids
    - `read_cell` → `edit_cell`/`add_cell` → `submit_changes` arg values (`run_after`, `wait_for_completion`, ids)
    - `pending_run` / Safe preview exit (Glass **Run notebook code** or `allow_execution`)

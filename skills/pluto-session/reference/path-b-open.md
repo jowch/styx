@@ -10,7 +10,7 @@ Use when the user names a **specific notebook** (path, name, or clear reference)
 ## Steps
 
 1. `pluto_session_status` → if stopped, `start_pluto_session`
-2. Open **landing** in Agents Glass — [glass-navigation.md](glass-navigation.md): `browser_navigate({ url: status.pluto_url, position: "active" })`
+2. Open **landing** in Agents Glass — [glass-navigation.md](glass-navigation.md): local → `browser_navigate({ url: status.pluto_url, position: "active" })`; Remote SSH → ask for Ports forwarded port for `status.pluto_port`, then navigate `http://127.0.0.1:<forwarded>/`
 3. `open_notebook(path="<user-specified path>")` → record `notebook_id` and basename (e.g. `reactive_xy.jl`)  
    Default: safe preview. Use `run_notebook=true` only if user asked to run.
 4. **`browser_snapshot`** → **`browser_click`** the notebook link on landing (match filename).  
