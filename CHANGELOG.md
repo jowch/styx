@@ -6,17 +6,28 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-09-12
+
+Install channel: default curl uses **`STYX_REF=main`** (no `v0.2.1` git tag / no GitHub Release). Fresh installs from `main` after this merge get 0.2.1 content. PlutoMCP is pinned by commit SHA (no PlutoMCP tag).
+
 ### Fixed
 
-- **`pending_run` stop hook spam:** fail quiet on MCP unreachable / unexpected `list_notebooks` payload / no session — only warn when `pending_run` is positively non-empty (aligns with Phase 5 / D15 silent-when-unverifiable intent)
-- **Remote SSH MCP identity ([#13](https://github.com/jowch/styx/issues/13)):** bound launcher / hooks / doctor resolve a window key from `VSCODE_PID` when set, else hash the UUID basename of `VSCODE_IPC_HOOK_CLI` → Int for PlutoMCP `cursor_host_pid`; doctor **FAIL**s when neither is available (no shared-port fallback)
+- **`pending_run` stop hook spam ([#17](https://github.com/jowch/styx/pull/17)):** fail quiet on MCP unreachable / unexpected `list_notebooks` payload / no session — only warn when `pending_run` is positively non-empty (aligns with Phase 5 / D15 silent-when-unverifiable intent)
+- **Remote SSH MCP identity ([#13](https://github.com/jowch/styx/issues/13) / [#14](https://github.com/jowch/styx/pull/14)):** bound launcher / hooks / doctor resolve a window key from `VSCODE_PID` when set, else hash the UUID basename of `VSCODE_IPC_HOOK_CLI` → Int for PlutoMCP `cursor_host_pid`; doctor **FAIL**s when neither is available (no shared-port fallback)
 
 ### Changed
 
-- **Remote SSH Agents Glass ([#15](https://github.com/jowch/styx/issues/15)):** local sessions keep host `pluto_url` (no ask); Remote SSH asks once per session for the Ports forwarded/local port, then opens `http://127.0.0.1:<forwarded>/` — never invent remaps; scrubbed invented-port lore from skills/hooks/rules
-- **Docs:** dedicated README **Update** section (curl one-liner / `./scripts/update.sh`) plus force Julia env refresh (`rm` marker/Manifest + `PLUTOMCP_ENV_FORCE=1`); install guide + styx-setup skill aligned
-- **Safe preview fast path:** prefer `allow_execution(run_notebook=false)` then `submit_changes` / `execute_cell` for staged cells when exiting Safe preview after edits (avoids default full-notebook restart/run); Glass **Run notebook code** and default `allow_execution` still valid ([#3](https://github.com/jowch/styx/issues/3) polish)
+- **Remote SSH Glass Ports ask ([#15](https://github.com/jowch/styx/issues/15) / [#18](https://github.com/jowch/styx/pull/18)):** under Remote SSH, agent asks once per session for the Cursor **Ports** forwarded/local port for remote `pluto_port` before opening Glass; local sessions keep host `pluto_url` with no ask
+- **Docs:** dedicated README **Update** section (curl one-liner / `./scripts/update.sh`) plus force Julia env refresh (`rm` marker/Manifest + `PLUTOMCP_ENV_FORCE=1`); install guide + styx-setup skill aligned ([#12](https://github.com/jowch/styx/pull/12))
+- **Safe preview fast path:** prefer `allow_execution(run_notebook=false)` then `submit_changes` / `execute_cell` for staged cells when exiting Safe preview after edits (avoids default full-notebook restart/run); Glass **Run notebook code** and default `allow_execution` still valid ([#10](https://github.com/jowch/styx/pull/10))
 - **Remote SSH skill:** document window identity (`VSCODE_PID` / `VSCODE_IPC_HOOK_CLI`) and doctor vs MCP-child env asymmetry
+- **Julia env:** `Project.toml` `[sources]` pins **PlutoMCP** to [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) commit **`1b88eb430839a680cefdd46f8cd9a8317857268f`** (0.2.0 pin + PlutoMCP [#5](https://github.com/jowch/PlutoMCP.jl/pull/5) Safe-preview AGENTS docs; package still **1.4.1**)
+
+### Notes
+
+- **No Styx `v0.2.1` tag / no GitHub Release** — `main` is the install channel for this content.
+- **No PlutoMCP tag** — pin by SHA only.
+- Upgraders: re-run the install one-liner. Force Julia env refresh (`PLUTOMCP_ENV_FORCE=1` or wipe `.julia-env-instantiated` + `Manifest.toml`) to pick up the new PlutoMCP pin. Toggle **pluto** MCP or Reload Window after upgrade.
 
 ## [0.2.0] — 2026-09-11
 
