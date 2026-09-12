@@ -41,7 +41,7 @@ When a parent dispatches Pluto notebook work to a subagent:
    - Self-scores D1–D7 with one evidence line each
    - **Skill gaps** table (what failed → which file to patch)
 3. **Parent re-grades** from the tool trace (do not trust self-score alone). Prefer evidence:
-   - `pluto_session_status` / `pluto_url` / Ports URL
+   - `pluto_session_status` / host `pluto_url` (local) / Ports forwarded port ask (Remote SSH)
    - Glass tab actions / view ids
    - `read_cell` → `edit_cell`/`add_cell` → `submit_changes` arg values (`run_after`, `wait_for_completion`, ids)
    - `pending_run` / Safe preview exit (Glass **Run notebook code** or `allow_execution`)
