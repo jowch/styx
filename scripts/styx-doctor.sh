@@ -117,8 +117,8 @@ else
   say_ok "PlutoMCP not installed yet — normal until first **pluto** MCP connect"
 fi
 
-if [[ -n "${VSCODE_PID:-}" ]]; then
-  say_ok "VSCODE_PID=${VSCODE_PID} (window lookup key)"
+if resolve_styx_window_key >/dev/null; then
+  say_ok "window key ${STYX_WINDOW_KEY} via ${STYX_WINDOW_KEY_SOURCE}"
   if binding="$(load_styx_binding 2>/dev/null)"; then
     sid="$(python3 -c 'import json,sys; print(json.load(sys.stdin)["session_id"][:8])' <<<"$binding")"
     mcp="$(python3 -c 'import json,sys; print(json.load(sys.stdin)["mcp_port"])' <<<"$binding")"
@@ -133,7 +133,9 @@ if [[ -n "${VSCODE_PID:-}" ]]; then
     say_ok "No window binding yet (normal until pluto MCP connects)"
   fi
 else
-  say_warn "VSCODE_PID unset — hooks cannot resolve a window binding outside Cursor"
+  say_fail "No window identity (need VSCODE_PID or VSCODE_IPC_HOOK_CLI) — pluto MCP cannot bind"
+  echo "      Local Cursor usually sets VSCODE_PID; Remote SSH MCP children get VSCODE_IPC_HOOK_CLI."
+  echo "      Doctor from a plain remote shell may miss IPC_HOOK_CLI — check MCP connected:true after Reload."
 fi
 
 if [[ "$CHECK_UPDATES" -eq 1 ]]; then

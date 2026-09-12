@@ -9,6 +9,8 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from styx_window_key import resolve_window_key
+
 EDIT_TOOLS_PRE = {
     "MCP:edit_cell",
     "MCP:edit_cells",
@@ -51,18 +53,19 @@ def runtime_dir() -> str:
     return os.path.join(tmp, f"styx-{uid}")
 
 
-def _vscode_pid() -> str | None:
-    pid = os.environ.get("VSCODE_PID")
-    if not pid or not pid.isdigit():
+def _window_key() -> str | None:
+    """Numeric window binding key (VSCODE_PID or hashed VSCODE_IPC_HOOK_CLI)."""
+    resolved = resolve_window_key()
+    if resolved is None:
         return None
-    return pid
+    return str(resolved[0])
 
 
 def load_binding() -> dict[str, Any] | None:
-    pid = _vscode_pid()
-    if not pid:
+    key = _window_key()
+    if not key:
         return None
-    path = os.path.join(runtime_dir(), "windows", f"{pid}.json")
+    path = os.path.join(runtime_dir(), "windows", f"{key}.json")
     if not os.path.isfile(path):
         return None
     try:
