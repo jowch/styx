@@ -2,7 +2,7 @@
   "name": "styx-ports",
   "displayName": "Styx Ports",
   "description": "Spike companion: resolve Pluto client URLs via vscode.env.asExternalUri (Cursor auto-forward). Issue #15.",
-  "version": "0.0.1-spike",
+  "version": "0.0.2-spike",
   "publisher": "jowch",
   "engines": {
     "vscode": "^1.85.0"

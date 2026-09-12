@@ -36,4 +36,5 @@ rm -rf "${DEST}"
 mv "${TMP}/${EXT_ID}" "${DEST}"
 
 echo "Installed Styx Ports spike → ${DEST}"
-echo "Reload Window, then run: Styx: Resolve Pluto Client URL (or wait for binding watcher)."
+echo "Reload Window in an Editor / Open IDE remote window (agent-exec EH does not load user extensions)."
+echo "Confirm Styx Ports under remote Extensions, then: Styx: Resolve Pluto Client URL (or wait for binding-scan watcher)."

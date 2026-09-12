@@ -8,7 +8,7 @@ All notable changes to **Styx** are documented here.
 
 ### Added
 
-- **Styx Ports companion (spike, [#15](https://github.com/jowch/styx/issues/15)):** `extensions/styx-ports/` + `scripts/install-styx-ports.sh` — remote EH uses `vscode.env.asExternalUri` (Cursor auto-forward) and writes `windows/<key>.client.json`; optional `client_url` on `pluto_session_status` when PlutoMCP reads a matching sidecar. Watcher **binding-scans** all `windows/*.json` (EH often lacks `VSCODE_PID` / `VSCODE_IPC_HOOK_CLI`); Agents Window agent-exec EH does not load the companion — Editor remote EH required
+- **Styx Ports companion (spike, [#15](https://github.com/jowch/styx/issues/15)):** `extensions/styx-ports/` **`0.0.2-spike`** + `scripts/install-styx-ports.sh` — remote EH uses `vscode.env.asExternalUri` (Cursor auto-forward) and writes `windows/<key>.client.json`; optional `client_url` on `pluto_session_status` when PlutoMCP reads a matching sidecar. Watcher **binding-scans** all `windows/*.json` (does not silent-exit when EH lacks `VSCODE_PID` / `VSCODE_IPC_HOOK_CLI`); Agents Window agent-exec EH does not load the companion — Editor remote EH required
 
 ### Fixed
 

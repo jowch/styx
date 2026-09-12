@@ -1,5 +1,7 @@
 # Styx Ports (spike — issue #15)
 
+Version **`0.0.2-spike`**: binding-scan watcher (all `windows/*.json` → matching `*.client.json`). Does **not** exit when EH lacks `VSCODE_PID` / `VSCODE_IPC_HOOK_CLI`.
+
 Thin **workspace** Extension Host companion. Cursor owns Remote SSH auto-forward and clash remaps; this extension only calls `vscode.env.asExternalUri(host_pluto_url)` and writes the result for MCP/agents.
 
 **Does not:** invent client ports, run a parallel remapper, or guess from Ports lore.
