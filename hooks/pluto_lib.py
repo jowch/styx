@@ -262,10 +262,6 @@ def write_allowed(tool_name: str, inp: dict[str, Any]) -> bool:
     return has_read(notebook_id, inp.get("cell_id"))
 
 
-class PendingRunError(Exception):
-    """MCP pending_run check failed (bridge down, timeout, or malformed response)."""
-
-
 def mcp_call(
     name: str, arguments: dict[str, Any] | None = None, *, timeout: float = 5
 ) -> dict[str, Any]:
@@ -303,7 +299,12 @@ def mcp_call(
 
 
 def pending_run_notebooks() -> list[dict[str, Any]]:
-    """Return notebooks with non-empty pending_run from the live bridge."""
+    """Return notebooks with non-empty pending_run from the live bridge.
+
+    Fail quiet: bridge down, MCP unreachable/slow, tool errors, or malformed
+    payloads return []. Only positively observed pending_run entries are kept
+    (Phase 5 / D15 — stop hook must not spam when state is unverifiable).
+    """
     if not mcp_health_ok():
         # Bound deferred: control bridge may be up with Pluto stopped, or missing entirely.
         return []
@@ -311,12 +312,17 @@ def pending_run_notebooks() -> list[dict[str, Any]]:
     try:
         notebooks = mcp_call("list_notebooks", timeout=3)
         if not isinstance(notebooks, list):
-            raise PendingRunError("list_notebooks returned unexpected payload")
+            # Tool error / unexpected shape — not evidence of staged edits.
+            return []
         for nb in notebooks:
+            if not isinstance(nb, dict):
+                continue
             nb_id = nb.get("notebook_id")
             if not nb_id:
                 continue
             proj = mcp_call("read_notebook_code", {"notebook_id": nb_id}, timeout=4)
+            if not isinstance(proj, dict):
+                continue
             pending = proj.get("pending_run") or []
             if pending:
                 out.append(
@@ -326,8 +332,6 @@ def pending_run_notebooks() -> list[dict[str, Any]]:
                         "pending_run": pending,
                     }
                 )
-    except PendingRunError:
-        raise
     except (
         urllib.error.URLError,
         TimeoutError,
@@ -336,8 +340,9 @@ def pending_run_notebooks() -> list[dict[str, Any]]:
         KeyError,
         IndexError,
         TypeError,
-    ) as e:
-        raise PendingRunError(f"pending_run check failed: {e}") from e
+        ValueError,
+    ):
+        return []
     return out
 
 

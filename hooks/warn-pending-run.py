@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""stop: warn when staged Pluto edits were not submitted (pending_run non-empty)."""
+"""stop: warn when staged Pluto edits were not submitted (pending_run non-empty).
+
+Only emits a followup when pending_run is positively observed. Unreachable MCP,
+unexpected payloads, and no-session / bridge-down cases stay quiet.
+"""
 from __future__ import annotations
 
 import json
@@ -8,24 +12,14 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from pluto_lib import PendingRunError, pending_run_notebooks
+from pluto_lib import pending_run_notebooks
 
 
 def main() -> int:
     try:
         pending = pending_run_notebooks()
-    except PendingRunError as e:
-        print(
-            json.dumps(
-                {
-                    "followup_message": (
-                        "Could not verify Pluto pending_run state (MCP slow or unreachable). "
-                        "If you staged edits, call submit_changes before ending the turn.\n"
-                        f"({e})"
-                    )
-                }
-            )
-        )
+    except Exception:  # noqa: BLE001 — stop hook must never spam on probe failure
+        print("{}")
         return 0
 
     if not pending:
