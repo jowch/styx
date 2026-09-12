@@ -64,6 +64,8 @@ Design Mode (**⌘⇧D**) → click a cell → describe edits.
 
 Cursor forwards ports when Pluto listens on the host. Install Julia **on the SSH machine**, enable Styx, then ask to work on notebooks — the agent starts Pluto **there**. Glass uses `pluto_session_status.pluto_url`; laptop handoff may use optional `client_url` when the Styx Ports companion resolved it. Details: `skills/pluto-session/reference/remote-ssh.md`.
 
+**Styx Ports (optional `client_url`):** run `scripts/install-styx-ports.sh` on the **SSH host** (not the laptop). Companion must load as `extensionKind: workspace` on the **Editor remote EH** — Agents Window agent-exec EH does not load user extensions. See `extensions/styx-ports/README.md`.
+
 ## Update
 
 Cursor does **not** auto-update local plugins under `~/.cursor/plugins/local/`.

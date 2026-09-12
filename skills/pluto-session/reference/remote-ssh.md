@@ -30,6 +30,12 @@ If neither is present, the launcher exits with `styx_identity_unavailable` (no s
 - **Agents Glass** prefers host `pluto_url`.
 - **Laptop handoff links** use optional `client_url` when the Styx Ports companion has resolved it. Never hardcode `:1234`. Never invent client ports from docs or prior sessions.
 
+### Styx Ports companion (`client_url`)
+
+- Install **`jowch.styx-ports`** on the **remote** EH (`extensionKind: workspace` → `~/.cursor-server/extensions/…`). Laptop UI EH cannot tunnel remote localhost.
+- **Agents-only caveat:** Agents Window **agent-exec** EH does **not** load user extensions. An **Editor / Open IDE remote EH** (same SSH host) must load Styx Ports. The companion **binding-scans** all `windows/*.json` and writes matching `*.client.json` so Agents MCP can still surface `client_url` even when the Editor EH lacks `VSCODE_PID` / `VSCODE_IPC_HOOK_CLI`.
+- Without that Editor remote EH (or if resolve fails) → status **omits** `client_url`; Glass keeps using host `pluto_url`.
+
 ## Never
 
 - `PlutoMCP.serve()` / `pluto-serve.sh` / curl discovery as an alternate transport.

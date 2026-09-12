@@ -20,6 +20,20 @@ function vs() {
 const SCHEMA_VERSION = 1;
 
 /**
+ * Binding files are `<key>.json`; sidecars are `<key>.client.json` — never treat
+ * sidecars as bindings.
+ * @param {string} name
+ * @returns {number | null}
+ */
+function bindingKeyFromFilename(name) {
+  const m = /^(\d+)\.json$/.exec(name);
+  if (!m) {
+    return null;
+  }
+  return Number(m[1]);
+}
+
+/**
  * @param {NodeJS.ProcessEnv} [env]
  * @returns {{ key: number, source: string } | null}
  */
@@ -73,6 +87,31 @@ function bindingPath(runtimeDir, windowKey) {
  */
 function sidecarPath(runtimeDir, windowKey) {
   return path.join(runtimeDir, "windows", `${windowKey}.client.json`);
+}
+
+/**
+ * List numeric window keys that have a binding JSON (not `.client.json`).
+ * EH often lacks VSCODE_PID / VSCODE_IPC_HOOK_CLI; Agents MCP may use a
+ * different key than this EH — scan all bindings so matching sidecars exist.
+ * @param {string} runtimeDir
+ * @returns {Promise<number[]>}
+ */
+async function listBindingKeys(runtimeDir) {
+  const windowsDir = path.join(runtimeDir, "windows");
+  let names;
+  try {
+    names = await fsp.readdir(windowsDir);
+  } catch {
+    return [];
+  }
+  const keys = [];
+  for (const name of names) {
+    const key = bindingKeyFromFilename(name);
+    if (key !== null) {
+      keys.push(key);
+    }
+  }
+  return keys.sort((a, b) => a - b);
 }
 
 /**
@@ -147,33 +186,102 @@ async function resolveHostUrl(hostUrlArg, runtimeDir, windowKey) {
 }
 
 /**
+ * Source label for a sidecar write: prefer env identity when it matches the key.
+ * @param {number} windowKey
+ * @param {{ key: number, source: string } | null} identity
+ */
+function sourceForKey(windowKey, identity) {
+  if (identity && identity.key === windowKey) {
+    return identity.source;
+  }
+  return "binding_scan";
+}
+
+/**
+ * Resolve asExternalUri for one binding key and write its sidecar.
+ * @param {string | undefined} hostUrlArg
+ * @param {string} runtimeDir
+ * @param {number} windowKey
+ * @param {{ key: number, source: string } | null} identity
+ * @returns {Promise<string | undefined>}
+ */
+async function resolveKeyAndWrite(hostUrlArg, runtimeDir, windowKey, identity) {
+  const hostUrl = await resolveHostUrl(hostUrlArg, runtimeDir, windowKey);
+  if (!hostUrl) {
+    return undefined;
+  }
+  const clientUrl = await resolveClientUrl(hostUrl);
+  await writeSidecar(
+    hostUrl,
+    clientUrl,
+    runtimeDir,
+    windowKey,
+    sourceForKey(windowKey, identity)
+  );
+  return clientUrl;
+}
+
+/**
+ * Command / manual resolve: refresh sidecars for all binding keys (and an
+ * explicit host URL when given). Env identity is optional — EH often lacks it.
  * @param {string | undefined} hostUrlArg
  * @returns {Promise<string | undefined>}
  */
 async function resolveAndWrite(hostUrlArg) {
   const identity = resolveWindowKey();
+  const runtimeDir = resolveRuntimeDir();
   const v = vs();
-  if (!identity) {
+  let keys = await listBindingKeys(runtimeDir);
+
+  let hostUrlOverride =
+    hostUrlArg && String(hostUrlArg).trim() ? String(hostUrlArg).trim() : undefined;
+
+  if (keys.length === 0) {
     v.window.showErrorMessage(
-      "Styx Ports: no VSCODE_PID or VSCODE_IPC_HOOK_CLI — cannot locate window binding."
+      "Styx Ports: no windows/<key>.json bindings. Start Pluto (Agents MCP), then retry — Editor remote EH must be able to see the runtime dir."
     );
     return undefined;
   }
-  const runtimeDir = resolveRuntimeDir();
-  let hostUrl = await resolveHostUrl(hostUrlArg, runtimeDir, identity.key);
-  if (!hostUrl) {
-    hostUrl = await v.window.showInputBox({
-      prompt: "Host pluto_url (from pluto_session_status)",
-      placeHolder: "http://127.0.0.1:<pluto_port>",
-    });
+
+  // If no binding has a running Pluto yet and no override, prompt once.
+  if (!hostUrlOverride) {
+    let anyRunning = false;
+    for (const key of keys) {
+      if (await resolveHostUrl(undefined, runtimeDir, key)) {
+        anyRunning = true;
+        break;
+      }
+    }
+    if (!anyRunning) {
+      hostUrlOverride = await v.window.showInputBox({
+        prompt: "Host pluto_url (from pluto_session_status)",
+        placeHolder: "http://127.0.0.1:<pluto_port>",
+      });
+      if (!hostUrlOverride) {
+        return undefined;
+      }
+    }
   }
-  if (!hostUrl) {
-    return undefined;
-  }
+
   try {
-    const clientUrl = await resolveClientUrl(hostUrl);
-    await writeSidecar(hostUrl, clientUrl, runtimeDir, identity.key, identity.source);
-    return clientUrl;
+    let last;
+    for (const key of keys) {
+      const written = await resolveKeyAndWrite(
+        hostUrlOverride,
+        runtimeDir,
+        key,
+        identity
+      );
+      if (written) {
+        last = written;
+      }
+    }
+    if (!last) {
+      v.window.showErrorMessage(
+        "Styx Ports: no running Pluto binding (and no host URL) to resolve."
+      );
+    }
+    return last;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     v.window.showErrorMessage(`Styx Ports: asExternalUri failed: ${msg}`);
@@ -182,19 +290,18 @@ async function resolveAndWrite(hostUrlArg) {
 }
 
 /**
- * Auto-resolve when binding shows a running Pluto (no invented URLs — omit on failure).
+ * Auto-resolve when any binding shows a running Pluto (no invented URLs — omit on failure).
+ * Watches **all** `windows/*.json` bindings: remote EH often lacks VSCODE_PID /
+ * VSCODE_IPC_HOOK_CLI, and Agents MCP may use a different window key than this EH.
  * @param {import("vscode").ExtensionContext} ctx
  */
 function watchBinding(ctx) {
   const identity = resolveWindowKey();
-  if (!identity) {
-    return;
-  }
   const runtimeDir = resolveRuntimeDir();
-  const bp = bindingPath(runtimeDir, identity.key);
-  const windowsDir = path.dirname(bp);
+  const windowsDir = path.join(runtimeDir, "windows");
 
-  let lastHost = null;
+  /** @type {Map<number, string>} */
+  const lastHostByKey = new Map();
   let inflight = false;
 
   const maybeResolve = async () => {
@@ -203,15 +310,26 @@ function watchBinding(ctx) {
     }
     inflight = true;
     try {
-      const hostUrl = await resolveHostUrl(undefined, runtimeDir, identity.key);
-      if (!hostUrl || hostUrl === lastHost) {
-        return;
+      const keys = await listBindingKeys(runtimeDir);
+      for (const key of keys) {
+        try {
+          const hostUrl = await resolveHostUrl(undefined, runtimeDir, key);
+          if (!hostUrl || hostUrl === lastHostByKey.get(key)) {
+            continue;
+          }
+          const clientUrl = await resolveClientUrl(hostUrl);
+          await writeSidecar(
+            hostUrl,
+            clientUrl,
+            runtimeDir,
+            key,
+            sourceForKey(key, identity)
+          );
+          lastHostByKey.set(key, hostUrl);
+        } catch {
+          // Fail closed per key: leave sidecar absent / stale unmatched; MCP omits client_url.
+        }
       }
-      const clientUrl = await resolveClientUrl(hostUrl);
-      await writeSidecar(hostUrl, clientUrl, runtimeDir, identity.key, identity.source);
-      lastHost = hostUrl;
-    } catch {
-      // Fail closed: leave sidecar absent / stale unmatched; MCP omits client_url.
     } finally {
       inflight = false;
     }
@@ -224,12 +342,19 @@ function watchBinding(ctx) {
   }
 
   const v = vs();
+  // Watch all binding JSON; onDid* also fires for *.client.json — filter in handler.
   const watcher = v.workspace.createFileSystemWatcher(
-    new v.RelativePattern(windowsDir, `${identity.key}.json`)
+    new v.RelativePattern(windowsDir, "*.json")
   );
+  const onBindingEvent = (uri) => {
+    if (bindingKeyFromFilename(path.basename(uri.fsPath)) === null) {
+      return;
+    }
+    void maybeResolve();
+  };
   ctx.subscriptions.push(watcher);
-  ctx.subscriptions.push(watcher.onDidCreate(() => void maybeResolve()));
-  ctx.subscriptions.push(watcher.onDidChange(() => void maybeResolve()));
+  ctx.subscriptions.push(watcher.onDidCreate(onBindingEvent));
+  ctx.subscriptions.push(watcher.onDidChange(onBindingEvent));
   // Also poll lightly — binding writes may not always fire create/change in all EH setups.
   const timer = setInterval(() => void maybeResolve(), 5000);
   ctx.subscriptions.push({ dispose: () => clearInterval(timer) });
@@ -257,4 +382,13 @@ function activate(ctx) {
 
 function deactivate() {}
 
-module.exports = { activate, deactivate, resolveWindowKey, resolveRuntimeDir, sidecarPath };
+module.exports = {
+  activate,
+  deactivate,
+  resolveWindowKey,
+  resolveRuntimeDir,
+  sidecarPath,
+  bindingKeyFromFilename,
+  listBindingKeys,
+  sourceForKey,
+};
