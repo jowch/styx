@@ -6,15 +6,16 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
-### Fixed
-
-- **Remote SSH MCP identity ([#13](https://github.com/jowch/styx/issues/13)):** bound launcher / hooks / doctor resolve a window key from `VSCODE_PID` when set, else hash the UUID basename of `VSCODE_IPC_HOOK_CLI` → Int for PlutoMCP `cursor_host_pid`; doctor **FAIL**s when neither is available (no shared-port fallback)
-
 ### Changed
 
+- **Remote SSH Agents Glass ([#15](https://github.com/jowch/styx/issues/15)):** local sessions keep host `pluto_url` (no ask); Remote SSH asks once per session for the Ports forwarded/local port, then opens `http://127.0.0.1:<forwarded>/` — never invent remaps; scrubbed invented-port lore from skills/hooks/rules
 - **Docs:** dedicated README **Update** section (curl one-liner / `./scripts/update.sh`) plus force Julia env refresh (`rm` marker/Manifest + `PLUTOMCP_ENV_FORCE=1`); install guide + styx-setup skill aligned
 - **Safe preview fast path:** prefer `allow_execution(run_notebook=false)` then `submit_changes` / `execute_cell` for staged cells when exiting Safe preview after edits (avoids default full-notebook restart/run); Glass **Run notebook code** and default `allow_execution` still valid ([#3](https://github.com/jowch/styx/issues/3) polish)
 - **Remote SSH skill:** document window identity (`VSCODE_PID` / `VSCODE_IPC_HOOK_CLI`) and doctor vs MCP-child env asymmetry
+
+### Fixed
+
+- **Remote SSH MCP identity ([#13](https://github.com/jowch/styx/issues/13)):** bound launcher / hooks / doctor resolve a window key from `VSCODE_PID` when set, else hash the UUID basename of `VSCODE_IPC_HOOK_CLI` → Int for PlutoMCP `cursor_host_pid`; doctor **FAIL**s when neither is available (no shared-port fallback)
 
 ## [0.2.0] — 2026-09-11
 

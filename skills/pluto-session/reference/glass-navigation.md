@@ -13,18 +13,32 @@ Only Agents Glass participates in Design Mode → `resolve_pluto_context` → `r
 
 ## Agent navigation: `cursor-ide-browser`
 
-1. Call `pluto_session_status` (or use the `pluto_url` from `start_pluto_session`)
-2. **Reuse Glass first** — see [Tab reuse](#tab-reuse-no-newtab-by-default) (do **not** open a new tab by default)
-3. **`browser_navigate`** — `{ url: "<pluto_url_or_ports_url>", position: "active" }` (reveal / focus Glass)
-4. Confirm view ID starts with **`glass-browser-`**
-5. **`browser_snapshot`** → **`browser_click`** on links (Path B: notebook filename on landing)
+1. Call `pluto_session_status` (or use the `pluto_url` / `pluto_port` from `start_pluto_session`)
+2. Resolve the Glass URL — see [Local vs Remote SSH](#local-vs-remote-ssh-glass-url)
+3. **Reuse Glass first** — see [Tab reuse](#tab-reuse-no-newtab-by-default) (do **not** open a new tab by default)
+4. **`browser_navigate`** — `{ url: "<glass_url>", position: "active" }` (reveal / focus Glass)
+5. Confirm view ID starts with **`glass-browser-`**
+6. **`browser_snapshot`** → **`browser_click`** on links (Path B: notebook filename on landing)
 
-### Host URL vs Ports (client) URL
+### Local vs Remote SSH (Glass URL)
 
-| Audience | Source | Notes |
-|----------|--------|-------|
-| MCP / host tools | `pluto_session_status.pluto_url` | Host-local (`127.0.0.1:<pluto_port>`). Correct for the SSH/remote extension host. |
-| Glass on the **laptop** (Remote SSH remap) | Cursor **Ports** panel forwarded URL (`remote_forward_unresolved` when status notes it) | Laptop port may differ (e.g. host `1234` → client `51708`). Use this when host `pluto_url` fails to load in Glass. |
+Agents Glass’s browser runs on the **laptop UI**. MCP/`pluto_url` are correct for the machine where Pluto listens.
+
+| Session | Glass URL | Ask user? |
+|---------|-----------|-----------|
+| **Local** (not Remote SSH / not remote) | Host `pluto_session_status.pluto_url` | **No** — open Glass immediately |
+| **Remote SSH** (or otherwise remote) | `http://127.0.0.1:<forwarded_port>/` from the user’s Ports answer | **Yes — every session** before first Glass navigate |
+
+**Remote — one ask, then open:**
+
+1. From status, name the **remote** Pluto port (`pluto_port` / host `pluto_url`).
+2. Ask once, clearly, e.g.:  
+   > Pluto is on remote port **\<N\>**. What is the **forwarded / local** port in Cursor **Ports** for that remote port? (port number or full URL is fine.)
+3. Accept a bare port (`35721`) or a full URL. Normalize to `http://127.0.0.1:<port>/` (keep path if they pasted `/edit?id=…`).
+4. **`browser_navigate`** that URL with `position: "active"` immediately — do not lecture, do not retry host URL first, do not invent remaps.
+5. Treat the answer as **session-scoped only**. Remaps differ per session; do **not** persist it as cross-session truth.
+
+**Never:** invent client ports; hardcode lore ports; claim host `pluto_url` is Glass-authoritative on Remote SSH; require an Extension Host companion.
 
 Do **not** use `plugin-browse-browser`. Do **not** hardcode `:1234`.
 
@@ -36,24 +50,26 @@ Glass tab spam is a known failure mode when Ports remaps or `browser_tabs` is in
 2. If tab APIs are available, **list tabs** and reuse any tab whose URL host/path looks like this session’s Pluto (landing or `/edit?id=`). Match on notebook id or path — not a guessed port alone.
 3. Treat an **empty or stale tab list as unreliable**, not proof that no Glass tab exists. Ask the user which Glass tab is Pluto, or navigate `position: "active"` to the best-known URL, before creating anything.
 4. **Never** pass `newTab` / `new` / `tabs_new` by default. Open a new Glass tab only if the user explicitly asks, or after confirming there is truly no reusable Pluto Glass view.
-5. After a failed navigate, **do not** retry by spawning another tab — fix the URL (host `pluto_url` vs Ports client URL) and reuse.
+5. After a failed navigate, **do not** retry by spawning another tab — fix the URL (local: host `pluto_url`; remote: re-ask Ports forwarded port) and reuse.
 
 ### Path A — landing only
+
+**Local:**
 
 ```text
 status = pluto_session_status()
 browser_navigate({ url: status.pluto_url, position: "active" })
 ```
 
+**Remote SSH:** ask for Ports forwarded port for `status.pluto_port` → navigate `http://127.0.0.1:<forwarded>/` (see above).
+
 Tell user to pick a notebook; stop.
 
 ### Path B — after `open_notebook`
 
-```text
-browser_navigate({ url: status.pluto_url, position: "active" })
-open_notebook({ path: "…" })
-browser_snapshot → browser_click({ ref: "<notebook filename link>" })
-```
+**Local:** `browser_navigate({ url: status.pluto_url, position: "active" })` then `open_notebook` → landing click.
+
+**Remote SSH:** resolve Glass URL via the per-session Ports ask first, then the same Path B steps on that URL.
 
 **Do not** `browser_navigate` to pasted `/edit?id=` after MCP `open_notebook` — cold loads hang on `Loading cells...`. Click the notebook on landing instead. Details: [path-b-open.md](path-b-open.md).
 
@@ -71,14 +87,15 @@ Do not leave Safe preview on after staging edits that need live results. Details
 
 If `cursor-ide-browser` is unavailable:
 
-1. Give landing URL from `pluto_session_status.pluto_url`
-2. Ask user to click the notebook on landing (Path B) or pick one (Path A)
+1. **Local:** give landing URL from `pluto_session_status.pluto_url`
+2. **Remote SSH:** give `http://127.0.0.1:<forwarded>/` after the Ports ask (same URL Glass would use)
+3. Ask user to click the notebook on landing (Path B) or pick one (Path A)
 
 ## URL forms
 
 | Page | URL |
 |------|-----|
-| Landing | `<pluto_url>/` from `pluto_session_status` |
-| Notebook editor (after loaded in Glass) | `<pluto_url>/edit?id=<notebook_id>` |
+| Landing | `<glass_url>/` |
+| Notebook editor (after loaded in Glass) | `<glass_url>/edit?id=<notebook_id>` |
 
 Plain `http://127.0.0.1:<port>/<notebook_id>` is **not** a documented Pluto route.

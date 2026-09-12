@@ -8,7 +8,7 @@ Canonical MCP names (PlutoMCP): `pluto_session_status`, `start_pluto_session`, `
 |---|--------|-----------------|-------------|
 | C1 | **Skill routing** | Notebook intent → `pluto-session` then `pluto-workflow` / `pluto-semantics`; `styx-setup` only when install/Julia/MCP is broken | Raw MCP / shell `serve` without skills |
 | C2 | **Session ownership** | `pluto_session_status` → `start_pluto_session` if stopped; one window owns one Pluto (local XOR remote) | Second stack, fixed `:1234`/`:2346`, or local+SSH mix |
-| C3 | **URL resolution** | Glass uses `pluto_url` from status; on Remote SSH remap failure uses **Ports** client URL | Hardcodes `:1234` or invents ports |
+| C3 | **URL resolution** | Local Glass uses host `pluto_url`; Remote SSH asks once per session for Ports forwarded port → `http://127.0.0.1:<forwarded>/` | Hardcodes `:1234`, invents remaps, or skips the remote ask |
 | C4 | **Tab reuse** | Reuses Agents Glass / `position: "active"`; no `newTab`/`new` by default | Tab spam after empty list or failed navigate |
 | C5 | **Path B open** | After `open_notebook`, `browser_click` notebook on landing — no pasted `/edit?id=` cold navigate | Pastes `/edit?id=` → hangs on Loading cells |
 | C6 | **Identity before edit** | `notebook_id` / `cell_id` from Glass URL or Design Mode → `resolve_pluto_context` / `read_cell` before writes | `list_notebooks` fishing; edit without read |
