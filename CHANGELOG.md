@@ -8,6 +8,7 @@ All notable changes to **Styx** are documented here.
 
 ### Fixed
 
+- **`pending_run` stop hook spam:** fail quiet on MCP unreachable / unexpected `list_notebooks` payload / no session — only warn when `pending_run` is positively non-empty (aligns with Phase 5 / D15 silent-when-unverifiable intent)
 - **Remote SSH MCP identity ([#13](https://github.com/jowch/styx/issues/13)):** bound launcher / hooks / doctor resolve a window key from `VSCODE_PID` when set, else hash the UUID basename of `VSCODE_IPC_HOOK_CLI` → Int for PlutoMCP `cursor_host_pid`; doctor **FAIL**s when neither is available (no shared-port fallback)
 
 ### Changed
