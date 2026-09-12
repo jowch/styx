@@ -88,11 +88,19 @@ if ! "${DEST}/scripts/check-julia.sh"; then
   exit 1
 fi
 
+# Issue #15 spike: sideload styx-ports EH companion when present (optional; fail soft).
+if [[ -x "${DEST}/scripts/install-styx-ports.sh" ]]; then
+  echo "Installing Styx Ports companion (asExternalUri spike)…"
+  STYX_PORTS_SRC="${DEST}/extensions/styx-ports" bash "${DEST}/scripts/install-styx-ports.sh" || \
+    echo "install-styx-ports: skipped (non-fatal)" >&2
+fi
+
 cat <<EOF
 
 Styx installed: ${DEST}
 
 Next: Reload Window → Settings → MCP → enable **pluto** → "Run Styx doctor"
+Remote SSH client URL (#15): companion **Styx Ports** should be installed on the EH; run **Styx: Resolve Pluto Client URL** after Pluto starts if status lacks client_url.
 Uninstall: Settings → Plugins → Installed → Styx → Uninstall (see install.md)
 
 EOF

@@ -18,7 +18,7 @@ Never ask the user to run `pluto-serve.sh` or `PlutoMCP.serve()`. Call `start_pl
 
 ## Bootstrap
 
-Notebook intent → **pluto-session** first. Glass: **`cursor-ide-browser`** (`position: "active"`; view ID `glass-browser-*`; reuse tabs — see **pluto-session** `glass-navigation.md`). Path B: after `open_notebook`, `browser_click` notebook on landing — not pasted `/edit?id=`. **Not** `plugin-browse-browser`. One window owns one Pluto; local Task children share that MCP. **Remote SSH:** stack runs on the SSH host (see **pluto-session** `remote-ssh.md`); local XOR remote; Ports client URL when laptop remap breaks host `pluto_url`. Parent agents grading subagents: `eval/agent-control/`.
+Notebook intent → **pluto-session** first. Glass: **`cursor-ide-browser`** (`position: "active"`; view ID `glass-browser-*`; reuse tabs — see **pluto-session** `glass-navigation.md`). Path B: after `open_notebook`, `browser_click` notebook on landing — not pasted `/edit?id=`. **Not** `plugin-browse-browser`. One window owns one Pluto; local Task children share that MCP. **Remote SSH:** stack runs on the SSH host (see **pluto-session** `remote-ssh.md`); local XOR remote; Glass prefers host `pluto_url`; laptop handoff uses optional status `client_url` when present — never invent remaps. Parent agents grading subagents: `eval/agent-control/`.
 
 ## Safe preview
 

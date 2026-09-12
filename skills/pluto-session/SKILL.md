@@ -45,7 +45,7 @@ Glass: never hardcode `:1234`; never `newTab` by default — see [reference/glas
 | Ask which notebook on Path A | Stop after landing |
 | `open_notebook` without user path | Never scan repo and pick |
 | Bare `/<notebook_id>` URL | Use `/edit?id=<notebook_id>` only when notebook opened in Glass (Path A); after MCP `open_notebook`, click on landing |
-| Hardcode `:1234` / spam `newTab` | Use `pluto_url` (or Ports client URL); reuse Glass — [glass-navigation.md](reference/glass-navigation.md) |
+| Hardcode `:1234` / spam `newTab` | Use `pluto_url` (optional `client_url` for laptop handoff only); reuse Glass — [glass-navigation.md](reference/glass-navigation.md) |
 | User runs `pluto-serve.sh` | Use `start_pluto_session` |
 
 ## Additional resources

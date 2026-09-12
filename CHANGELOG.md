@@ -6,12 +6,17 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **Styx Ports companion (spike, [#15](https://github.com/jowch/styx/issues/15)):** `extensions/styx-ports/` + `scripts/install-styx-ports.sh` — remote EH uses `vscode.env.asExternalUri` (Cursor auto-forward) and writes `windows/<key>.client.json`; optional `client_url` on `pluto_session_status` when PlutoMCP reads a matching sidecar
+
 ### Fixed
 
 - **Remote SSH MCP identity ([#13](https://github.com/jowch/styx/issues/13)):** bound launcher / hooks / doctor resolve a window key from `VSCODE_PID` when set, else hash the UUID basename of `VSCODE_IPC_HOOK_CLI` → Int for PlutoMCP `cursor_host_pid`; doctor **FAIL**s when neither is available (no shared-port fallback)
 
 ### Changed
 
+- **Remote SSH URL guidance ([#15](https://github.com/jowch/styx/issues/15)):** scrub invented Ports lore (`51708`, `remote_forward_unresolved`); Glass prefers host `pluto_url`; laptop handoff uses optional `client_url` only when resolved — never invent remaps
 - **Docs:** dedicated README **Update** section (curl one-liner / `./scripts/update.sh`) plus force Julia env refresh (`rm` marker/Manifest + `PLUTOMCP_ENV_FORCE=1`); install guide + styx-setup skill aligned
 - **Safe preview fast path:** prefer `allow_execution(run_notebook=false)` then `submit_changes` / `execute_cell` for staged cells when exiting Safe preview after edits (avoids default full-notebook restart/run); Glass **Run notebook code** and default `allow_execution` still valid ([#3](https://github.com/jowch/styx/issues/3) polish)
 - **Remote SSH skill:** document window identity (`VSCODE_PID` / `VSCODE_IPC_HOOK_CLI`) and doctor vs MCP-child env asymmetry

@@ -8,7 +8,7 @@ One Cursor window = one Styx/PlutoMCP/Pluto. Parent + local Task children share 
 
 | Tool | Purpose |
 |------|---------|
-| `pluto_session_status` | `pluto`, `session_id`, `managed`, `mcp_port`/`mcp_url`, `pluto_port`/`pluto_url`, notebooks |
+| `pluto_session_status` | `pluto`, `session_id`, `managed`, `mcp_port`/`mcp_url`, `pluto_port`/`pluto_url`, optional `client_url`, notebooks |
 | `start_pluto_session` | Start deferred Pluto (bound mode allocates UI port; ignore port args) |
 | `stop_pluto_session` | Tear down Pluto; bound mode keeps the control bridge |
 | `open_notebook` | Load a `.jl` file (Path B); may return `notebook_in_use` |
@@ -22,7 +22,7 @@ Lifecycle tools may be **hidden** in Cursor's MCP tool picker. **Invoke by name 
 
 ## Glass URL
 
-Always navigate with **`pluto_url` from status/start** — never hardcode `:1234`.
+Always navigate Agents Glass with **`pluto_url` from status/start** — never hardcode `:1234`. For laptop browser / human handoff, use optional **`client_url`** when present (Styx Ports companion); if absent, do not invent a remap.
 
 ## Never ask the user to run
 

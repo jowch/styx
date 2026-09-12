@@ -15,18 +15,19 @@ Only Agents Glass participates in Design Mode → `resolve_pluto_context` → `r
 
 1. Call `pluto_session_status` (or use the `pluto_url` from `start_pluto_session`)
 2. **Reuse Glass first** — see [Tab reuse](#tab-reuse-no-newtab-by-default) (do **not** open a new tab by default)
-3. **`browser_navigate`** — `{ url: "<pluto_url_or_ports_url>", position: "active" }` (reveal / focus Glass)
+3. **`browser_navigate`** — `{ url: "<pluto_url>", position: "active" }` (reveal / focus Glass)
 4. Confirm view ID starts with **`glass-browser-`**
 5. **`browser_snapshot`** → **`browser_click`** on links (Path B: notebook filename on landing)
 
-### Host URL vs Ports (client) URL
+### Host URL vs client URL
 
 | Audience | Source | Notes |
 |----------|--------|-------|
 | MCP / host tools | `pluto_session_status.pluto_url` | Host-local (`127.0.0.1:<pluto_port>`). Correct for the SSH/remote extension host. |
-| Glass on the **laptop** (Remote SSH remap) | Cursor **Ports** panel forwarded URL (`remote_forward_unresolved` when status notes it) | Laptop port may differ (e.g. host `1234` → client `51708`). Use this when host `pluto_url` fails to load in Glass. |
+| Agents Glass (`cursor-ide-browser`) | Prefer **`pluto_url`** | Usually enough on remote-aware Glass — do not invent a laptop remap. |
+| Laptop browser / human handoff | Optional **`client_url`** from status when present | Resolved by the **Styx Ports** companion via `asExternalUri` (Cursor auto-forward). **Omit** if unresolved — never guess Ports numbers. |
 
-Do **not** use `plugin-browse-browser`. Do **not** hardcode `:1234`.
+Do **not** use `plugin-browse-browser`. Do **not** hardcode `:1234`. Do **not** invent client ports from docs or prior sessions.
 
 ### Tab reuse (no `newTab` by default)
 
@@ -36,7 +37,7 @@ Glass tab spam is a known failure mode when Ports remaps or `browser_tabs` is in
 2. If tab APIs are available, **list tabs** and reuse any tab whose URL host/path looks like this session’s Pluto (landing or `/edit?id=`). Match on notebook id or path — not a guessed port alone.
 3. Treat an **empty or stale tab list as unreliable**, not proof that no Glass tab exists. Ask the user which Glass tab is Pluto, or navigate `position: "active"` to the best-known URL, before creating anything.
 4. **Never** pass `newTab` / `new` / `tabs_new` by default. Open a new Glass tab only if the user explicitly asks, or after confirming there is truly no reusable Pluto Glass view.
-5. After a failed navigate, **do not** retry by spawning another tab — fix the URL (host `pluto_url` vs Ports client URL) and reuse.
+5. After a failed navigate, **do not** retry by spawning another tab — stick to host `pluto_url` (or status `client_url` when present for laptop handoff) and reuse.
 
 ### Path A — landing only
 
@@ -71,8 +72,9 @@ Do not leave Safe preview on after staging edits that need live results. Details
 
 If `cursor-ide-browser` is unavailable:
 
-1. Give landing URL from `pluto_session_status.pluto_url`
+1. Prefer landing URL from `pluto_session_status.client_url` when present (laptop-reachable); else `pluto_url`
 2. Ask user to click the notebook on landing (Path B) or pick one (Path A)
+3. If neither URL works for the user’s browser, stop and ask — **never invent** a remapped port
 
 ## URL forms
 
