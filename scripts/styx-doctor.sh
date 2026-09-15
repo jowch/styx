@@ -88,7 +88,6 @@ check_updates() {
 
   say_warn "Update available: installed ${installed}, latest ${latest}"
   echo "      Re-run: curl -fsSL https://raw.githubusercontent.com/${STYX_REPO}/main/scripts/install.sh | bash"
-  echo "      Or: STYX_REF=${latest} curl -fsSL https://raw.githubusercontent.com/${STYX_REPO}/main/scripts/install.sh | bash"
 }
 
 echo "Styx doctor (plugin: ${PLUGIN_ROOT})"

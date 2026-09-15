@@ -10,7 +10,7 @@ Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
 
 **Prerequisites:** Cursor 3 (Plugins + MCP) and **Julia 1.11+** on your `PATH`.
 
-Default install tracks **`main`**; releases are tagged (`STYX_REF=v0.2.2` to pin one). Current version: [CHANGELOG](CHANGELOG.md).
+Default install is the **latest tagged release**; `STYX_REF=main` installs the development tip, `STYX_REF=<tag>` pins one. Current version: [CHANGELOG](CHANGELOG.md).
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash

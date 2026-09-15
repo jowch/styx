@@ -4,9 +4,13 @@ All notable changes to **Styx** are documented here.
 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-Each release is a git tag and GitHub Release; `main` is the install channel. PlutoMCP is pinned by commit SHA in `Project.toml`.
+Each release is a git tag and GitHub Release; the installer targets the latest release by default. PlutoMCP is pinned by commit SHA in `Project.toml`.
 
 ## [Unreleased]
+
+### Changed
+
+- **Install target:** `install.sh` / `install-styx.sh` default to the latest GitHub Release tag (resolved via `releases/latest`) instead of `main`; `STYX_REF=main` installs the development tip. Doctor no longer prints a redundant `STYX_REF=<tag>` hint.
 
 ## [0.2.2] — 2026-09-14
 
