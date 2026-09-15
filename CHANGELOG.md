@@ -4,7 +4,7 @@ All notable changes to **Styx** are documented here.
 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-Releases after v0.1.0 ship on `main` with no git tag or GitHub Release; PlutoMCP is pinned by commit SHA in `Project.toml`.
+Each release is a git tag and GitHub Release; `main` is the install channel. PlutoMCP is pinned by commit SHA in `Project.toml`.
 
 ## [Unreleased]
 
