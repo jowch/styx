@@ -50,6 +50,7 @@ Default **`wait_for_completion=false`** on `submit_changes` for stdio-bound sess
 | Leave Safe preview on after edits needing outputs | Exit yourself: Glass **Run notebook code**, or `allow_execution(run_notebook=false)` then submit/execute staged cells |
 | `run_all_cells` / `execute_cell` before exit | Exit Safe preview first — they do not bypass the gate |
 | End turn with staged edits | `submit_changes(wait_for_completion=false)` first |
+| Markdown cell added with its code showing | `add_cell(..., folded=true)`; `fold_cell(folded=true)` for existing prose cells |
 | `submit_changes(wait_for_completion=true)` on stdio | Prefer `false` — blocking wait can kill in-process Pluto |
 
 ## Additional resources

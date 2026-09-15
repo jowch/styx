@@ -20,6 +20,7 @@ Each cell = **exactly one Julia expression**. Bare multiple statements → `plut
 | **compute_cell** | `begin … end` — multi-statement blocks that re-run together |
 | **scoped_cell** | `let … end` — locals that must not become globals |
 | **output_cell** | Single expression display (`plot`, `md`, bare value) |
+| **prose_cell** | `md"…"` — add with `add_cell(folded=true)` so only the rendered text shows after submit/run; `fold_cell` for existing cells |
 
 **Default:** prefer **`begin`/`end`** inside a cell for a conceptual block instead of many single-line cells.
 
