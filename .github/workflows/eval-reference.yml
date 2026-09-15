@@ -29,8 +29,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: jowch/PlutoMCP.jl
-          # Keep in sync with Project.toml [sources] PlutoMCP rev (Styx 0.2.1 pin).
-          ref: 1b88eb430839a680cefdd46f8cd9a8317857268f
+          # Keep in sync with Project.toml [sources] PlutoMCP rev (Styx pin).
+          ref: e840947c5d46f05c702480ada8df1874255cd5ca
           path: PlutoMCP.jl
 
       - uses: julia-actions/setup-julia@v2

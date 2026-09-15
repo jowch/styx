@@ -6,6 +6,10 @@ All notable changes to **Styx** are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **PlutoMCP pin:** `Project.toml` `[sources]` and the eval workflow now pin [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) commit **`e840947c5d46f05c702480ada8df1874255cd5ca`** (PlutoMCP [#7](https://github.com/jowch/PlutoMCP.jl/pull/7) control bridge refuses browser-origin / non-loopback requests; [#8](https://github.com/jowch/PlutoMCP.jl/pull/8) `pending_run` no longer clears before cells run, safe preview keeps it with `execution_blocked::`, orphan ids pruned). Reference eval gate passes at this pin.
+
 ## [0.2.1] — 2026-09-12
 
 Install channel: default curl uses **`STYX_REF=main`** (no `v0.2.1` git tag / no GitHub Release). Fresh installs from `main` after this merge get 0.2.1 content. PlutoMCP is pinned by commit SHA (no PlutoMCP tag).
