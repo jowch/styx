@@ -7,6 +7,6 @@ julia = "1.11"
 PlutoMCP = "1.4.1"
 
 [sources]
-# Pin to fork tip at Styx 0.2.1 cut (0.2.0 pin + PlutoMCP #5 Safe-preview AGENTS docs).
+# Pin to fork tip at Styx 0.2.2 cut (PlutoMCP #7 bridge origin guard + #8 pending_run fixes).
 # Do not float rev = "main". Bump this SHA intentionally when cutting the next Styx release.
 PlutoMCP = {url = "https://github.com/jowch/PlutoMCP.jl.git", rev = "e840947c5d46f05c702480ada8df1874255cd5ca"}

@@ -13,7 +13,7 @@ Styx requires **Julia 1.11 or newer** on your system `PATH` (`[sources]` in the 
 
 ## 2. Install Styx
 
-**One line** (fresh install or update) — **`main` is the install channel** for current **0.2.1** content (no `v0.2.1` tag):
+**One line** (fresh install or update) — **`main` is the install channel** for current **0.2.2** content (no `v0.2.2` tag):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash
