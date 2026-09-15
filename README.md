@@ -10,7 +10,7 @@ Repository: [github.com/jowch/styx](https://github.com/jowch/styx)
 
 **Prerequisites:** Cursor 3 (Plugins + MCP) and **Julia 1.11+** on your `PATH`.
 
-**Latest (0.2.2 content):** default install tracks **`main`** — no `v0.2.2` git tag / GitHub Release.
+Default install tracks **`main`**; releases are not git-tagged (current version: [CHANGELOG](CHANGELOG.md)).
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jowch/styx/main/scripts/install.sh | bash

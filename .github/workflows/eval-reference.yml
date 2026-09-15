@@ -26,11 +26,13 @@ jobs:
         with:
           path: styx
 
+      - id: pin
+        run: echo "rev=$(sed -n 's/^PlutoMCP = .*rev = "\([0-9a-f]*\)".*/\1/p' styx/Project.toml)" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
         with:
           repository: jowch/PlutoMCP.jl
-          # Keep in sync with Project.toml [sources] PlutoMCP rev (Styx pin).
-          ref: e840947c5d46f05c702480ada8df1874255cd5ca
+          ref: ${{ steps.pin.outputs.rev }}
           path: PlutoMCP.jl
 
       - uses: julia-actions/setup-julia@v2
