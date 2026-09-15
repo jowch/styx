@@ -24,6 +24,7 @@ Pluto enforces **one expression per cell** (parse). This doc defines **roles** a
 | **compute_cell** | `begin … end` — multi-statement block that re-runs together | ex. 1, 2, 3 |
 | **scoped_cell** | `let … end` — locals that must not leak to notebook scope | ex. 5 |
 | **output_cell** | Single expression: `plot`, `md`, bare value | ex. 7 |
+| **prose_cell** | `md"…"` added with `add_cell(folded=true)` — code hidden, rendered text shows after submit/run; `fold_cell` for existing cells | ex. 7 |
 
 **`@bind`:** returning expression of its cell only. Bare `using` + `@bind` on adjacent lines → `pluto_multi_expression` → [agent-examples.md](agent-examples.md) ex. 8.
 

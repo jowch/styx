@@ -10,10 +10,7 @@ Each release is a git tag and GitHub Release; the installer targets the latest r
 
 ### Changed
 
-- **PlutoMCP pin:** `1e9197e` (PlutoMCP [#9](https://github.com/jowch/PlutoMCP.jl/pull/9): `fold_cell` tool, `add_cell(folded=true)`, `read_cell` reports `code_folded`; markdown projection heuristic tightened to `md"…"` only). Skills: fold markdown cells on add (`pluto-semantics` prose_cell row, `pluto-workflow` mistakes table).
-
-### Changed
-
+- **PlutoMCP pin:** `Project.toml` `[sources]` pins [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) commit **`1e9197ef1eed7823b11d37ba39a43aa2330466a1`** (PlutoMCP [#9](https://github.com/jowch/PlutoMCP.jl/pull/9): `fold_cell` tool, `add_cell(folded=true)`, `read_cell` reports `code_folded`; markdown projection heuristic tightened to `md"…"` only; package still **1.4.1**). Skills: fold markdown cells on add (`pluto-semantics` prose_cell row, `pluto-workflow` mistakes table). Eval workflow now also runs when `Project.toml` changes.
 - **Install target:** `install.sh` / `install-styx.sh` default to the latest GitHub Release tag (resolved via `releases/latest`) instead of `main`; `STYX_REF=main` installs the development tip. Doctor no longer prints a redundant `STYX_REF=<tag>` hint.
 
 ## [0.2.2] — 2026-09-14
