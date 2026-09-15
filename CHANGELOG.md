@@ -8,6 +8,10 @@ Each release is a git tag and GitHub Release; the installer targets the latest r
 
 ## [Unreleased]
 
+### Added
+
+- **Glass viewId cache:** hooks persist `(session_id, notebook_id | _landing) → { viewId, url }` in `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` after successful `cursor-ide-browser` navigate/snapshot/lock (and `browser_tabs` list when a Pluto URL matches). `sessionStart` injects the map for parent and Task children; never `newTab` / `action: "new"`. Skill: `pluto-session` glass-navigation.
+
 ### Changed
 
 - **Install target:** `install.sh` / `install-styx.sh` default to the latest GitHub Release tag (resolved via `releases/latest`) instead of `main`; `STYX_REF=main` installs the development tip. Doctor no longer prints a redundant `STYX_REF=<tag>` hint.

@@ -52,6 +52,8 @@ Glass tab spam is a known failure mode when Ports remaps or `browser_tabs` is in
 4. **Never** pass `newTab` / `new` / `tabs_new` by default. Open a new Glass tab only if the user explicitly asks, or after confirming there is truly no reusable Pluto Glass view.
 5. After a failed navigate, **do not** retry by spawning another tab — fix the URL (local: host `pluto_url`; remote: re-ask Ports forwarded port) and reuse.
 
+**Glass view cache:** After any successful Glass navigate/snapshot on this session’s Pluto URL, Styx hooks record `viewId` under `(session_id, notebook_id)` (`_landing` if no `edit?id=`). Before Glass work, use the injected map (or `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json`): look up by `notebook_id` / landing — never a single viewId for the whole session — and call `browser_navigate({ url, viewId, position: "active" })`. If `browser_tabs` list is non-empty, confirm URL matches and refresh the map; if empty, still use the stored `viewId`. On failure, drop that entry only and **hard-stop** — ask the user; **never** `newTab` / `action: "new"`. One notebook → one remembered view (last success wins). Parent and Task children share the same file.
+
 ### Path A — landing only
 
 **Local:**
