@@ -4,11 +4,17 @@ All notable changes to **Styx** are documented here.
 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+Each release is a git tag and GitHub Release; `main` is the install channel. PlutoMCP is pinned by commit SHA in `Project.toml`.
+
 ## [Unreleased]
 
-## [0.2.1] — 2026-09-12
+## [0.2.2] — 2026-09-14
 
-Install channel: default curl uses **`STYX_REF=main`** (no `v0.2.1` git tag / no GitHub Release). Fresh installs from `main` after this merge get 0.2.1 content. PlutoMCP is pinned by commit SHA (no PlutoMCP tag).
+### Changed
+
+- **PlutoMCP pin:** `Project.toml` `[sources]` now pins [jowch/PlutoMCP.jl](https://github.com/jowch/PlutoMCP.jl) commit **`e840947c5d46f05c702480ada8df1874255cd5ca`** (PlutoMCP [#7](https://github.com/jowch/PlutoMCP.jl/pull/7) control bridge refuses browser-origin / non-loopback requests; [#8](https://github.com/jowch/PlutoMCP.jl/pull/8) `pending_run` no longer clears before cells run, safe preview keeps it with `execution_blocked::`, orphan ids pruned). Reference eval gate passes at this pin.
+
+## [0.2.1] — 2026-09-12
 
 ### Fixed
 
@@ -25,13 +31,9 @@ Install channel: default curl uses **`STYX_REF=main`** (no `v0.2.1` git tag / no
 
 ### Notes
 
-- **No Styx `v0.2.1` tag / no GitHub Release** — `main` is the install channel for this content.
-- **No PlutoMCP tag** — pin by SHA only.
 - Upgraders: re-run the install one-liner. Force Julia env refresh (`PLUTOMCP_ENV_FORCE=1` or wipe `.julia-env-instantiated` + `Manifest.toml`) to pick up the new PlutoMCP pin. Toggle **pluto** MCP or Reload Window after upgrade.
 
 ## [0.2.0] — 2026-09-11
-
-Install channel: default curl uses **`STYX_REF=main`** (no `v0.2.0` git tag / no GitHub Release). Fresh installs from `main` after this merge get 0.2.0 content. PlutoMCP is pinned by commit SHA (no PlutoMCP tag).
 
 ### Fixed
 
@@ -66,7 +68,6 @@ Install channel: default curl uses **`STYX_REF=main`** (no `v0.2.0` git tag / no
 
 ### Notes
 
-- **No Styx `v0.2.0` tag / no GitHub Release** — `main` is the install channel for this content.
 - **No PlutoMCP tag** — pin by SHA only; includes session binding, wait defaults flip, and PlutoMCP #4 stdio-stall polish.
 - Upgraders: re-run the install one-liner, then force Julia env refresh (`PLUTOMCP_ENV_FORCE=1` or wipe `.julia-env-instantiated` + `Manifest.toml`) to pick up the new pin. Toggle **pluto** MCP or Reload Window after upgrade.
 
