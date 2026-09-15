@@ -7,4 +7,4 @@ julia = "1.11"
 PlutoMCP = "1.4.1"
 
 [sources]
-PlutoMCP = {url = "https://github.com/jowch/PlutoMCP.jl.git", rev = "e840947c5d46f05c702480ada8df1874255cd5ca"}
+PlutoMCP = {url = "https://github.com/jowch/PlutoMCP.jl.git", rev = "1e9197ef1eed7823b11d37ba39a43aa2330466a1"}
