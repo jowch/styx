@@ -339,10 +339,44 @@ def result_blob(payload: dict[str, Any]) -> Any:
     return None
 
 
+# Cursor ide-browser returns these as content text with isError:false (live hook logs).
+_GLASS_FAILURE_LINE_PREFIXES = (
+    "browser view not found",
+    "no browser tab available",
+)
+
+
+def _mcp_content_texts(result: Any) -> list[str]:
+    """Text blocks from an MCP tool result (`content[].text`)."""
+    parsed = _parse_jsonish(result)
+    if not isinstance(parsed, dict):
+        return []
+    content = parsed.get("content")
+    if not isinstance(content, list):
+        return []
+    texts: list[str] = []
+    for item in content:
+        if isinstance(item, dict) and isinstance(item.get("text"), str):
+            texts.append(item["text"])
+    return texts
+
+
+def _content_looks_failed(result: Any) -> bool:
+    """True when MCP content text is a known Glass failure, even if isError is false."""
+    for blob in _mcp_content_texts(result):
+        for line in blob.splitlines():
+            low = line.strip().lower()
+            if any(low.startswith(prefix) for prefix in _GLASS_FAILURE_LINE_PREFIXES):
+                return True
+    return False
+
+
 def _tool_failed(payload: dict[str, Any], result: Any) -> bool:
     if payload.get("isError") is True or payload.get("is_error") is True:
         return True
     if isinstance(result, dict) and result.get("isError") is True:
+        return True
+    if _content_looks_failed(result):
         return True
     return False
 

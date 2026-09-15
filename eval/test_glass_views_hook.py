@@ -279,6 +279,105 @@ class RecordGlassFromHookTests(unittest.TestCase):
         )
         self.assertEqual(self._views()["entries"], {})
 
+    def test_skips_view_not_found_when_iserror_false(self) -> None:
+        """Live afterMCPExecution: Cursor reports view-not-found with isError false."""
+        self._record(
+            {
+                "tool_name": "browser_navigate",
+                "mcp_server_name": "cursor-ide-browser",
+                "hook_event_name": "afterMCPExecution",
+                "tool_input": json.dumps(
+                    {
+                        "url": LANDING,
+                        "viewId": "glass-browser-e7ffd6",
+                        "position": "active",
+                    }
+                ),
+                "result_json": json.dumps(
+                    {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": (
+                                    "Browser view not found: glass-browser-e7ffd6. "
+                                    "Use browser_navigate without a viewId to create a new tab."
+                                ),
+                            }
+                        ],
+                        "isError": False,
+                    }
+                ),
+            }
+        )
+        self.assertEqual(self._views()["entries"], {})
+
+    def test_skips_no_tab_available_when_iserror_false(self) -> None:
+        """Live postToolUse: no-tab error is also isError false."""
+        self._record(
+            {
+                "tool_name": "MCP:browser_navigate",
+                "hook_event_name": "postToolUse",
+                "tool_input": {"url": LANDING, "position": "active"},
+                "tool_output": json.dumps(
+                    {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No browser tab available. Please navigate to a page first.",
+                            }
+                        ],
+                        "isError": False,
+                    }
+                ),
+            }
+        )
+        self.assertEqual(self._views()["entries"], {})
+
+    def test_skips_snapshot_no_tab_even_with_input_url(self) -> None:
+        """Same hole as navigate if snapshot/lock ever carry a URL plus viewId."""
+        self._record(
+            {
+                "tool_name": "browser_snapshot",
+                "tool_input": {"viewId": "glass-browser-e7ffd6", "url": LANDING},
+                "result_json": json.dumps(
+                    {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "No browser tab available. Please navigate to a page first.",
+                            }
+                        ],
+                        "isError": False,
+                    }
+                ),
+            }
+        )
+        self.assertEqual(self._views()["entries"], {})
+
+    def test_skips_lock_view_not_found_even_with_result_url(self) -> None:
+        self._record(
+            {
+                "tool_name": "browser_lock",
+                "tool_input": {"action": "lock", "viewId": "lock-id"},
+                "result_json": json.dumps(
+                    {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": (
+                                    "Browser view not found: lock-id. "
+                                    "Use browser_navigate without a viewId to create a new tab."
+                                ),
+                            }
+                        ],
+                        "metadata": {"url": EDIT_A},
+                        "isError": False,
+                    }
+                ),
+            }
+        )
+        self.assertEqual(self._views()["entries"], {})
+
     def test_input_view_id_when_result_has_no_id(self) -> None:
         self._record(
             {
