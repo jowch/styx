@@ -3,7 +3,7 @@
 set -euo pipefail
 
 REPO="${STYX_REPO:-jowch/styx}"
-REF="${STYX_REF:-main}"
+REF="${STYX_REF:-}"
 DEST="${STYX_DEST:-${HOME}/.cursor/plugins/local/styx}"
 SRC=""
 FROM_DEV=0
@@ -22,7 +22,7 @@ Options:
 
 Environment:
   STYX_REPO   GitHub repo (default: jowch/styx)
-  STYX_REF    Branch or tag (default: main)
+  STYX_REF    Tag or branch (default: latest GitHub Release; main = development tip)
   STYX_DEST   Install path (default: ~/.cursor/plugins/local/styx)
 
 Install docs: skills/styx-setup/reference/install.md (in repo) or README on GitHub.
@@ -62,6 +62,16 @@ trap cleanup EXIT
 
 if [[ "$FROM_DEV" -eq 0 ]]; then
   need git
+  if [[ -z "$REF" ]]; then
+    need curl
+    # Default: latest GitHub Release. STYX_REF=main installs the development tip.
+    latest_release() {
+      curl -fsSL --max-time 10 "https://api.github.com/repos/${REPO}/releases/latest" \
+        | sed -n 's/^[[:space:]]*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1
+    }
+    REF="$(latest_release)" || true
+    [[ -n "$REF" ]] || { echo "Styx install: could not resolve the latest release; set STYX_REF (a tag, or main)." >&2; exit 1; }
+  fi
   TMP="$(mktemp -d)"
   echo "Cloning ${REPO}@${REF}..."
   git clone --depth 1 --branch "$REF" "https://github.com/${REPO}.git" "$TMP"
