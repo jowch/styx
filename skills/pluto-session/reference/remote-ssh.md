@@ -21,7 +21,7 @@ If neither is present, the launcher exits with `styx_identity_unavailable` (no s
 2. Confirm **pluto** MCP is connected (`plugin-styx-pluto`). If `styx_identity_unavailable`, Reload Window and re-enable **pluto** so the child inherits `VSCODE_IPC_HOOK_CLI`.
 3. `pluto_session_status`. Read `pluto_url` / `pluto_port` / `mcp_port` from the result — ports are dynamic.
 4. If stopped → **`start_pluto_session`** (bound MCP stdio on the SSH host owns the stack). Do **not** fall back to `PlutoMCP.serve()` or fixed `:1234`/`:2346`.
-5. **Glass (required ask):** Agents Glass runs on the **laptop**. Before the first Glass navigate this session, ask the user for the Cursor **Ports** forwarded/local port for the remote Pluto port from status. Accept a port number or full URL; open `http://127.0.0.1:<forwarded>/` (**omit `position`**). Ask every session — remaps differ; do not reuse a prior session’s answer as truth. **Never invent** remaps. Full policy: [glass-navigation.md](glass-navigation.md#local-vs-remote-ssh-glass-url).
+5. **Glass (required ask):** Agents Glass runs on the **laptop**. Before the first Glass navigate this session, ask the user for the Cursor **Ports** forwarded/local port for the remote Pluto port from status. Accept a port number or full URL; open `http://127.0.0.1:<forwarded>/` (**reuse** omits `position`; **reveal once** with `position: "active"` if this is the first visible open and tabs are empty). Ask every session — remaps differ; do not reuse a prior session’s answer as truth. **Never invent** remaps. Full policy: [glass-navigation.md](glass-navigation.md#local-vs-remote-ssh-glass-url).
 6. Local Task children inherit this window's `plugin-styx-pluto` MCP — do not pass ports in prompts.
 
 ## Host vs laptop ports

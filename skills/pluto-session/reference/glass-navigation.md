@@ -15,8 +15,8 @@ Only Agents Glass participates in Design Mode → `resolve_pluto_context` → `r
 
 1. Call `pluto_session_status` (or use the `pluto_url` / `pluto_port` from `start_pluto_session`)
 2. Resolve the Glass URL — see [Local vs Remote SSH](#local-vs-remote-ssh-glass-url)
-3. **Reuse Glass first** — see [Tab reuse](#tab-reuse-no-newtab-by-default) (do **not** open a new tab by default)
-4. **`browser_navigate`** — `{ url: "<glass_url>" }` plus cached `viewId` when known. **Omit `position`** unless the user explicitly asks to show/focus Glass (see below).
+3. **Reuse or reveal Glass** — see [Reuse vs reveal](#reuse-vs-reveal) (do **not** open a new tab)
+4. **`browser_navigate`** — `{ url: "<glass_url>" }` plus cached `viewId` when known. **Reuse** omits `position`; **reveal** (closed pane / first visible open) may pass `position: "active"` **once**.
 5. Confirm MCP `viewId` from the result (`Browser View ID:` / metadata) — typically **6-hex**, not `glass-browser-<hex>`
 6. **`browser_snapshot`** → **`browser_click`** on links (Path B: notebook filename on landing)
 
@@ -35,26 +35,27 @@ Agents Glass’s browser runs on the **laptop UI**. MCP/`pluto_url` are correct 
 2. Ask once, clearly, e.g.:  
    > Pluto is on remote port **\<N\>**. What is the **forwarded / local** port in Cursor **Ports** for that remote port? (port number or full URL is fine.)
 3. Accept a bare port (`35721`) or a full URL. Normalize to `http://127.0.0.1:<port>/` (keep path if they pasted `/edit?id=…`).
-4. **`browser_navigate`** that URL immediately (**omit `position`**) — do not lecture, do not retry host URL first, do not invent remaps.
+4. **`browser_navigate`** that URL immediately — **reuse** omits `position`; **reveal** (`position: "active"` **once**) if this is the first visible open and tabs are empty — do not lecture, do not retry host URL first, do not invent remaps.
 5. Treat the answer as **session-scoped only**. Remaps differ per session; do **not** persist it as cross-session truth.
 
 **Never:** invent client ports; hardcode lore ports; claim host `pluto_url` is Glass-authoritative on Remote SSH; require an Extension Host companion.
 
 Do **not** use `plugin-browse-browser`. Do **not** hardcode `:1234`.
 
-### Tab reuse (no `newTab`, no `position: "active"` by default)
+### Reuse vs reveal
 
-Glass tab spam is a known failure mode ([issue #4](https://github.com/jowch/styx/issues/4)). Cursor keeps **two** ids: MCP Playwright **6-hex** vs workbench **`glass-browser-<uuid>`**. `browser_navigate` with **`position: "active"`** reveals Agents Glass via workbench `_reopenBrowserTab`, which **always mints a new** `glass-browser-<uuid>` pane even when a 6-hex tab already exists. Omit `position` unless the user explicitly asks to show/focus the browser.
+Glass tab spam is a known failure mode ([issue #4](https://github.com/jowch/styx/issues/4)). Cursor keeps **two** ids: MCP Playwright **6-hex** vs workbench **`glass-browser-<uuid>`**. Omitting `position` is background tab navigation (focus preserved — a closed pane stays hidden). `browser_navigate` with **`position: "active"`** reveals Agents Glass via workbench `_reopenBrowserTab`, which **always mints a new** `glass-browser-<uuid>` pane even when a 6-hex tab already exists.
 
 **Parent** owns Agents Glass. A **Task child** in the same window cannot attach: `browser_tabs` is empty and `browser_navigate({ url, viewId })` with the file’s `viewId` returns “Browser view not found”. That is expected Cursor isolation — do **not** `newTab` / `position: "active"`. Leave Glass to the parent; use inherited `plugin-styx-pluto` for notebook tools.
 
-1. **`browser_navigate({ url })`** (parent first pane — hooks write `glass-views.json`) or **`browser_navigate({ url, viewId })`** (parent reuse). Never add `position` or `newTab` by default.
-2. If tab APIs are available, **list tabs** and reuse any tab whose URL host/path looks like this session’s Pluto (landing or `/edit?id=`). Match on notebook id or path — not a guessed port alone. Prefer the **6-hex** `viewId` when both a hex id and a `glass-browser-<uuid>` point at the same Pluto URL.
-3. **Parent:** treat an **empty or stale tab list as unreliable**, not proof that no Glass tab exists. Ask the user which Glass tab is Pluto, or navigate to the best-known URL **with that tab’s `viewId`**, before creating anything.
-4. **Never** pass `newTab` / `new` / `tabs_new` by default. Open a new Glass tab only if the user explicitly asks, or after the **parent** confirms there is truly no reusable Pluto Glass view. A Task child must never create a tab.
-5. After a failed navigate, **do not** retry by spawning another tab — fix the URL (local: host `pluto_url`; remote: re-ask Ports forwarded port) and reuse. Child view-not-found is not a URL bug — stop Glass work.
+1. **Reuse / tab navigation (default):** if a Pluto Glass tab already exists (cached `viewId` or parent `browser_tabs` list), `browser_navigate({ url, viewId })` — **omit** `position` and `newTab`. This is the path that works without minting siblings.
+2. **Reveal if the pane is closed (parent, once):** if the user cannot see Glass (closed/hidden pane, they say it did not open, or this is the first visible open this session and tabs are empty), the parent may pass `position: "active"` **once** to show the UI. That can mint a sibling workbench pane; then record the result `viewId` in `glass-views.json` (hooks) and omit `position` on later navigates. Never `newTab: true` / `action: "new"` as the reveal mechanism.
+3. If tab APIs are available, **list tabs** and reuse any tab whose URL host/path looks like this session’s Pluto (landing or `/edit?id=`). Match on notebook id or path — not a guessed port alone. Prefer the **6-hex** `viewId` when both a hex id and a `glass-browser-<uuid>` point at the same Pluto URL.
+4. **Parent:** treat an **empty or stale tab list as unreliable**, not proof that no Glass tab exists. Ask the user which Glass tab is Pluto, or navigate to the best-known URL **with that tab’s `viewId`**, before creating anything. Empty tabs plus “need the pane visible” is **reveal once**, not `newTab`.
+5. **Never** pass `newTab` / `new` / `tabs_new`. A Task child must never create a tab or pass `position: "active"`.
+6. After a failed navigate, **do not** retry by spawning another tab — fix the URL (local: host `pluto_url`; remote: re-ask Ports forwarded port) and reuse. Child view-not-found is not a URL bug — stop Glass work.
 
-**Glass view cache:** After any successful **parent** Glass navigate/snapshot on this session’s Pluto URL, Styx hooks record `viewId` under `(session_id, notebook_id)` (`_landing` if no `edit?id=`). **Parent Read the file** before Glass work — `sessionStart` may print a “Known Glass views” block, but Cursor does **not** put that hook output in model-visible context (parent or Task child). Path: `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json`, else `$XDG_RUNTIME_DIR/styx-$UID/sessions/<session_id>/glass-views.json`. `session_id` comes from `pluto_session_status`. Look up by `notebook_id` / `_landing` — never a single viewId for the whole session — and call `browser_navigate({ url, viewId })` (**no** `position`). If `browser_tabs` list is non-empty, confirm URL matches and refresh the map; if empty on the **parent**, still use the stored `viewId` when a pane may exist, and do **not** mint a tab. A Task child can **Read** the same file (same `session_id`) but cannot attach — view-not-found is expected. On parent failure, drop that entry only and **hard-stop** — ask the user; **never** `newTab` / `action: "new"`. One notebook → one remembered view (last success wins). Reload Window mints a new `session_id`; PlutoMCP teardown deletes the old `sessions/<id>/` (not a sessionStart wipe) — do not assume the old dir survives reload + Pluto restart.
+**Glass view cache:** After any successful **parent** Glass navigate/snapshot on this session’s Pluto URL, Styx hooks record `viewId` under `(session_id, notebook_id)` (`_landing` if no `edit?id=`). **Parent Read the file** before Glass work — `sessionStart` may print a “Known Glass views” block, but Cursor does **not** put that hook output in model-visible context (parent or Task child). Path: `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json`, else `$XDG_RUNTIME_DIR/styx-$UID/sessions/<session_id>/glass-views.json`. `session_id` comes from `pluto_session_status`. Look up by `notebook_id` / `_landing` — never a single viewId for the whole session — and **reuse** with `browser_navigate({ url, viewId })` (omit `position`). If `browser_tabs` list is non-empty, confirm URL matches and refresh the map; if empty on the **parent**, still try the stored `viewId` for tab navigation (omit `position`) when a pane may exist — do **not** `newTab`. If the user cannot see Glass, **reveal once** with `position: "active"` and record the result `viewId`. A Task child can **Read** the same file (same `session_id`) but cannot attach — view-not-found is expected. On parent failure, drop that entry only and **hard-stop** — ask the user; **never** `newTab` / `action: "new"`. One notebook → one remembered view (last success wins). Reload Window mints a new `session_id`; PlutoMCP teardown deletes the old `sessions/<id>/` (not a sessionStart wipe) — do not assume the old dir survives reload + Pluto restart.
 
 ### Path A — landing only
 
@@ -62,6 +63,8 @@ Glass tab spam is a known failure mode ([issue #4](https://github.com/jowch/styx
 
 ```text
 status = pluto_session_status()
+# reuse: browser_navigate({ url: status.pluto_url, viewId }) — omit position
+# reveal (pane closed / first visible open): add position: "active" once
 browser_navigate({ url: status.pluto_url })
 ```
 
@@ -71,7 +74,7 @@ Tell user to pick a notebook; stop.
 
 ### Path B — after `open_notebook`
 
-**Local:** `browser_navigate({ url: status.pluto_url })` then `open_notebook` → landing click.
+**Local:** `browser_navigate` landing (`reuse` omit `position`; `reveal` once if pane closed) then `open_notebook` → landing click.
 
 **Remote SSH:** resolve Glass URL via the per-session Ports ask first, then the same Path B steps on that URL.
 
