@@ -86,6 +86,32 @@ class ParseGlassViewTests(unittest.TestCase):
             EDIT_A,
         )
 
+    def test_iter_tab_matches_prose_open_tabs(self) -> None:
+        """Live cursor-ide-browser list is prose, not {tabs:[...]} JSON."""
+        prose = (
+            "Open tabs:\n"
+            f'[0] "cell-seg-demo.jl" - {EDIT_A} (viewId: c28e15)'
+        )
+        expected = [(EDIT_A, "c28e15")]
+        self.assertEqual(pluto_lib.iter_tab_matches(prose), expected)
+        self.assertEqual(
+            pluto_lib.iter_tab_matches(
+                {
+                    "content": [{"type": "text", "text": prose}],
+                    "isError": False,
+                }
+            ),
+            expected,
+        )
+
+    def test_iter_tab_matches_json_tabs_still_works(self) -> None:
+        self.assertEqual(
+            pluto_lib.iter_tab_matches(
+                {"tabs": [{"url": EDIT_B, "viewId": "glass-b"}]}
+            ),
+            [(EDIT_B, "glass-b")],
+        )
+
 
 class GlassViewStoreTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -148,12 +174,19 @@ class GlassViewStoreTests(unittest.TestCase):
             with mock.patch.object(pluto_lib, "load_binding", return_value=self.binding):
                 payload = pluto_lib.session_start_payload()
             views = pluto_lib.load_glass_views(self.binding)
+            path = pluto_lib.glass_views_path(self.binding)
         assert views is not None
         self.assertEqual(views["entries"][pluto_lib.LANDING_KEY]["viewId"], "e7ffd6")
         ctx = payload["additional_context"]
         self.assertIn("e7ffd6", ctx)
         self.assertIn(pluto_lib.LANDING_KEY, ctx)
         self.assertIn("Never `newTab`", ctx)
+        self.assertNotIn('position: "active"', ctx)
+        self.assertIn("omit `position`", ctx)
+        self.assertIn("`browser_navigate({ url, viewId })`", ctx)
+        assert path is not None
+        self.assertIn(path, ctx)
+        self.assertIn("Read that file", ctx)
 
     def test_foreign_origin_not_session_pluto(self) -> None:
         self.assertFalse(
@@ -246,6 +279,31 @@ class RecordGlassFromHookTests(unittest.TestCase):
             }
         )
         self.assertEqual(self._views()["entries"], {})
+
+    def test_tabs_list_prose_records_matching_url(self) -> None:
+        self._record(
+            {
+                "tool_name": "browser_tabs",
+                "tool_input": {"action": "list"},
+                "result_json": json.dumps(
+                    {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": (
+                                    "Open tabs:\n"
+                                    f'[0] "cell-seg-demo.jl" - {EDIT_A} (viewId: c28e15)'
+                                ),
+                            }
+                        ],
+                        "isError": False,
+                    }
+                ),
+            }
+        )
+        views = self._views()
+        self.assertEqual(views["entries"][NB_A]["viewId"], "c28e15")
+        self.assertEqual(views["entries"][NB_A]["url"], EDIT_A)
 
     def test_tabs_list_records_matching_url_only(self) -> None:
         self._record(

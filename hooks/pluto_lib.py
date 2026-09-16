@@ -49,6 +49,11 @@ _UUID_RE = re.compile(
     r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
 _BROWSER_VIEW_ID_RE = re.compile(r"Browser View ID:\s*([A-Za-z0-9_-]+)", re.I)
+# Live browser_tabs list: `Open tabs:\n[0] "name" - http://… (viewId: c28e15)`
+_PROSE_TAB_RE = re.compile(
+    r"(https?://[^\s)]+)\s*\(viewId:\s*([A-Za-z0-9_-]+)\)",
+    re.I,
+)
 _REMOTE_SSH_CONTEXT = (
     "Remote SSH workspace. This Cursor window owns its own Styx/PlutoMCP/Pluto on "
     "the SSH host (local XOR remote). MCP uses host pluto_url/pluto_port. Before "
@@ -463,8 +468,16 @@ def parse_result_url(result: Any, inp: dict[str, Any] | None = None) -> str | No
     return None
 
 
+def _prose_tab_pairs(text: str) -> list[tuple[str, str]]:
+    """Parse `Open tabs:\\n[0] title - url (viewId: hex)` lines."""
+    pairs: list[tuple[str, str]] = []
+    for url, vid in _PROSE_TAB_RE.findall(text):
+        pairs.append((url.rstrip(".,);"), vid.strip()))
+    return pairs
+
+
 def iter_tab_matches(result: Any) -> list[tuple[str, str]]:
-    """(url, viewId) pairs from a browser_tabs list payload."""
+    """(url, viewId) pairs from a browser_tabs list payload (JSON or prose)."""
     found: list[tuple[str, str]] = []
 
     def _walk(obj: Any, depth: int = 0) -> None:
@@ -484,11 +497,13 @@ def iter_tab_matches(result: Any) -> list[tuple[str, str]]:
             return
         if isinstance(obj, str):
             text = obj.strip()
-            if text[:1] in "[{" :
+            if text[:1] in "[{":
                 try:
                     _walk(json.loads(text), depth + 1)
-                except json.JSONDecodeError:
                     return
+                except json.JSONDecodeError:
+                    pass
+            found.extend(_prose_tab_pairs(text))
 
     _walk(result)
     return found
@@ -663,10 +678,13 @@ def glass_views_additional_context(binding: dict[str, Any] | None = None) -> str
         parts.append(f"{key} → viewId `{vid}` (url {url})")
     if not parts:
         return None
+    path = glass_views_path(b)
+    path_bit = f" (file `{path}`)" if path else ""
     return (
-        f"Known Glass views for session {sid}: "
+        f"Known Glass views for session {sid}{path_bit}: "
         + "; ".join(parts)
-        + ". Reuse these with `browser_navigate({ url, viewId, position: \"active\" })`. "
+        + ". Cursor does not inject this block into the model — Read that file before Glass work. "
+        "Reuse with `browser_navigate({ url, viewId })` (omit `position`). "
         "Empty `browser_tabs` list is unreliable. Never `newTab` / `action: \"new\"`. "
         "On a stale viewId, drop that entry only and hard-stop — never open a new tab."
     )

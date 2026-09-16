@@ -10,11 +10,13 @@ Each release is a git tag and GitHub Release; the installer targets the latest r
 
 ### Added
 
-- **Glass viewId cache:** hooks persist `(session_id, notebook_id | _landing) → { viewId, url }` in `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` after successful `cursor-ide-browser` navigate/snapshot/lock (and `browser_tabs` list when a Pluto URL matches). `sessionStart` injects the map for parent and Task children; never `newTab` / `action: "new"`. Skill: `pluto-session` glass-navigation.
+- **Glass viewId cache:** hooks persist `(session_id, notebook_id | _landing) → { viewId, url }` in `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` after successful `cursor-ide-browser` navigate/snapshot/lock (and `browser_tabs` list when a Pluto URL matches, including live prose `Open tabs:` lines). Agents **Read that file** before Glass work — Cursor does not put `sessionStart` `additional_context` in the model (parent or Task child). Never `newTab` / `action: "new"`. Skill: `pluto-session` glass-navigation.
 
 ### Fixed
 
 - **Glass viewId cache:** do not persist a `viewId` when `cursor-ide-browser` returns `Browser view not found` or `No browser tab available` as content text with `isError: false`. Those failures previously poisoned `_landing` from `tool_input`.
+- **Glass view map delivery:** `sessionStart` still emits “Known Glass views”, but Cursor does not put that `additional_context` in the model (parent or Task child). Skills/rules now require a **Read** of `glass-views.json`; the hook text includes the file path and omits `position: "active"`.
+- **`browser_tabs` list refresh:** `iter_tab_matches` parses live prose (`Open tabs:\n[0] … (viewId: hex)`), not only `{tabs:[…]}` JSON.
 
 ### Changed
 

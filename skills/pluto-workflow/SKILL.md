@@ -14,7 +14,7 @@ Live reactive session — not a `.jl` file to patch. See [pluto-mental-model.md]
 
 Notebook open in Glass at the session's `pluto_url` (`…/edit?id=<notebook_id>`). Resolve URL from `pluto_session_status` — never assume `:1234`. If not bootstrapped, use **pluto-session** first.
 
-Local Task children use the parent's MCP server; do not curl bridges or run `PlutoMCP.serve()`.
+Local Task children use the parent's MCP server; do not curl bridges or run `PlutoMCP.serve()`. Before Glass, Read `glass-views.json` (path from `pluto_session_status.session_id` + `$STYX_RUNTIME_DIR` or `$XDG_RUNTIME_DIR/styx-$UID`) — Cursor does not inject sessionStart “Known Glass views” into the model.
 
 ## Find the notebook (browser first)
 

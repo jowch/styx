@@ -35,7 +35,7 @@ Use after [CHECKLIST.md](CHECKLIST.md). Checklist Fail → overall **Fail** (do 
 
 When a parent dispatches Pluto notebook work to a subagent:
 
-1. **Attach** this rubric + checklist (or link `eval/agent-control/`).
+1. **Attach** this rubric + checklist (or link `eval/agent-control/`). Do **not** rely on sessionStart “Known Glass views” — Cursor does not put that hook output in the model (parent or child). The child must **Read** `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` (else `$XDG_RUNTIME_DIR/styx-$UID/sessions/<session_id>/glass-views.json`) before Glass work; parents may pass that path but the child must discover it from `pluto_session_status.session_id` if omitted. Never tell the child to `newTab` / `position: "active"`.
 2. Require the subagent’s final message to include a filled [SCORECARD.template.md](SCORECARD.template.md):
    - Checklist C1–C14 with **Yes / No / N/A** + evidence
    - Self-scores D1–D7 with one evidence line each
@@ -55,7 +55,7 @@ Failures are **inputs to skill/docs edits**, not only a grade. Map checklist/rub
 | Symptom / fail | First place to patch |
 |----------------|----------------------|
 | Wrong bootstrap / Path A vs B / reopen | `skills/pluto-session/SKILL.md`, `path-a-landing.md`, `path-b-open.md` |
-| `:1234`, Ports remap, `newTab` spam | `skills/pluto-session/reference/glass-navigation.md`, `remote-ssh.md`, `AGENTS.md`, `rules/pluto-notebook-workflow.mdc` |
+| `:1234`, Ports remap, `newTab` spam, missing glass-views Read | `skills/pluto-session/reference/glass-navigation.md`, `remote-ssh.md`, `AGENTS.md`, `rules/pluto-notebook-workflow.mdc` |
 | Edit without read / no submit / `run_after=true` spam | `skills/pluto-workflow/SKILL.md`, `reference/edit-loop.md` |
 | Blocking `wait_for_completion` / session death | `skills/pluto-workflow/SKILL.md` (+ product work on [#3](https://github.com/jowch/styx/issues/3)) |
 | Cell structure / `@bind` / parse errors | `skills/pluto-semantics/` (`cell-structure.md`, `agent-examples.md`) |
