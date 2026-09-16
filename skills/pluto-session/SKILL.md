@@ -25,13 +25,13 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 
 **Path B:** `start_pluto_session` if needed → **reuse Glass** → landing → `open_notebook(path=…)` → **`browser_click` notebook on landing** (not pasted `/edit?id=`) → exit Safe preview when outputs need to be live (Glass **Run notebook code** or `allow_execution`) → **pluto-workflow** for edits.
 
-**Glass URL:** **local** → host `pluto_url` (no ask). **Remote SSH** → ask once this session for the Ports forwarded/local port for remote `pluto_port`, then `http://127.0.0.1:<forwarded>/`. Never invent remaps; never `newTab` by default. **Before Glass work:** `pluto_session_status` → Read `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` (else `$XDG_RUNTIME_DIR/styx-$UID/sessions/<session_id>/glass-views.json`) → `browser_navigate({ url, viewId })` (**omit** `position`). Do not wait for sessionStart “Known Glass views” — Cursor does not put that hook output in the model. [reference/glass-navigation.md](reference/glass-navigation.md).
+**Glass URL:** **local** → host `pluto_url` (no ask). **Remote SSH** → ask once this session for the Ports forwarded/local port for remote `pluto_port`, then `http://127.0.0.1:<forwarded>/`. Never invent remaps; never `newTab` by default. **Parent before Glass work:** `pluto_session_status` → Read `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` (else `$XDG_RUNTIME_DIR/styx-$UID/sessions/<session_id>/glass-views.json`) → `browser_navigate({ url, viewId })` (**omit** `position`); first pane is `browser_navigate({ url })` with no `viewId`. Do not wait for sessionStart “Known Glass views” — Cursor does not put that hook output in the model (parent or child). [reference/glass-navigation.md](reference/glass-navigation.md).
 
 **Already running:** Path A → landing only. Path B → `list_notebooks`; skip `open_notebook` if target is open. Same path open in another Styx session → `notebook_in_use`.
 
 **Remote SSH:** this window owns Pluto on the SSH host (local XOR remote). Glass needs the per-session Ports ask — [reference/remote-ssh.md](reference/remote-ssh.md).
 
-**Local Task child:** use the inherited `plugin-styx-pluto` server — do not pass MCP ports. Read `glass-views.json` yourself (same `session_id` as the parent); do not wait for sessionStart injection.
+**Local Task child:** inherit `plugin-styx-pluto` for notebook tools (`read_cell` / `edit_cell` / `submit_changes`) — do not pass MCP ports. Agents Glass (`cursor-ide-browser`) is **parent-only**: `browser_tabs` is empty; a cached `viewId` fails “Browser view not found”. Do **not** `newTab` / `position: "active"`. Leave Glass to the parent. [reference/glass-navigation.md](reference/glass-navigation.md).
 
 ## REQUIRED chain
 
@@ -46,6 +46,7 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 | `open_notebook` without user path | Never scan repo and pick |
 | Bare `/<notebook_id>` URL | Use `/edit?id=<notebook_id>` only when notebook opened in Glass (Path A); after MCP `open_notebook`, click on landing |
 | Hardcode `:1234` / invent Ports remaps / spam `newTab` | Local: host `pluto_url`. Remote: ask Ports forwarded port this session; reuse Glass — [glass-navigation.md](reference/glass-navigation.md) |
+| Task child `newTab` after empty tabs / view-not-found | Expected isolation — notebook tools via inherited MCP; parent owns Glass |
 | User runs `pluto-serve.sh` | Use `start_pluto_session` |
 
 ## Additional resources

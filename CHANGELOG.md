@@ -20,6 +20,8 @@ Each release is a git tag and GitHub Release; the installer targets the latest r
 
 ### Changed
 
+- **Task child Glass:** Agents Glass (`cursor-ide-browser`) is parent-only. Child empty `browser_tabs` + cached `viewId` → “Browser view not found” is expected Cursor isolation — do not `newTab`. Skills, workflow rule, and eval C4/D4 updated.
+
 - **Glass navigate:** omit `position: "active"` unless the user asks to show/focus the browser. That flag triggers workbench `_reopenBrowserTab`, which mints a sibling `glass-browser-<uuid>` pane next to the MCP 6-hex tab.
 
 - **Install target:** `install.sh` / `install-styx.sh` default to the latest GitHub Release tag (resolved via `releases/latest`) instead of `main`; `STYX_REF=main` installs the development tip. Doctor no longer prints a redundant `STYX_REF=<tag>` hint.
