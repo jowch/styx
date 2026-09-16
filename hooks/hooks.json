@@ -28,10 +28,22 @@
         "timeout": 5
       }
     ],
+    "afterMCPExecution": [
+      {
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/record-glass-view.py",
+        "matcher": "browser_navigate|browser_snapshot|browser_lock|browser_tabs",
+        "timeout": 5
+      }
+    ],
     "postToolUse": [
       {
         "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/record-read.py",
         "matcher": "MCP:read_cell|MCP:read_notebook_code|read_cell|read_notebook_code",
+        "timeout": 5
+      },
+      {
+        "command": "python3 ${CURSOR_PLUGIN_ROOT}/hooks/record-glass-view.py",
+        "matcher": "MCP:browser_navigate|MCP:browser_snapshot|MCP:browser_lock|MCP:browser_tabs|browser_navigate|browser_snapshot|browser_lock|browser_tabs",
         "timeout": 5
       }
     ],

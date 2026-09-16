@@ -14,7 +14,7 @@ Live reactive session — not a `.jl` file to patch. See [pluto-mental-model.md]
 
 Notebook open in Glass at the session's `pluto_url` (`…/edit?id=<notebook_id>`). Resolve URL from `pluto_session_status` — never assume `:1234`. If not bootstrapped, use **pluto-session** first.
 
-Local Task children use the parent's MCP server; do not curl bridges or run `PlutoMCP.serve()`.
+Local Task children inherit `plugin-styx-pluto` (`read_cell` / `edit_cell` / `submit_changes`); do not curl bridges or run `PlutoMCP.serve()`. Agents Glass (`cursor-ide-browser`) is **parent-only** — child `browser_tabs` is empty and a cached `viewId` fails “Browser view not found”; do **not** `newTab` / `position: "active"`. Leave Glass to the parent; exit Safe preview via MCP `allow_execution` when the child needs live outputs.
 
 ## Find the notebook (browser first)
 
@@ -32,7 +32,7 @@ read → stage (run_after=false) → submit_changes(wait_for_completion=false) �
 
 Default **`wait_for_completion=false`** on `submit_changes` for stdio-bound sessions so MCP stays responsive ([issue #3](https://github.com/jowch/styx/issues/3)). Only block when the user explicitly needs a synchronous result and the session is known durable.
 
-**Safe preview:** still edit + `submit_changes(wait_for_completion=false)`. When outputs aren't live, **exit Safe preview yourself** — Glass **Run notebook code** (`browser_click`), or MCP `allow_execution(run_notebook=false)` then re-`submit_changes` / `execute_cell` for staged cells (faster than default full-notebook run). See [safe-preview.md](reference/safe-preview.md).
+**Safe preview:** still edit + `submit_changes(wait_for_completion=false)`. When outputs aren't live, **exit Safe preview yourself** — Glass **Run notebook code** (`browser_click`) on the **parent**, or MCP `allow_execution(run_notebook=false)` then re-`submit_changes` / `execute_cell` for staged cells (Task children: MCP only). See [safe-preview.md](reference/safe-preview.md).
 
 **Cell structure / parse errors:** **pluto-semantics** — [cell-structure.md](../pluto-semantics/reference/cell-structure.md).
 

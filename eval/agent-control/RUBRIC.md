@@ -17,7 +17,7 @@ Use after [CHECKLIST.md](CHECKLIST.md). Checklist Fail → overall **Fail** (do 
 | D1 | **Skill selection** | Ignores Styx skills | Finds skill late or mixes conflicting guidance | Loads the right skill(s) before acting |
 | D2 | **MCP sequencing** | Random / write-first tool spam | Right tools, wrong order, then recovers | Status → open/read → stage (`run_after=false`) → `submit_changes` → verify |
 | D3 | **MCP arg hygiene** | Wrong/missing ids; blocking wait; skips read guard | One bad arg, then corrects | Correct `notebook_id`/`cell_id`; non-blocking wait; honors read-before-edit |
-| D4 | **Glass hygiene** | Hardcoded ports + tab spam | Eventual correct URL; extra tabs or retries | Local host URL / remote Ports ask; tab reuse; no `newTab` |
+| D4 | **Glass hygiene** | Hardcoded ports + tab spam; child `newTab` | Eventual correct URL; extra tabs or retries | **Parent:** local host URL / remote Ports ask; tab reuse; no `newTab`. **Child:** empty list + view-not-found accepted; no `newTab` |
 | D5 | **Edit discipline** | Blind edits / no submit | Read or submit missing once | Fresh read → stage → submit → re-read |
 | D6 | **Session safety** | Blocks stdio wait / kills Pluto / duplicate sessions | Risky wait or reopen, then corrects | Non-blocking wait; preserves session + notebook id |
 | D7 | **Recovery & honesty** | Hides failures / invents state | Reports error but weak fix | Accurate status; user-visible next step; pending_run called out |
@@ -35,7 +35,7 @@ Use after [CHECKLIST.md](CHECKLIST.md). Checklist Fail → overall **Fail** (do 
 
 When a parent dispatches Pluto notebook work to a subagent:
 
-1. **Attach** this rubric + checklist (or link `eval/agent-control/`).
+1. **Attach** this rubric + checklist (or link `eval/agent-control/`). Do **not** rely on sessionStart “Known Glass views” — Cursor does not put that hook output in the model (parent or child). Agents Glass (`cursor-ide-browser`) is **parent-only**: a Task child’s `browser_tabs` is empty and a cached `viewId` from `glass-views.json` fails “Browser view not found” — that is expected, not a reason to `newTab` / `position: "active"`. The parent **Read**s `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` (else `$XDG_RUNTIME_DIR/styx-$UID/sessions/<session_id>/glass-views.json`, else `${TMPDIR:-/tmp}/styx-$UID/sessions/<session_id>/glass-views.json`) before Glass work. Dispatch notebook tools (`read_cell` / `edit_cell` / `submit_changes`) to the child via inherited `plugin-styx-pluto`; leave Glass to the parent.
 2. Require the subagent’s final message to include a filled [SCORECARD.template.md](SCORECARD.template.md):
    - Checklist C1–C14 with **Yes / No / N/A** + evidence
    - Self-scores D1–D7 with one evidence line each
@@ -55,7 +55,7 @@ Failures are **inputs to skill/docs edits**, not only a grade. Map checklist/rub
 | Symptom / fail | First place to patch |
 |----------------|----------------------|
 | Wrong bootstrap / Path A vs B / reopen | `skills/pluto-session/SKILL.md`, `path-a-landing.md`, `path-b-open.md` |
-| `:1234`, Ports remap, `newTab` spam | `skills/pluto-session/reference/glass-navigation.md`, `remote-ssh.md`, `AGENTS.md`, `rules/pluto-notebook-workflow.mdc` |
+| `:1234`, Ports remap, `newTab` spam, child Glass attach, missing parent glass-views Read | `skills/pluto-session/reference/glass-navigation.md`, `remote-ssh.md`, `AGENTS.md`, `rules/pluto-notebook-workflow.mdc` |
 | Edit without read / no submit / `run_after=true` spam | `skills/pluto-workflow/SKILL.md`, `reference/edit-loop.md` |
 | Blocking `wait_for_completion` / session death | `skills/pluto-workflow/SKILL.md` (+ product work on [#3](https://github.com/jowch/styx/issues/3)) |
 | Cell structure / `@bind` / parse errors | `skills/pluto-semantics/` (`cell-structure.md`, `agent-examples.md`) |
@@ -67,4 +67,4 @@ Failures are **inputs to skill/docs edits**, not only a grade. Map checklist/rub
 ## What this is not
 
 - Not a substitute for `eval/run_reference.jl` golden-path CI.
-- Not a claim that Cursor Glass tab APIs are complete — grade agents on **fallback behavior** when lists are empty.
+- Not a claim that Cursor Glass tab APIs are complete — grade **parent** fallback when lists are empty. A Task child’s empty `browser_tabs` + view-not-found is expected isolation (Fail = child `newTab`).
