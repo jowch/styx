@@ -10,13 +10,7 @@ Each release is a git tag and GitHub Release; the installer targets the latest r
 
 ### Added
 
-- **Glass viewId cache:** hooks persist `(session_id, notebook_id | _landing) → { viewId, url }` in `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` after successful `cursor-ide-browser` navigate/snapshot/lock (and `browser_tabs` list when a Pluto URL matches, including live prose `Open tabs:` lines). Agents **Read that file** before Glass work — Cursor does not put `sessionStart` `additional_context` in the model (parent or Task child). Never `newTab` / `action: "new"`. Skill: `pluto-session` glass-navigation.
-
-### Fixed
-
-- **Glass viewId cache:** do not persist a `viewId` when `cursor-ide-browser` returns `Browser view not found` or `No browser tab available` as content text with `isError: false`. Those failures previously poisoned `_landing` from `tool_input`.
-- **Glass view map delivery:** `sessionStart` still emits “Known Glass views”, but Cursor does not put that `additional_context` in the model (parent or Task child). Skills/rules now require a **Read** of `glass-views.json`; the hook text includes the file path and omits `position: "active"`.
-- **`browser_tabs` list refresh:** `iter_tab_matches` parses live prose (`Open tabs:\n[0] … (viewId: hex)`), not only `{tabs:[…]}` JSON.
+- **Glass viewId cache:** hooks persist `(session_id, notebook_id | _landing) → { viewId, url }` in `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` after successful `cursor-ide-browser` navigate/snapshot/lock (and `browser_tabs` **list** only — other/missing `action` values are skipped — when a URL matches this session’s Pluto origin, including live prose `Open tabs:` lines). Failed navigates (`Browser view not found` / `No browser tab available`, including `isError: false` content text or a bare-string `tool_output`) are not recorded. Local sessions match the binding’s Pluto origin only; Remote SSH may accept a forwarded loopback origin on first touch. Agents **Read that file** before Glass work (`$STYX_RUNTIME_DIR`, else `$XDG_RUNTIME_DIR/styx-$UID`, else `${TMPDIR:-/tmp}/styx-$UID`) — Cursor does not put `sessionStart` `additional_context` in the model (parent or Task child). Never `newTab` / `action: "new"`. Skill: `pluto-session` glass-navigation. On a stale `viewId`, delete that key from `entries` in the JSON (do not wipe the file).
 
 ### Changed
 

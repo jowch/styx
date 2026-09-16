@@ -151,7 +151,7 @@ def reads_path(binding: dict[str, Any] | None = None) -> str | None:
     if b is None:
         return None
     sid = b.get("session_id")
-    if not isinstance(sid, str):
+    if not isinstance(sid, str) or not _UUID_RE.fullmatch(sid):
         return None
     path = os.path.join(runtime_dir(), "sessions", sid, "reads.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -234,7 +234,7 @@ def glass_views_path(binding: dict[str, Any] | None = None) -> str | None:
     if b is None:
         return None
     sid = b.get("session_id")
-    if not isinstance(sid, str) or not sid:
+    if not isinstance(sid, str) or not _UUID_RE.fullmatch(sid):
         return None
     path = os.path.join(runtime_dir(), "sessions", sid, "glass-views.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -352,8 +352,10 @@ _GLASS_FAILURE_LINE_PREFIXES = (
 
 
 def _mcp_content_texts(result: Any) -> list[str]:
-    """Text blocks from an MCP tool result (`content[].text`)."""
+    """Text from an MCP tool result (`content[].text` or a bare string)."""
     parsed = _parse_jsonish(result)
+    if isinstance(parsed, str):
+        return [parsed]
     if not isinstance(parsed, dict):
         return []
     content = parsed.get("content")
@@ -394,7 +396,7 @@ def _is_ide_browser_tool(payload: dict[str, Any], tool_name: str) -> bool:
 
 
 def is_forbidden_new_tab(tool_name: str, inp: dict[str, Any]) -> bool:
-    """True for newTab:true or browser_tabs action new — never record those."""
+    """True for newTab:true, or any browser_tabs action other than list (including missing action)."""
     if inp.get("newTab") is True:
         return True
     if str(inp.get("newTab")).lower() == "true":
@@ -548,6 +550,10 @@ def url_is_session_pluto(
     if origin in _allowed_origins(binding, views):
         return True
     # Remote SSH first touch: Glass uses a forwarded loopback port, not host pluto_url.
+    # Local sessions already have pluto_url/pluto_port in the binding — do not treat
+    # every 127.0.0.1 tab as this session's Pluto.
+    if os.environ.get("CURSOR_CODE_REMOTE") != "true":
+        return False
     _scheme, host, _port = origin
     return host == "127.0.0.1"
 
@@ -686,7 +692,8 @@ def glass_views_additional_context(binding: dict[str, Any] | None = None) -> str
         + ". Cursor does not inject this block into the model — Read that file before Glass work. "
         "Reuse with `browser_navigate({ url, viewId })` (omit `position`). "
         "Empty `browser_tabs` list is unreliable. Never `newTab` / `action: \"new\"`. "
-        "On a stale viewId, drop that entry only and hard-stop — never open a new tab."
+        "On a stale viewId, delete that key from `entries` in the JSON (do not wipe the file) "
+        "and hard-stop — never open a new tab."
     )
 
 
@@ -726,11 +733,11 @@ def record_glass_from_hook(payload: dict[str, Any]) -> None:
     inp = tool_input(payload)
     if is_forbidden_new_tab(tool_name, inp):
         return
-    binding = verified_binding()
-    if binding is None:
-        return
     result = result_blob(payload)
     if _tool_failed(payload, result):
+        return
+    binding = verified_binding()
+    if binding is None:
         return
     views = load_glass_views(binding) or _empty_glass_views(binding)
     bare = tool_name.removeprefix("MCP:")

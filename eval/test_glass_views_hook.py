@@ -8,6 +8,7 @@ import os
 import sys
 import tempfile
 import unittest
+import threading
 from pathlib import Path
 from unittest import mock
 
@@ -197,6 +198,62 @@ class GlassViewStoreTests(unittest.TestCase):
         self.assertTrue(pluto_lib.url_is_session_pluto(LANDING, self.binding, None))
         self.assertTrue(pluto_lib.url_is_session_pluto(EDIT_A, self.binding, None))
 
+    def test_local_loopback_other_port_rejected(self) -> None:
+        views = pluto_lib._empty_glass_views(self.binding)
+        with mock.patch.dict(os.environ, {"CURSOR_CODE_REMOTE": ""}, clear=False):
+            self.assertFalse(
+                pluto_lib.url_is_session_pluto("http://127.0.0.1:3000/", self.binding, views)
+            )
+            self.assertFalse(
+                pluto_lib.url_is_session_pluto("http://localhost:5173/", self.binding, views)
+            )
+            self.assertTrue(pluto_lib.url_is_session_pluto(LANDING, self.binding, views))
+
+    def test_remote_ssh_loopback_fallback(self) -> None:
+        with mock.patch.dict(os.environ, {"CURSOR_CODE_REMOTE": "true"}, clear=False):
+            self.assertTrue(
+                pluto_lib.url_is_session_pluto(
+                    "http://127.0.0.1:35721/", self.binding, None
+                )
+            )
+            self.assertFalse(
+                pluto_lib.url_is_session_pluto("https://example.com/", self.binding, None)
+            )
+
+    def test_glass_views_path_rejects_non_uuid_session_id(self) -> None:
+        evil = dict(self.binding)
+        evil["session_id"] = "../../evil"
+        with mock.patch.dict(os.environ, self.env, clear=False):
+            self.assertIsNone(pluto_lib.glass_views_path(evil))
+            sessions = self.runtime / "sessions"
+            self.assertFalse((self.runtime / "evil").exists())
+            self.assertTrue(sessions.is_dir())
+
+    def test_concurrent_upserts_do_not_drop_keys(self) -> None:
+        errors: list[BaseException] = []
+
+        def worker(n: int) -> None:
+            try:
+                key = NB_A if n % 2 == 0 else NB_B
+                url = EDIT_A if n % 2 == 0 else EDIT_B
+                for i in range(20):
+                    pluto_lib.upsert_glass_view(
+                        key, f"v-{n}-{i}", url, binding=self.binding
+                    )
+            except BaseException as e:  # noqa: BLE001
+                errors.append(e)
+
+        with mock.patch.dict(os.environ, self.env, clear=False):
+            threads = [threading.Thread(target=worker, args=(i,)) for i in range(4)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+            views = pluto_lib.load_glass_views(self.binding)
+        self.assertEqual(errors, [])
+        assert views is not None
+        self.assertEqual(set(views["entries"]), {NB_A, NB_B})
+
 
 class RecordGlassFromHookTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -335,6 +392,47 @@ class RecordGlassFromHookTests(unittest.TestCase):
                 ),
             }
         )
+        self.assertEqual(self._views()["entries"], {})
+
+    def test_skips_plugin_browse_browser(self) -> None:
+        self._record(
+            {
+                "tool_name": "browser_navigate",
+                "mcp_server_name": "plugin-browse-browser",
+                "tool_input": {"url": LANDING},
+                "result_json": json.dumps(
+                    {"metadata": {"viewId": "nope", "url": LANDING}, "isError": False}
+                ),
+            }
+        )
+        self.assertEqual(self._views()["entries"], {})
+
+    def test_skips_bare_string_view_not_found(self) -> None:
+        """postToolUse tool_output can be a bare failure string, not content[].text."""
+        self._record(
+            {
+                "tool_name": "browser_navigate",
+                "hook_event_name": "postToolUse",
+                "tool_input": {"url": LANDING, "viewId": "glass-browser-e7ffd6"},
+                "tool_output": "Browser view not found: glass-browser-e7ffd6. Use browser_navigate without a viewId to create a new tab.",
+            }
+        )
+        self.assertEqual(self._views()["entries"], {})
+
+    def test_failed_call_skips_verified_binding(self) -> None:
+        with (
+            mock.patch.dict(os.environ, self.env, clear=False),
+            mock.patch.object(pluto_lib, "verified_binding") as health,
+            mock.patch.object(pluto_lib, "load_binding", return_value=self.binding),
+        ):
+            pluto_lib.record_glass_from_hook(
+                {
+                    "tool_name": "browser_navigate",
+                    "tool_input": {"url": LANDING, "viewId": "stale"},
+                    "tool_output": "No browser tab available. Please navigate to a page first.",
+                }
+            )
+        health.assert_not_called()
         self.assertEqual(self._views()["entries"], {})
 
     def test_skips_view_not_found_when_iserror_false(self) -> None:
