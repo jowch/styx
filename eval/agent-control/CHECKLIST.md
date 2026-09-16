@@ -2,7 +2,7 @@
 
 Grade **Fail** overall if any item is **No** without an explicit, justified exception. Parents require subagents to answer each row with **evidence** (tool name + args, URL, `notebook_id` / `cell_id`, or quote).
 
-Canonical MCP names (PlutoMCP): `pluto_session_status`, `start_pluto_session`, `open_notebook`, `read_cell`, `edit_cell` / `add_cell` (`run_after=false`), `submit_changes` (`wait_for_completion`), `resolve_pluto_context`.
+Canonical MCP names (PlutoMCP): `pluto_session_status`, `start_pluto_session`, `open_notebook`, `read_cell`, `edit_cell` / `add_cell` (`run_after=false`, `folded` for markdown), `fold_cell`, `submit_changes` (`wait_for_completion`), `resolve_pluto_context`.
 
 | # | Check | Pass looks like | Common fail |
 |---|--------|-----------------|-------------|

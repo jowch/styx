@@ -151,7 +151,7 @@ end
 md"Mean of `values`: **$(mean(values))**"
 ```
 
-Alternate `md` cells with executable cells — no separate markdown cell type in Pluto.
+Alternate `md` cells with executable cells — no separate markdown cell type in Pluto. Add the `md` cells with `add_cell(..., folded=true)` (or `fold_cell` afterwards) so only the rendered prose shows once run.
 
 ---
 
