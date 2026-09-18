@@ -80,7 +80,7 @@ Pluto starts when you request notebook work, not at Cursor launch. Each Cursor w
 | `rules/pluto-notebook-workflow.mdc` | Short guardrails |
 | `hooks/` | Read-before-edit, `pending_run` warning, Design Mode hints |
 | `scripts/styx-doctor.sh` | Health check (Julia, env, session binding) |
-| `scripts/styx-start.sh` | Boot Pluto (+ optional notebook) via control bridge; print welcome URL |
+| `scripts/styx-start.sh` | Boot Pluto (+ optional notebook) via control bridge; `/styx-start` then opens Glass (Path B click when known) |
 
 ## Workflow
 

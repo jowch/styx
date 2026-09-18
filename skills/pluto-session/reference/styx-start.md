@@ -1,19 +1,24 @@
-# styx-start — boot without Glass
+# styx-start — boot + Glass ready (same turn)
 
-Programmatic lifecycle boot for [#26](https://github.com/jowch/styx/issues/26). Starts Pluto (and optionally `open_notebook`) via the window **control bridge** — no Agents Glass, no landing click, no cold `/edit?id=`.
+Programmatic lifecycle boot for [#26](https://github.com/jowch/styx/issues/26).
+
+**Success bar:** one `/styx-start` → user comes back to Pluto **open and ready to work** (no second ask). That means boot, resolve Glass URL, navigate landing, and (when a notebook is known) Path B click — all in **this agent turn**.
 
 Use when the user wants “get Pluto running / open this notebook” as a one-shot setup. For Glass already open but broken → [reconnect.md](reconnect.md) (**styx-reconnect**).
 
-## Script
+## Script (boot only)
 
 ```bash
 scripts/styx-start.sh                  # start; open ./analysis.jl if present
 scripts/styx-start.sh --welcome        # Pluto only
 scripts/styx-start.sh -p path/to.jl    # start + open_notebook
 scripts/styx-start.sh -p path/to.jl --run
+scripts/styx-start.sh --open           # local: also webbrowser.open(welcome_url)
 ```
 
 `scripts/styx-start.py` is the implementation; the `.sh` wrapper sets `PYTHONPATH` to `hooks/`.
+
+The script does **not** drive Agents Glass (plugins cannot). The **command** path must finish Glass + Path B after the script returns.
 
 ### Binding resolution
 
@@ -29,11 +34,23 @@ Multiple healthy bridges without a session id → error (do not guess).
 
 Prints `welcome_url=` from **exact** `pluto_url` (one host per session — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost-vs-127001)). Also session/ports and optional `notebook_id` / `path`.
 
-**Do not** print or open `/edit?id=` as the handoff URL after MCP open — user opens landing and clicks (Path B hydration).
+**Do not** print or navigate to `/edit?id=` as the handoff URL after MCP open — open landing, then click (Path B hydration).
 
-## Agent path
+`--open` (optional): on **local** only, also opens `welcome_url` in the OS default browser for human handoff. Skipped when `CURSOR_CODE_REMOTE=true`. This does **not** replace Agents Glass.
 
-Command **styx-start**: run the script when possible. If the bridge is unavailable, call MCP `start_pluto_session` (+ optional `open_notebook`) **by name** and print the welcome URL. **Never** use `cursor-ide-browser` for this command.
+## Agent path (required — same turn)
+
+Command **styx-start** — complete all of this before stopping:
+
+1. **Boot** — run the script when possible (else MCP `start_pluto_session` + optional `open_notebook` by name).
+2. Read `welcome_url=` / `pluto_port=` / `session_id=` / optional `notebook_id=` + `path=` from stdout or status.
+3. **Resolve Glass URL** — [Local vs Remote SSH](glass-navigation.md#local-vs-remote-ssh-glass-url):
+   - **Local:** exact `welcome_url` / `pluto_url`.
+   - **Remote SSH:** remember last-good for this session+port → same-port Glass probe → ask Ports **only if** needed.
+4. **Reuse or reveal** Glass — [Reuse vs reveal](glass-navigation.md#reuse-vs-reveal); `cursor-ide-browser` only.
+5. `browser_navigate` to **landing**; snapshot to confirm Pluto welcome / My work.
+6. **If a notebook was opened / known** — Path B: `browser_snapshot` → `browser_click` the notebook on landing ([path-b-open.md](path-b-open.md)). **Never** cold `/edit?id=` after MCP open.
+7. **Stop** when Glass shows the notebook editor (or landing if welcome-only). Do **not** ask the user to open a URL.
 
 ## Defaults
 
@@ -43,5 +60,6 @@ Command **styx-start**: run the script when possible. If the bridge is unavailab
 | `--welcome` | Start only |
 | `--path` / `-p` | Open that notebook |
 | `--run` | `open_notebook(..., run_notebook=true)` |
+| `--open` | Local: OS browser to `welcome_url` (extra human handoff) |
 
 Cold start timeout defaults to 180s (`STYX_START_TIMEOUT`).

@@ -11,7 +11,7 @@ Use when the user wants Pluto/notebooks but **does not name a specific file**.
 ## Steps
 
 1. `pluto_session_status` → if stopped, `start_pluto_session`
-2. Open **Pluto landing page** in Agents Glass — see [glass-navigation.md](glass-navigation.md) (`cursor-ide-browser`: **reuse** `{ url, viewId }` omit `position` / `newTab`; **reveal once** with `position: "active"` if the pane is closed or this is the first visible open; local uses host `pluto_url`, Remote SSH asks for Ports forwarded port first)
+2. Open **Pluto landing page** in Agents Glass — see [glass-navigation.md](glass-navigation.md) (`cursor-ide-browser`: **reuse** `{ url, viewId }` omit `position` / `newTab`; **reveal once** with `position: "active"` if the pane is closed or this is the first visible open; local uses host `pluto_url`; Remote SSH uses remember → same-port probe → ask Ports only if needed)
 3. Tell the user briefly:
 
    > Pluto is ready. Pick or create a notebook on this page. When you're in a notebook, send your next message — click a cell with **⌘⇧D** (Design Mode) or describe what you want.

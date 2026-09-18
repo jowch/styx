@@ -56,11 +56,11 @@ _PROSE_TAB_RE = re.compile(
 )
 _REMOTE_SSH_CONTEXT = (
     "Remote SSH workspace. This Cursor window owns its own Styx/PlutoMCP/Pluto on "
-    "the SSH host (local XOR remote). MCP uses host pluto_url/pluto_port. Before "
-    "Agents Glass this session: ask the user for the Cursor Ports forwarded/local "
-    "port for that remote Pluto port; open http://127.0.0.1:<forwarded>/ — do not "
-    "invent remaps or probe fixed :1234/:2346. See pluto-session "
-    "glass-navigation.md / remote-ssh.md."
+    "the SSH host (local XOR remote). MCP uses host pluto_url/pluto_port. Agents "
+    "Glass: remember last-good client origin for this session+port from "
+    "glass-views.json → else probe http://127.0.0.1:<pluto_port>/ via Glass → "
+    "ask Ports only if probe fails. Never invent remaps or use remote curl as "
+    "Glass proof. See pluto-session glass-navigation.md / remote-ssh.md."
 )
 
 

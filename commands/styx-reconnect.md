@@ -6,4 +6,4 @@ description: Glass/Pluto dropped — auth, Loading cells, stale port — soft re
 
 Invoke **pluto-session** and follow [skills/pluto-session/reference/reconnect.md](../skills/pluto-session/reference/reconnect.md).
 
-**Soft reconnect first** (landing → click notebook; exact `pluto_url` host). **Hard restart** (`stop_pluto_session` / `start_pluto_session`, or **styx-start** after stop) only when Pluto/MCP is dead or soft reconnect fails.
+**Soft reconnect first** (resolve Glass URL → landing → click notebook). Remote: remember → same-port probe → ask Ports only if needed. **Hard restart** then **styx-start** (boot + Glass ready in one turn) only when Pluto/MCP is dead or soft reconnect fails.

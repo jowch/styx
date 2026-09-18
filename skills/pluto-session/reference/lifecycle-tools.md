@@ -24,13 +24,15 @@ Lifecycle tools may be **hidden** in Cursor's MCP tool picker. **Invoke by name 
 
 | Command | Role |
 |---------|------|
-| **styx-start** | Boot Pluto (+ optional `open_notebook`) via control bridge; print welcome URL — **no Glass** — [styx-start.md](styx-start.md) |
+| **styx-start** | Boot Pluto (+ optional `open_notebook`) → same-turn Agents Glass landing (+ Path B click if notebook known) — [styx-start.md](styx-start.md) |
 | **styx-reconnect** | Soft reconnect → hard restart when Glass auth/WS/port drops — [reconnect.md](reconnect.md) |
 | **pluto-notebooks** | Full agent bootstrap including Glass (Path A/B) |
 
 ## Glass URL
 
-Always navigate with **`pluto_url` from status/start** — never hardcode `:1234`, and never rewrite its host (`localhost` ≠ `127.0.0.1` for cookies — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost-vs-127001)).
+**Local:** navigate with **exact** `pluto_url` from status/start — never hardcode `:1234`, and never rewrite its host (`localhost` ≠ `127.0.0.1` for cookies — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost-vs-127001)).
+
+**Remote SSH:** remember → same-port Glass probe → ask Ports only if needed — [glass-navigation.md](glass-navigation.md#local-vs-remote-ssh-glass-url).
 
 ## Never ask the user to run
 

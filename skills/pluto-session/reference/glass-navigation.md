@@ -26,19 +26,20 @@ Agents Glass’s browser runs on the **laptop UI**. MCP/`pluto_url` are correct 
 
 | Session | Glass URL | Ask user? |
 |---------|-----------|-----------|
-| **Local** (not Remote SSH / not remote) | Host `pluto_session_status.pluto_url` | **No** — open Glass immediately |
-| **Remote SSH** (or otherwise remote) | `http://127.0.0.1:<forwarded_port>/` from the user’s Ports answer | **Yes — every session** before first Glass navigate |
+| **Local** (not Remote SSH / not remote) | Exact host `pluto_session_status.pluto_url` / `welcome_url` | **No** — open Glass immediately |
+| **Remote SSH** (or otherwise remote) | Last-good client origin → else same-port Glass probe → else Ports answer | **Only if** remember + probe both fail |
 
-**Remote — one ask, then open:**
+**Remote — resolve ladder (maximize automation):**
 
-1. From status, name the **remote** Pluto port (`pluto_port` / host `pluto_url`).
-2. Ask once, clearly, e.g.:  
+1. From status, note the **remote** Pluto port (`pluto_port` / host `pluto_url`).
+2. **Remember** — Read `sessions/<session_id>/glass-views.json` (same path fallbacks as [Glass view cache](#reuse-vs-reveal)). If any entry `url` (or optional `glass-client.json` with matching `remote_pluto_port`) has a client origin **and** it was recorded for this session’s current `pluto_port`, reuse that origin. Do **not** invent remaps; do **not** reuse a prior session’s answer blindly when the remote port changed.
+3. **Else probe** — `browser_navigate` to `http://127.0.0.1:<pluto_port>/` (same number as remote — Cursor often 1:1-forwards). Snapshot: if it looks like Pluto landing (not connection refused / wrong app), **use that origin** and continue. Hooks persist the proven URL into `glass-views.json` after success. **Never** treat remote-shell `curl` / host `pluto_ui_ok` as Glass proof (false positive on the SSH host).
+4. **Else ask once** — only when remember + probe failed:
    > Pluto is on remote port **\<N\>**. What is the **forwarded / local** port in Cursor **Ports** for that remote port? (port number or full URL is fine.)
-3. Accept a bare port (`35721`) or a full URL. Normalize to `http://127.0.0.1:<port>/` (keep path if they pasted `/edit?id=…`).
-4. **`browser_navigate`** that URL immediately — **reuse** omits `position`; **reveal** (`position: "active"` **once**) if this is the first visible open and tabs are empty — do not lecture, do not retry host URL first, do not invent remaps.
-5. Treat the answer as **session-scoped only**. Remaps differ per session; do **not** persist it as cross-session truth.
+   Accept a bare port (`35721`) or a full URL. Normalize to `http://127.0.0.1:<port>/` (keep path if they pasted `/edit?id=…`). Then navigate immediately.
+5. **`browser_navigate`** the resolved URL — **reuse** omits `position`; **reveal** (`position: "active"` **once**) if this is the first visible open and tabs are empty — do not lecture, do not invent remaps.
 
-**Never:** invent client ports; hardcode lore ports; claim host `pluto_url` is Glass-authoritative on Remote SSH; require an Extension Host companion.
+**Never:** invent client ports; hardcode lore ports; claim host `pluto_url` is always Glass-authoritative on Remote SSH; require an Extension Host companion; skip the probe and ask every time when remember/probe would work.
 
 Do **not** use `plugin-browse-browser`. Do **not** hardcode `:1234`.
 
@@ -68,7 +69,7 @@ Glass tab spam is a known failure mode ([issue #4](https://github.com/jowch/styx
 3. If tab APIs are available, **list tabs** and reuse any tab whose URL host/path looks like this session’s Pluto (landing or `/edit?id=`). Match on notebook id or path — not a guessed port alone. Prefer the **6-hex** `viewId` when both a hex id and a `glass-browser-<uuid>` point at the same Pluto URL.
 4. **Parent:** treat an **empty or stale tab list as unreliable**, not proof that no Glass tab exists. Ask the user which Glass tab is Pluto, or navigate to the best-known URL **with that tab’s `viewId`**, before creating anything. Empty tabs plus “need the pane visible” is **reveal once**, not `newTab`.
 5. **Never** pass `newTab` / `new` / `tabs_new`. A Task child must never create a tab or pass `position: "active"`.
-6. After a failed navigate, **do not** retry by spawning another tab — fix the URL (local: host `pluto_url`; remote: re-ask Ports forwarded port) and reuse. Child view-not-found is not a URL bug — stop Glass work.
+6. After a failed navigate, **do not** retry by spawning another tab — fix the URL (local: host `pluto_url`; remote: re-run the [resolve ladder](#local-vs-remote-ssh-glass-url) — remember → probe → ask) and reuse. Child view-not-found is not a URL bug — stop Glass work.
 
 **Glass view cache:** After any successful **parent** Glass navigate/snapshot on this session’s Pluto URL, Styx hooks record `viewId` under `(session_id, notebook_id)` (`_landing` if no `edit?id=`). **Parent Read the file** before Glass work — `sessionStart` may print a “Known Glass views” block, but Cursor does **not** put that hook output in model-visible context (parent or Task child). Path: `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json`, else `$XDG_RUNTIME_DIR/styx-$UID/sessions/<session_id>/glass-views.json`, else `${TMPDIR:-/tmp}/styx-$UID/sessions/<session_id>/glass-views.json` (`STYX_RUNTIME_DIR` is MCP-process env, not the agent's — walk the fallbacks; macOS usually has no `XDG_RUNTIME_DIR`). `session_id` comes from `pluto_session_status`. Look up by `notebook_id` / `_landing` — never a single viewId for the whole session — and **reuse** with `browser_navigate({ url, viewId })` (omit `position`). If `browser_tabs` list is non-empty, confirm URL matches and refresh the map; if empty on the **parent**, still try the stored `viewId` for tab navigation (omit `position`) when a pane may exist — do **not** `newTab`. If the user cannot see Glass, **reveal once** with `position: "active"` and record the result `viewId`. A Task child can **Read** the same file (same `session_id`) but cannot attach — view-not-found is expected. On parent failure, delete that key from `entries` in the JSON (do not wipe the file) and **hard-stop** — ask the user; **never** `newTab` / `action: "new"`. One notebook → one remembered view (last success wins). Reload Window mints a new `session_id`; PlutoMCP teardown deletes the old `sessions/<id>/` (not a sessionStart wipe) — do not assume the old dir survives reload + Pluto restart.
 
@@ -83,7 +84,7 @@ status = pluto_session_status()
 browser_navigate({ url: status.pluto_url })
 ```
 
-**Remote SSH:** ask for Ports forwarded port for `status.pluto_port` → navigate `http://127.0.0.1:<forwarded>/` (see above).
+**Remote SSH:** resolve Glass URL via the [ladder](#local-vs-remote-ssh-glass-url) (remember → same-port probe → ask only if needed), then navigate landing.
 
 Tell user to pick a notebook; stop.
 
@@ -91,7 +92,7 @@ Tell user to pick a notebook; stop.
 
 **Local:** `browser_navigate` landing (`reuse` omit `position`; `reveal` once if pane closed) then `open_notebook` → landing click.
 
-**Remote SSH:** resolve Glass URL via the per-session Ports ask first, then the same Path B steps on that URL.
+**Remote SSH:** resolve Glass URL via the [ladder](#local-vs-remote-ssh-glass-url) first, then the same Path B steps on that URL.
 
 **Do not** `browser_navigate` to pasted `/edit?id=` after MCP `open_notebook` — cold loads hang on `Loading cells...`. Click the notebook on landing instead. Details: [path-b-open.md](path-b-open.md).
 
@@ -109,9 +110,11 @@ Do not leave Safe preview on after staging edits that need live results. Details
 
 If `cursor-ide-browser` is unavailable:
 
-1. **Local:** give landing URL from `pluto_session_status.pluto_url`
-2. **Remote SSH:** give `http://127.0.0.1:<forwarded>/` after the Ports ask (same URL Glass would use)
+1. **Local:** give landing URL from `pluto_session_status.pluto_url` (or use `styx-start --open` for OS browser)
+2. **Remote SSH:** give the resolved client origin (remember / probe / Ports answer — same URL Glass would use)
 3. Ask user to click the notebook on landing (Path B) or pick one (Path A)
+
+Prefer **styx-start** same-turn Glass navigate over asking the user to paste a URL.
 
 ## URL forms
 

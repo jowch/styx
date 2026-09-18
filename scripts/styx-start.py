@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""styx-start — boot Pluto via the window control bridge (no Glass).
+"""styx-start — boot Pluto via the window control bridge.
 
 Starts Pluto (idempotent), optionally opens a notebook, prints the welcome URL.
-Does not open Agents Glass or navigate to /edit?id=.
+Optional --open: local OS default browser (human handoff). Agents Glass is driven
+by the /styx-start command after this script returns — not by this CLI.
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ import json
 import os
 import sys
 import urllib.error
+import webbrowser
 from pathlib import Path
 from typing import Any
 
@@ -52,7 +54,7 @@ def _call(
         _die(f"bridge call failed ({name}): {e}")
 
 
-def _print_result(status: dict[str, Any], opened: dict[str, Any] | None) -> None:
+def _print_result(status: dict[str, Any], opened: dict[str, Any] | None) -> str:
     url = status.get("pluto_url")
     if not isinstance(url, str) or not url:
         port = status.get("pluto_port")
@@ -75,15 +77,16 @@ def _print_result(status: dict[str, Any], opened: dict[str, Any] | None) -> None
         print(f"execution_allowed={opened.get('execution_allowed', False)}")
     print()
     print(
-        "Open the welcome URL (My work / landing), then click the notebook there. "
-        "Do not paste /edit?id= after MCP open — that hangs on Loading cells… in Glass. "
-        "Use /styx-reconnect if Glass auth/WS drops."
+        "Command path: open Agents Glass to welcome_url (reuse/reveal), then "
+        "Path B click the notebook on landing if one was opened — do not paste "
+        "/edit?id=. Use /styx-reconnect if Glass auth/WS drops."
     )
+    return url
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Start Pluto via Styx control bridge; print welcome URL (no Glass)."
+        description="Start Pluto via Styx control bridge; print welcome URL."
     )
     parser.add_argument(
         "--path",
@@ -99,6 +102,11 @@ def main(argv: list[str] | None = None) -> int:
         "--run",
         action="store_true",
         help="Pass run_notebook=true to open_notebook (queue execution).",
+    )
+    parser.add_argument(
+        "--open",
+        action="store_true",
+        help="Local only: also open welcome_url in the OS default browser (human handoff).",
     )
     parser.add_argument(
         "--session-id",
@@ -146,7 +154,18 @@ def main(argv: list[str] | None = None) -> int:
             err = opened.get("error") if isinstance(opened, dict) else opened
             _die(f"open_notebook failed: {err}")
 
-    _print_result(status, opened)
+    url = _print_result(status, opened)
+
+    if args.open:
+        if os.environ.get("CURSOR_CODE_REMOTE") == "true":
+            print(
+                "styx-start: --open skipped on Remote SSH "
+                "(use Agents Glass via /styx-start)",
+                file=sys.stderr,
+            )
+        else:
+            webbrowser.open(url)
+
     return 0
 
 
