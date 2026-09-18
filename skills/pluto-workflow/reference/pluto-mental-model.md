@@ -10,6 +10,7 @@ Curated from Pluto.jl source and docs. Pluto is **not** a file you patch — it 
 - MCP writes **server state**; the browser editor has a separate draft buffer (last-write-wins).
 - **No hidden workspace state:** Pluto deletes/redefines globals on reactive runs (`bump_workspace_module`).
 - **Visual order ≠ execution order** — use `read_notebook_code` (execution order) or dependency graph.
+- **Fold = UI presentation** (`code_folded`, file markers `╟─` folded vs `╠═` open) — persisted metadata, not an execution gate; prefer `add_cell(..., folded=true)` for prose.
 
 ## What triggers re-run
 

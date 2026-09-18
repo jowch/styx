@@ -19,6 +19,7 @@ Canonical MCP names (PlutoMCP): `pluto_session_status`, `start_pluto_session`, `
 | C11 | **Safe preview honesty** | When outputs aren't live, exits Safe preview (**Run notebook code** in Glass or `allow_execution`) rather than stopping at staged edits; does not claim live outputs while still gated | Claims live outputs while still in safe preview; only reminds and leaves the gate on |
 | C12 | **Notebook lease / sharing** | Does not reopen a path already owned; respects `notebook_in_use` / leases | Re-`open_notebook` mints new id / resets safe preview |
 | C13 | **Cell grammar** | Structure-first cells per `pluto-semantics` (`imports_cell`, `begin`/`end`, `@bind` last) | Multi-statement soup / Jupyter mutation assumptions |
-| C14 | **Ground truth** | Re-reads via MCP after submit (`read_cell` / `read_notebook_code`); chat memory ≠ notebook state | “Already changed” without notebook evidence |
+| C14 | **Presentation fold** | New prose / section `md` cells use `add_cell(..., folded=true)` (or `fold_cell`); verify `code_folded` via `read_cell` — no `submit_changes` for fold alone | Leaves markdown source visible; confuses “fold into compute” with Pluto `code_folded` |
+| C15 | **Ground truth** | Re-reads via MCP after submit (`read_cell` / `read_notebook_code`); chat memory ≠ notebook state | “Already changed” without notebook evidence |
 
 **Exception rule:** mark **N/A** only with a one-line reason (e.g. “Path A landing only — no edits”). N/A does not count as Fail.
