@@ -146,6 +146,71 @@ def verified_binding(timeout: float = 2) -> dict[str, Any] | None:
     return binding
 
 
+def _read_binding_file(path: str) -> dict[str, Any] | None:
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    if data.get("schema_version") != 1:
+        return None
+    if not data.get("session_id") or not data.get("mcp_port"):
+        return None
+    return data
+
+
+def iter_window_bindings() -> list[dict[str, Any]]:
+    """Load schema-valid bindings under runtime windows/ (may be unhealthy)."""
+    windows = os.path.join(runtime_dir(), "windows")
+    if not os.path.isdir(windows):
+        return []
+    out: list[dict[str, Any]] = []
+    try:
+        names = os.listdir(windows)
+    except OSError:
+        return []
+    for name in names:
+        if not name.endswith(".json"):
+            continue
+        data = _read_binding_file(os.path.join(windows, name))
+        if data is not None:
+            out.append(data)
+    return out
+
+
+def healthy_bindings(timeout: float = 2) -> list[dict[str, Any]]:
+    """Bindings whose /health session_id matches the file."""
+    return [b for b in iter_window_bindings() if _health_matches(b, timeout=timeout)]
+
+
+def resolve_bridge_binding(
+    *, session_id: str | None = None, timeout: float = 2
+) -> dict[str, Any] | None:
+    """Resolve a live control bridge for CLI / hooks.
+
+    Order: this window (VSCODE_* key) → STYX_SESSION_ID / session_id →
+    exactly one healthy binding under windows/.
+    """
+    want = session_id or os.environ.get("STYX_SESSION_ID") or None
+    if isinstance(want, str):
+        want = want.strip() or None
+
+    window = verified_binding(timeout=timeout)
+    if window is not None and (want is None or window.get("session_id") == want):
+        return window
+
+    healthy = healthy_bindings(timeout=timeout)
+    if want is not None:
+        matches = [b for b in healthy if b.get("session_id") == want]
+        return matches[0] if len(matches) == 1 else None
+
+    if len(healthy) == 1:
+        return healthy[0]
+    return None
+
+
 def reads_path(binding: dict[str, Any] | None = None) -> str | None:
     b = binding if binding is not None else verified_binding()
     if b is None:
@@ -817,10 +882,21 @@ def write_allowed(tool_name: str, inp: dict[str, Any]) -> bool:
 
 
 def mcp_call(
-    name: str, arguments: dict[str, Any] | None = None, *, timeout: float = 5
+    name: str,
+    arguments: dict[str, Any] | None = None,
+    *,
+    timeout: float = 5,
+    binding: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """POST tools/call to this window's verified PlutoMCP control bridge."""
-    binding = verified_binding(timeout=min(timeout, 2))
+    """POST tools/call to a verified PlutoMCP control bridge.
+
+    When ``binding`` is omitted, uses this window's verified binding.
+    """
+    health_timeout = min(timeout, 2)
+    if binding is None:
+        binding = verified_binding(timeout=health_timeout)
+    elif not _health_matches(binding, timeout=health_timeout):
+        binding = None
     if binding is None:
         raise urllib.error.URLError("styx_binding_unavailable")
     port = int(binding["mcp_port"])

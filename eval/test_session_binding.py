@@ -129,6 +129,69 @@ class SessionBindingTests(unittest.TestCase):
         with mock.patch.dict(os.environ, self.env, clear=False):
             self.assertIsNone(pluto_lib.load_binding())
 
+    def test_resolve_bridge_prefers_window(self) -> None:
+        with mock.patch.dict(os.environ, self.env, clear=False):
+            os.environ.pop("STYX_SESSION_ID", None)
+            b = pluto_lib.resolve_bridge_binding()
+            self.assertIsNotNone(b)
+            assert b is not None
+            self.assertEqual(b["session_id"], self.session_id)
+
+    def test_resolve_bridge_by_session_id_env(self) -> None:
+        other_sid = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+        other = self.runtime / "windows" / "999999.json"
+        other.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "session_id": other_sid,
+                    "cursor_host_pid": 999999,
+                    "owner_pid": 1,
+                    "mcp_port": self.port,
+                    "pluto_port": None,
+                    "pluto": "stopped",
+                    "updated_at": "0",
+                }
+            ),
+            encoding="utf-8",
+        )
+        # Health handler still answers with self.session_id — other file is unhealthy.
+        _HealthHandler.session_id = self.session_id
+        env = {**self.env, "STYX_SESSION_ID": self.session_id}
+        with mock.patch.dict(os.environ, env, clear=False):
+            os.environ.pop("VSCODE_PID", None)
+            os.environ.pop("VSCODE_IPC_HOOK_CLI", None)
+            b = pluto_lib.resolve_bridge_binding()
+            self.assertIsNotNone(b)
+            assert b is not None
+            self.assertEqual(b["session_id"], self.session_id)
+
+    def test_resolve_bridge_sole_healthy_without_window(self) -> None:
+        with mock.patch.dict(os.environ, {"STYX_RUNTIME_DIR": str(self.runtime)}, clear=False):
+            os.environ.pop("VSCODE_PID", None)
+            os.environ.pop("VSCODE_IPC_HOOK_CLI", None)
+            os.environ.pop("STYX_SESSION_ID", None)
+            b = pluto_lib.resolve_bridge_binding()
+            self.assertIsNotNone(b)
+            assert b is not None
+            self.assertEqual(b["mcp_port"], self.port)
+
+    def test_resolve_bridge_ambiguous_without_session_id(self) -> None:
+        other_sid = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+        # Second healthy binding needs its own health server matching other_sid.
+        server2 = HTTPServer(("127.0.0.1", 0), _HealthHandler)
+        # Can't easily dual-session one handler — patch healthy_bindings instead.
+        server2.server_close()
+        fake = [
+            {"session_id": self.session_id, "mcp_port": 1},
+            {"session_id": other_sid, "mcp_port": 2},
+        ]
+        with mock.patch.object(pluto_lib, "verified_binding", return_value=None), mock.patch.object(
+            pluto_lib, "healthy_bindings", return_value=fake
+        ), mock.patch.dict(os.environ, {"STYX_RUNTIME_DIR": str(self.runtime)}, clear=False):
+            os.environ.pop("STYX_SESSION_ID", None)
+            self.assertIsNone(pluto_lib.resolve_bridge_binding())
+
     def test_session_scoped_receipts_and_concurrent_updates(self) -> None:
         with mock.patch.dict(os.environ, self.env, clear=False):
             path = pluto_lib.reads_path()
