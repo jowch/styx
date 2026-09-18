@@ -8,6 +8,7 @@
 | `notebook_not_found` | Confirm path with user |
 | MCP unreachable | Enable **pluto** MCP in Cursor Settings → retry |
 | `julia: command not found` / MCP exits immediately | Install Julia 1.11+ (https://julialang.org/downloads/), Reload Window → **styx-setup** |
+| Glass **“Not yet authenticated”** | Host mismatch: reopen landing with exact `pluto_url` host (do not swap `localhost`/`127.0.0.1`) — [glass-navigation.md](../../pluto-session/reference/glass-navigation.md#one-host-per-session-localhost--127001) |
 
 If cell edits fail before bootstrap, return to **pluto-session** first.
 

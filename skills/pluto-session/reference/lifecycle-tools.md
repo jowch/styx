@@ -22,7 +22,7 @@ Lifecycle tools may be **hidden** in Cursor's MCP tool picker. **Invoke by name 
 
 ## Glass URL
 
-Always navigate with **`pluto_url` from status/start** — never hardcode `:1234`.
+Always navigate with **`pluto_url` from status/start** — never hardcode `:1234`, and never rewrite its host (`localhost` ≠ `127.0.0.1` for cookies — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost--127001)).
 
 ## Never ask the user to run
 
