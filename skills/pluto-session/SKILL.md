@@ -3,8 +3,9 @@ name: pluto-session
 description: >-
   Use when the user mentions Pluto.jl notebooks, wants to start or open Pluto,
   open a specific .jl notebook in Glass, begins notebook work with no
-  notebook_id yet, wants one-shot boot + Glass ready (/styx-start), or needs
-  Glass/Pluto reconnect (auth, Loading cells, stale port — /styx-reconnect).
+  notebook_id yet, wants one-shot boot + Glass ready (/styx-start), needs
+  Glass/Pluto reconnect (auth, Loading cells, stale port — /styx-reconnect),
+  or needs stale session cleanup (dead bindings, foreign_session — /styx-cleanup).
 ---
 
 # Pluto session bootstrap
@@ -12,6 +13,8 @@ description: >-
 The user is a **Cursor user first**. Only start Pluto when they **request notebook work**. You handle setup — never ask them to run `pluto-serve.sh` / raw `PlutoMCP.serve()`.
 
 **styx-start** (boot + Glass ready in one turn) and **styx-reconnect** (Glass/auth/WS recovery) are first-class commands — follow their playbooks.
+
+**Stale runtime** (doctor health mismatch, `foreign_session`, orphan `windows/*` / `sessions/*`) → **styx-cleanup** — [reference/cleanup.md](reference/cleanup.md). Glass auth / Loading cells → soft reconnect first (not cleanup).
 
 ## Pick a path
 
@@ -55,7 +58,12 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 | Jump to `stop`/`start_pluto_session` for auth or Loading cells | Soft reconnect first — **styx-reconnect** / [reconnect.md](reference/reconnect.md) |
 | Print welcome URL and ask user to open it after **styx-start** | Same turn: Glass navigate + Path B click — [styx-start.md](reference/styx-start.md) |
 | Task child `newTab` after empty tabs / view-not-found | Expected isolation — notebook tools via inherited MCP; parent owns Glass |
+<<<<<<< HEAD
 | User runs `pluto-serve.sh` | Use `start_pluto_session` or **styx-start** |
+=======
+| User runs `pluto-serve.sh` | Use `start_pluto_session` |
+| Jump to `pkill julia` / wipe runtime for auth alone | Soft reconnect; cleanup only for dead bindings — [cleanup.md](reference/cleanup.md) |
+>>>>>>> 17d1473 (feat: styx-cleanup playbook for stale session crumbs)
 
 ## Additional resources
 
@@ -64,6 +72,7 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 - **styx-start (boot + Glass ready):** [reference/styx-start.md](reference/styx-start.md)
 - **styx-reconnect (auth / WS / stale port):** [reference/reconnect.md](reference/reconnect.md)
 - **Glass navigation (`cursor-ide-browser`):** [reference/glass-navigation.md](reference/glass-navigation.md)
+- **Stale session cleanup:** [reference/cleanup.md](reference/cleanup.md)
 - **Lifecycle tools + MCP picker quirk:** [reference/lifecycle-tools.md](reference/lifecycle-tools.md)
 - **Bootstrap errors:** [pluto-workflow/reference/errors.md](../pluto-workflow/reference/errors.md)
 - **Remote SSH:** [reference/remote-ssh.md](reference/remote-ssh.md)

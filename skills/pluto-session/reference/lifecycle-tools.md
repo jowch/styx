@@ -14,6 +14,8 @@ One Cursor window = one Styx/PlutoMCP/Pluto. Parent + local Task children share 
 | `open_notebook` | Load a `.jl` file (Path B); may return `notebook_in_use` |
 | `allow_execution` | Exit Safe preview (agent should call this or Glass **Run notebook code** when outputs need to be live); optional `run_notebook` (default true, non-blocking) |
 
+**After stop / Reload leftovers:** dead `windows/*` bindings, `sessions/*`, or notebook leases → **styx-cleanup** — [cleanup.md](cleanup.md). Do not confuse with Glass reconnect.
+
 ## MCP tool picker quirk
 
 Lifecycle tools may be **hidden** in Cursor's MCP tool picker. **Invoke by name anyway.**

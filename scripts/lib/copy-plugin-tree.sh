@@ -1,7 +1,7 @@
 # Portable plugin tree copy (tar; rsync not required).
 # shellcheck shell=bash
 # Shipped scripts: install*, update, check-julia, ensure-julia-env, pluto-mcp-launcher,
-# styx-doctor, styx-start, load-env-dev, lib/*. Dev/maintainer scripts below stay repo-only.
+# styx-doctor, styx-start, styx-cleanup, load-env-dev, lib/*. Dev/maintainer scripts below stay repo-only.
 COPY_PLUGIN_TREE_EXCLUDES=(
   .git .cursor .github .git-template dist eval AGENTS.md
   .env.dev node_modules hooks/__pycache__
