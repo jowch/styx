@@ -46,6 +46,7 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 | `open_notebook` without user path | Never scan repo and pick |
 | Bare `/<notebook_id>` URL | Use `/edit?id=<notebook_id>` only when notebook opened in Glass (Path A); after MCP `open_notebook`, click on landing |
 | Hardcode `:1234` / invent Ports remaps / spam `newTab` | Local: host `pluto_url`. Remote: ask Ports forwarded port this session; reuse or reveal Glass — [glass-navigation.md](reference/glass-navigation.md) |
+| Rewrite `127.0.0.1` ↔ `localhost` mid-session | Same port ≠ same origin — cookie fails (“Not yet authenticated”). One host per session: exact host from `pluto_url` (local) or the Ports URL (remote) — [glass-navigation.md](reference/glass-navigation.md#one-host-per-session-localhost-vs-127001) |
 | Task child `newTab` after empty tabs / view-not-found | Expected isolation — notebook tools via inherited MCP; parent owns Glass |
 | User runs `pluto-serve.sh` | Use `start_pluto_session` |
 

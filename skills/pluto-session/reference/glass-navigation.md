@@ -42,6 +42,21 @@ Agents Glass’s browser runs on the **laptop UI**. MCP/`pluto_url` are correct 
 
 Do **not** use `plugin-browse-browser`. Do **not** hardcode `:1234`.
 
+### One host per session (localhost vs 127.0.0.1)
+
+Pluto’s secret cookie is **origin-scoped**. `http://localhost:<port>` and `http://127.0.0.1:<port>` are **different origins** — they do not share cookies. Mixing them yields Pluto’s **“Not yet authenticated”** page (asks for the terminal secret link) even though the other host is already authed.
+
+**Rule:** pick **one** loopback host for the whole session and stick to it.
+
+| Session | Host to use |
+|---------|-------------|
+| **Local** | Exact host from `pluto_session_status.pluto_url` / `start_pluto_session` (today usually `127.0.0.1`) — copy the URL string; do **not** rewrite `127.0.0.1` ↔ `localhost` for Glass navigate, handoff links, or chat URLs that the user will open |
+| **Remote SSH** | The Ports-forwarded origin you already chose (`http://127.0.0.1:<forwarded>/`) — same host for every Glass navigate this session |
+
+**Recovery** if Glass shows **“Not yet authenticated”:** re-open landing via the session URL above (status `pluto_url` locally, or the same forwarded origin remotely). Only try the *other* loopback host as a last recovery step — then keep that host for the rest of the session. Do **not** hunt for `?secret=` first.
+
+Product default (emit `localhost` from status vs keep `127.0.0.1`) is deferred — until then, **status host wins**.
+
 ### Reuse vs reveal
 
 Glass tab spam is a known failure mode ([issue #4](https://github.com/jowch/styx/issues/4)). Cursor keeps **two** ids: MCP Playwright **6-hex** vs workbench **`glass-browser-<uuid>`**. Omitting `position` is background tab navigation (focus preserved — a closed pane stays hidden). `browser_navigate` with **`position: "active"`** reveals Agents Glass via workbench `_reopenBrowserTab`, which **always mints a new** `glass-browser-<uuid>` pane even when a 6-hex tab already exists.

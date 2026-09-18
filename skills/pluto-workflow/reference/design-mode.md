@@ -29,7 +29,7 @@ Drawings/annotations in Design Mode are screenshot-only — no structured `dom_p
 
 ## Glass URL resolution
 
-Notebook URL form: `<pluto_url>/edit?id=<notebook_id>` (any localhost port from `pluto_session_status`)
+Notebook URL form: `<pluto_url>/edit?id=<notebook_id>` (exact host + port from `pluto_session_status` — do not rewrite `localhost` ↔ `127.0.0.1`)
 
 `resolve_pluto_context` accepts Glass URL, `dom_path`, or `browser_element` block.
 
