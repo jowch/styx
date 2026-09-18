@@ -20,6 +20,14 @@ Lifecycle tools may be **hidden** in Cursor's MCP tool picker. **Invoke by name 
 
 **After upgrading PlutoMCP:** toggle **pluto** MCP off/on (or Reload Window) so `tools/list` and the launcher refresh.
 
+## Commands (lifecycle UX)
+
+| Command | Role |
+|---------|------|
+| **styx-start** | Boot Pluto (+ optional `open_notebook`) via control bridge; print welcome URL — **no Glass** — [styx-start.md](styx-start.md) |
+| **styx-reconnect** | Soft reconnect → hard restart when Glass auth/WS/port drops — [reconnect.md](reconnect.md) |
+| **pluto-notebooks** | Full agent bootstrap including Glass (Path A/B) |
+
 ## Glass URL
 
 Always navigate with **`pluto_url` from status/start** — never hardcode `:1234`, and never rewrite its host (`localhost` ≠ `127.0.0.1` for cookies — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost-vs-127001)).
@@ -29,4 +37,4 @@ Always navigate with **`pluto_url` from status/start** — never hardcode `:1234
 - `scripts/pluto-serve.sh` (dev-only)
 - `PlutoMCP.serve()` / curl port probes
 
-Use lifecycle tools. Local children must not discover bridges over HTTP or start shell servers.
+Use lifecycle tools or **styx-start** (agent runs the script). Local children must not discover bridges over HTTP or start shell servers.

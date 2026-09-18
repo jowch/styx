@@ -75,11 +75,12 @@ Pluto starts when you request notebook work, not at Cursor launch. Each Cursor w
 | `skills/styx-setup` | Install, Julia prerequisite, MCP troubleshooting |
 | `skills/pluto-session` | Agent bootstrap: start Pluto, choose notebook, open Glass |
 | `skills/pluto-workflow`, `pluto-semantics` | Cell editing and grammar |
-| `commands/pluto-notebooks`, `styx-setup` | User entry points |
+| `commands/pluto-notebooks`, `styx-start`, `styx-reconnect`, `styx-setup` | User entry points |
 | `mcp.json` + launcher | Deferred Pluto MCP (`connect()` until notebook intent) |
 | `rules/pluto-notebook-workflow.mdc` | Short guardrails |
 | `hooks/` | Read-before-edit, `pending_run` warning, Design Mode hints |
 | `scripts/styx-doctor.sh` | Health check (Julia, env, session binding) |
+| `scripts/styx-start.sh` | Boot Pluto (+ optional notebook) via control bridge; print welcome URL |
 
 ## Workflow
 

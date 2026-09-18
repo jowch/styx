@@ -2,13 +2,16 @@
 name: pluto-session
 description: >-
   Use when the user mentions Pluto.jl notebooks, wants to start or open Pluto,
-  open a specific .jl notebook in Glass, or begins notebook work with no
-  notebook_id yet in browser context or chat.
+  open a specific .jl notebook in Glass, begins notebook work with no
+  notebook_id yet, wants programmatic boot without Glass (/styx-start), or needs
+  Glass/Pluto reconnect (auth, Loading cells, stale port — /styx-reconnect).
 ---
 
 # Pluto session bootstrap
 
-The user is a **Cursor user first**. Only start Pluto when they **request notebook work**. You handle setup — never ask them to run shell scripts.
+The user is a **Cursor user first**. Only start Pluto when they **request notebook work**. You handle setup — never ask them to run `pluto-serve.sh` / raw `PlutoMCP.serve()`.
+
+**styx-start** (boot without Glass) and **styx-reconnect** (Glass/auth/WS recovery) are first-class commands — follow their playbooks.
 
 ## Pick a path
 
@@ -47,13 +50,17 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 | Bare `/<notebook_id>` URL | Use `/edit?id=<notebook_id>` only when notebook opened in Glass (Path A); after MCP `open_notebook`, click on landing |
 | Hardcode `:1234` / invent Ports remaps / spam `newTab` | Local: host `pluto_url`. Remote: ask Ports forwarded port this session; reuse or reveal Glass — [glass-navigation.md](reference/glass-navigation.md) |
 | Rewrite `127.0.0.1` ↔ `localhost` mid-session | Same port ≠ same origin — cookie fails (“Not yet authenticated”). One host per session: exact host from `pluto_url` (local) or the Ports URL (remote) — [glass-navigation.md](reference/glass-navigation.md#one-host-per-session-localhost-vs-127001) |
+| Jump to `stop`/`start_pluto_session` for auth or Loading cells | Soft reconnect first — **styx-reconnect** / [reconnect.md](reference/reconnect.md) |
+| Drive Glass for “just start Pluto / open this file” | Prefer **styx-start** (bridge only) — [styx-start.md](reference/styx-start.md) |
 | Task child `newTab` after empty tabs / view-not-found | Expected isolation — notebook tools via inherited MCP; parent owns Glass |
-| User runs `pluto-serve.sh` | Use `start_pluto_session` |
+| User runs `pluto-serve.sh` | Use `start_pluto_session` or **styx-start** |
 
 ## Additional resources
 
 - **Path A steps:** [reference/path-a-landing.md](reference/path-a-landing.md)
 - **Path B + cookies + safe preview:** [reference/path-b-open.md](reference/path-b-open.md)
+- **styx-start (boot without Glass):** [reference/styx-start.md](reference/styx-start.md)
+- **styx-reconnect (auth / WS / stale port):** [reference/reconnect.md](reference/reconnect.md)
 - **Glass navigation (`cursor-ide-browser`):** [reference/glass-navigation.md](reference/glass-navigation.md)
 - **Lifecycle tools + MCP picker quirk:** [reference/lifecycle-tools.md](reference/lifecycle-tools.md)
 - **Bootstrap errors:** [pluto-workflow/reference/errors.md](../pluto-workflow/reference/errors.md)

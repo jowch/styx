@@ -53,7 +53,7 @@ Pluto’s secret cookie is **origin-scoped**. `http://localhost:<port>` and `htt
 | **Local** | Exact host from `pluto_session_status.pluto_url` / `start_pluto_session` (today usually `127.0.0.1`) — copy the URL string; do **not** rewrite `127.0.0.1` ↔ `localhost` for Glass navigate, handoff links, or chat URLs that the user will open |
 | **Remote SSH** | The Ports-forwarded origin you already chose (`http://127.0.0.1:<forwarded>/`) — same host for every Glass navigate this session |
 
-**Recovery** if Glass shows **“Not yet authenticated”:** re-open landing via the session URL above (status `pluto_url` locally, or the same forwarded origin remotely). Only try the *other* loopback host as a last recovery step — then keep that host for the rest of the session. Do **not** hunt for `?secret=` first.
+**Recovery** if Glass shows **“Not yet authenticated”:** re-open landing via the session URL above (status `pluto_url` locally, or the same forwarded origin remotely). Only try the *other* loopback host as a last recovery step — then keep that host for the rest of the session. Do **not** hunt for `?secret=` first. Full soft→hard ladder (Loading cells, stale port, dead Pluto): [reconnect.md](reconnect.md).
 
 Product default (emit `localhost` from status vs keep `127.0.0.1`) is deferred — until then, **status host wins**.
 
