@@ -12,7 +12,7 @@
 | Empty title / **Loading cells…** / stale port | Soft reconnect (landing → click) before hard restart — [reconnect.md](../../pluto-session/reference/reconnect.md) |
 | `foreign_session` (409) | Wrong/stale bridge vs this window’s binding — check then **styx-cleanup** — [cleanup.md](../../pluto-session/reference/cleanup.md) |
 | `notebook_in_use` / `styx_binding_in_use` / `stale_binding_unrecoverable` | Live peer → use another window; dead peer → check then **styx-cleanup** — [cleanup.md](../../pluto-session/reference/cleanup.md) |
-| Doctor: binding present, `/health` nonce mismatch | Stale Styx binding — `styx-check-stale` then cleanup — [cleanup.md](../../pluto-session/reference/cleanup.md) |
+| Doctor: binding present, `/health` nonce mismatch | Stale Styx binding — `styx-check-stale` then optional cleanup — [cleanup.md](../../pluto-session/reference/cleanup.md) |
 
 If cell edits fail before bootstrap, return to **pluto-session** first. Glass/auth/WS drops → **styx-reconnect** / [reconnect.md](../../pluto-session/reference/reconnect.md). One-shot boot + Glass ready → **styx-start** / [styx-start.md](../../pluto-session/reference/styx-start.md).
 

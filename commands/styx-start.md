@@ -6,6 +6,23 @@ description: Boot Pluto (+ optional notebook), open Agents Glass, Path B click w
 
 **Success:** one `/styx-start` → user returns to Pluto **open and ready to work** (no second ask). Prefer the script for boot; MCP tools are the fallback. Complete the full chain in **this agent turn**.
 
+## 0. Stale check (once per window)
+
+Before or as the first step of boot:
+
+```bash
+scripts/styx-check-stale.sh
+```
+
+Parse `stale=` / `offer_cleanup=` / `offer_file=`.
+
+- `stale=no` → continue boot.
+- `stale=yes` and `offer_cleanup=yes` → **offer cleanup once** this turn; run `scripts/styx-check-stale.sh --mark-offer` immediately; if the user accepts, `scripts/styx-cleanup.sh --apply`; if they decline or ignore, continue boot and **do not re-ask** later.
+- `offer_cleanup=no` (already offered this window) → continue boot without nagging.
+- Exit `2` → brief warn; continue boot.
+
+Styx-managed crumbs only — never treat the user’s own unmanaged Pluto as debris. Details: [cleanup.md](../skills/pluto-session/reference/cleanup.md).
+
 ## 1. Boot (script or MCP)
 
 From the **workspace** (notebook cwd). The `.sh` wrapper finds the plugin tree; do not `cd` into it or `./analysis.jl` will miss:

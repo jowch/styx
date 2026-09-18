@@ -1,9 +1,9 @@
 ---
-description: Clear stale Styx/PlutoMCP runtime crumbs — dead bindings, sessions, leases — after stop; never nuke unrelated Julias
+description: Clear stale Styx-managed session crumbs — check first, then optional reclaim; never touch user Pluto
 ---
 
 # Styx cleanup
 
 Invoke **pluto-session** and follow [skills/pluto-session/reference/cleanup.md](../skills/pluto-session/reference/cleanup.md).
 
-**Ladder:** status → `stop_pluto_session` (managed) → clear stale `windows/*` / `sessions/*` / notebook leases → optional orphan kill **only** when clearly ours. Glass/auth/WS issues → **styx-reconnect** first. Fresh boot → **styx-start** (or `start_pluto_session`). Prefer `scripts/styx-cleanup.sh` (dry-run default) for runtime crumbs.
+**Wire:** `scripts/styx-check-stale.sh` (report; exit 1 if stale) → if `offer_cleanup=yes`, ask once → `--mark-offer` → optional `scripts/styx-cleanup.sh --apply` → continue. Glass/auth → **styx-reconnect**. Boot → **styx-start** (includes this check). Never reclaim unmanaged user Pluto.

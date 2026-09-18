@@ -14,7 +14,7 @@ The user is a **Cursor user first**. Only start Pluto when they **request notebo
 
 **styx-start** (boot + Glass ready in one turn) and **styx-reconnect** (Glass/auth/WS recovery) are first-class commands — follow their playbooks.
 
-**Stale runtime** (doctor health mismatch, `foreign_session`, orphan `windows/*` / `sessions/*`) → **styx-cleanup** — [reference/cleanup.md](reference/cleanup.md). Glass auth / Loading cells → soft reconnect first (not cleanup).
+**Stale Styx runtime** (check found dead bindings / `foreign_session` crumbs) → check then optional **styx-cleanup** — [reference/cleanup.md](reference/cleanup.md). Never treat the user’s unmanaged Pluto as debris. Glass auth / Loading cells → soft reconnect first (not cleanup).
 
 ## Pick a path
 
@@ -59,7 +59,7 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 | Print welcome URL and ask user to open it after **styx-start** | Same turn: Glass navigate + Path B click — [styx-start.md](reference/styx-start.md) |
 | Task child `newTab` after empty tabs / view-not-found | Expected isolation — notebook tools via inherited MCP; parent owns Glass |
 | User runs `pluto-serve.sh` | Use `start_pluto_session` or **styx-start** |
-| Jump to `pkill julia` / wipe runtime for auth alone | Soft reconnect; cleanup only for dead bindings — [cleanup.md](reference/cleanup.md) |
+| Jump to `pkill julia` / wipe runtime for auth alone | Soft reconnect; cleanup only for dead Styx bindings — [cleanup.md](reference/cleanup.md) |
 
 ## Additional resources
 

@@ -31,7 +31,7 @@ Multiple healthy bridges without a session id → error (do not guess).
 
 ### Output
 
-Prints `welcome_url=` from **exact** `pluto_url` (one host per session — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost-vs-127001)). Also session/ports and optional `notebook_id` / `path`.
+Prints `stale_check=` / `offer_cleanup=` / `offer_file=` first (report-only; see [cleanup.md](cleanup.md)), then `welcome_url=` from **exact** `pluto_url` (one host per session — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost-vs-127001)). Also session/ports and optional `notebook_id` / `path`.
 
 **Do not** print or navigate to `/edit?id=` as the handoff URL after MCP open — open landing, then click (Path B hydration). Never open the OS default browser.
 
@@ -39,8 +39,9 @@ Prints `welcome_url=` from **exact** `pluto_url` (one host per session — [glas
 
 Command **styx-start** — complete all of this before stopping:
 
+0. **Stale check** — `scripts/styx-check-stale.sh`. If `stale=yes` and `offer_cleanup=yes`: ask once to reclaim → `styx-check-stale.sh --mark-offer` → optional `styx-cleanup.sh --apply`. If declined/ignored or `offer_cleanup=no`, do not re-nag. Styx-managed only — [cleanup.md](cleanup.md).
 1. **Boot** — run the script when possible (else MCP `start_pluto_session` + optional `open_notebook` by name).
-2. Read `welcome_url=` / `pluto_port=` / `session_id=` / optional `notebook_id=` + `path=` from stdout or status.
+2. Read `welcome_url=` / `pluto_port=` / `session_id=` / optional `notebook_id=` + `path=` from stdout or status (also `stale_check=` lines if the script emitted them).
 3. **Resolve Glass URL** — [Local vs Remote SSH](glass-navigation.md#local-vs-remote-ssh-glass-url):
    - **Local:** exact `welcome_url` / `pluto_url`.
    - **Remote SSH:** remember last-good for this session+port → same-port Glass probe → ask Ports **only if** needed.

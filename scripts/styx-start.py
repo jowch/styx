@@ -82,6 +82,35 @@ def _print_result(status: dict[str, Any], opened: dict[str, Any] | None) -> None
     )
 
 
+def _emit_stale_check() -> None:
+    """Run report-only stale check; print agent lines. Never blocks boot."""
+    scripts = Path(__file__).resolve().parent
+    lib = scripts / "lib"
+    hooks = scripts.parent / "hooks"
+    for p in (str(lib), str(hooks)):
+        if p not in sys.path:
+            sys.path.insert(0, p)
+    try:
+        import styx_stale  # noqa: WPS433
+    except ImportError as e:
+        print(f"stale_check=error")
+        print(f"stale_check_error={e}")
+        return
+    try:
+        inv = styx_stale.inventory()
+    except OSError as e:
+        print("stale_check=error")
+        print(f"stale_check_error={e}")
+        return
+    count = inv["stale_count"]
+    key = styx_stale.window_key()
+    offered = styx_stale.offer_recorded(Path(inv["runtime_dir"]), key)
+    print(f"stale_check={'stale' if count else 'clean'}")
+    print(f"stale_count={count}")
+    print(f"offer_cleanup={'yes' if count and not offered else 'no'}")
+    print(f"offer_file={styx_stale.offer_path(Path(inv['runtime_dir']), key)}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Start Pluto via Styx control bridge; print welcome URL."
@@ -109,6 +138,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.welcome and args.path:
         _die("use either --welcome or --path, not both")
+
+    # Report-only; agent offers cleanup once when offer_cleanup=yes (see styx-start.md).
+    _emit_stale_check()
 
     binding = pluto_lib.resolve_bridge_binding(session_id=args.session_id)
     if binding is None:

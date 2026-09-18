@@ -51,7 +51,7 @@ julia --version   # must be 1.11+
 
 In Cursor chat: **"Run Styx doctor"** — the agent runs `scripts/styx-doctor.sh`.
 
-Stale binding / `foreign_session` after Reload → **styx-cleanup** (`scripts/styx-cleanup.sh`, dry-run then `--apply`) — [pluto-session cleanup](../../pluto-session/reference/cleanup.md).
+Stale Styx binding / `foreign_session` after Reload → `scripts/styx-check-stale.sh` then optional **styx-cleanup** — [pluto-session cleanup](../../pluto-session/reference/cleanup.md). Does not touch unmanaged user Pluto.
 
 ## 5. Start using Pluto
 
