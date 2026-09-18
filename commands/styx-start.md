@@ -8,14 +8,13 @@ description: Boot Pluto (+ optional notebook), open Agents Glass, Path B click w
 
 ## 1. Boot (script or MCP)
 
-From the plugin root (or repo):
+From the **workspace** (notebook cwd). The `.sh` wrapper finds the plugin tree; do not `cd` into it or `./analysis.jl` will miss:
 
 ```bash
-scripts/styx-start.sh                  # start; open ./analysis.jl if present
-scripts/styx-start.sh --welcome        # start only
-scripts/styx-start.sh --path note.jl   # start + open_notebook
-scripts/styx-start.sh --path note.jl --run
-scripts/styx-start.sh --open           # local: also OS default browser (human handoff)
+"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh"                  # start; open ./analysis.jl if present
+"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh" --welcome        # start only
+"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh" --path note.jl   # start + open_notebook
+"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh" --path note.jl --run
 ```
 
 Parse stdout for `welcome_url=` / `pluto_port=` / `session_id=` / optional `notebook_id=` + `path=` (exact host — do not rewrite `localhost` ↔ `127.0.0.1`).
@@ -32,8 +31,6 @@ Do not stop after printing the URL. Immediately:
 2. **Reuse or reveal** Glass — [reuse rules](../skills/pluto-session/reference/glass-navigation.md#reuse-vs-reveal) (`cursor-ide-browser` only; never `plugin-browse-browser` / `newTab`).
 3. `browser_navigate` to the **landing** (`welcome_url` / resolved origin `/`). Snapshot if needed.
 4. **If a notebook was opened / known** (`path` / `notebook_id` from boot): Path B — `browser_snapshot` → `browser_click` that notebook on landing. **Never** cold-navigate `/edit?id=` after MCP open.
-5. **Stop** when Glass shows the notebook editor (or landing if `--welcome` / no notebook). Brief confirm; do not ask the user to open a URL.
-
-`--open` is optional **extra** human handoff (OS browser, local only). Agents Glass + Path B via this command is the required seamless path.
+5. **Stop** when Glass shows the notebook editor (or landing if `--welcome` / no notebook). Brief confirm; do not ask the user to open a URL. Never open the OS default browser.
 
 Full notes: [skills/pluto-session/reference/styx-start.md](../skills/pluto-session/reference/styx-start.md). Glass already open but broken → **styx-reconnect**.

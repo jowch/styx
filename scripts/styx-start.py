@@ -2,8 +2,8 @@
 """styx-start — boot Pluto via the window control bridge.
 
 Starts Pluto (idempotent), optionally opens a notebook, prints the welcome URL.
-Optional --open: local OS default browser (human handoff). Agents Glass is driven
-by the /styx-start command after this script returns — not by this CLI.
+Agents Glass is driven by the /styx-start command after this script returns —
+not by this CLI. Never opens the OS browser.
 """
 from __future__ import annotations
 
@@ -12,7 +12,6 @@ import json
 import os
 import sys
 import urllib.error
-import webbrowser
 from pathlib import Path
 from typing import Any
 
@@ -54,7 +53,7 @@ def _call(
         _die(f"bridge call failed ({name}): {e}")
 
 
-def _print_result(status: dict[str, Any], opened: dict[str, Any] | None) -> str:
+def _print_result(status: dict[str, Any], opened: dict[str, Any] | None) -> None:
     url = status.get("pluto_url")
     if not isinstance(url, str) or not url:
         port = status.get("pluto_port")
@@ -81,7 +80,6 @@ def _print_result(status: dict[str, Any], opened: dict[str, Any] | None) -> str:
         "Path B click the notebook on landing if one was opened — do not paste "
         "/edit?id=. Use /styx-reconnect if Glass auth/WS drops."
     )
-    return url
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -102,11 +100,6 @@ def main(argv: list[str] | None = None) -> int:
         "--run",
         action="store_true",
         help="Pass run_notebook=true to open_notebook (queue execution).",
-    )
-    parser.add_argument(
-        "--open",
-        action="store_true",
-        help="Local only: also open welcome_url in the OS default browser (human handoff).",
     )
     parser.add_argument(
         "--session-id",
@@ -154,18 +147,7 @@ def main(argv: list[str] | None = None) -> int:
             err = opened.get("error") if isinstance(opened, dict) else opened
             _die(f"open_notebook failed: {err}")
 
-    url = _print_result(status, opened)
-
-    if args.open:
-        if os.environ.get("CURSOR_CODE_REMOTE") == "true":
-            print(
-                "styx-start: --open skipped on Remote SSH "
-                "(use Agents Glass via /styx-start)",
-                file=sys.stderr,
-            )
-        else:
-            webbrowser.open(url)
-
+    _print_result(status, opened)
     return 0
 
 

@@ -48,7 +48,7 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 | Mistake | Fix |
 |---------|-----|
 | Ask which notebook on Path A | Stop after landing |
-| `open_notebook` without user path | Never scan repo and pick |
+| `open_notebook` without user path | Never scan the repo. `/styx-start` may open cwd `./analysis.jl` if that file exists; otherwise welcome-only |
 | Bare `/<notebook_id>` URL | Use `/edit?id=<notebook_id>` only when notebook opened in Glass (Path A); after MCP `open_notebook`, click on landing |
 | Hardcode `:1234` / invent Ports remaps / spam `newTab` | Local: host `pluto_url`. Remote: remember → probe → ask — [glass-navigation.md](reference/glass-navigation.md) |
 | Rewrite `127.0.0.1` ↔ `localhost` mid-session | Same port ≠ same origin — cookie fails (“Not yet authenticated”). One host per session: exact host from `pluto_url` (local) or the resolved Ports/probe origin (remote) — [glass-navigation.md](reference/glass-navigation.md#one-host-per-session-localhost-vs-127001) |

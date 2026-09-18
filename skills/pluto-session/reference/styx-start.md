@@ -9,14 +9,13 @@ Use when the user wants “get Pluto running / open this notebook” as a one-sh
 ## Script (boot only)
 
 ```bash
-scripts/styx-start.sh                  # start; open ./analysis.jl if present
-scripts/styx-start.sh --welcome        # Pluto only
-scripts/styx-start.sh -p path/to.jl    # start + open_notebook
-scripts/styx-start.sh -p path/to.jl --run
-scripts/styx-start.sh --open           # local: also webbrowser.open(welcome_url)
+"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh"                  # start; open ./analysis.jl if present
+"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh" --welcome        # Pluto only
+"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh" -p path/to.jl    # start + open_notebook
+"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh" -p path/to.jl --run
 ```
 
-`scripts/styx-start.py` is the implementation; the `.sh` wrapper sets `PYTHONPATH` to `hooks/`.
+`scripts/styx-start.py` is the implementation; the `.sh` wrapper sets `PYTHONPATH` to `hooks/`. Run from the **workspace** (so `./analysis.jl` is the notebook cwd). Do not `cd` to the plugin tree. In this repo checkout, `scripts/styx-start.sh` is equivalent.
 
 The script does **not** drive Agents Glass (plugins cannot). The **command** path must finish Glass + Path B after the script returns.
 
@@ -34,9 +33,7 @@ Multiple healthy bridges without a session id → error (do not guess).
 
 Prints `welcome_url=` from **exact** `pluto_url` (one host per session — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost-vs-127001)). Also session/ports and optional `notebook_id` / `path`.
 
-**Do not** print or navigate to `/edit?id=` as the handoff URL after MCP open — open landing, then click (Path B hydration).
-
-`--open` (optional): on **local** only, also opens `welcome_url` in the OS default browser for human handoff. Skipped when `CURSOR_CODE_REMOTE=true`. This does **not** replace Agents Glass.
+**Do not** print or navigate to `/edit?id=` as the handoff URL after MCP open — open landing, then click (Path B hydration). Never open the OS default browser.
 
 ## Agent path (required — same turn)
 
@@ -60,6 +57,5 @@ Command **styx-start** — complete all of this before stopping:
 | `--welcome` | Start only |
 | `--path` / `-p` | Open that notebook |
 | `--run` | `open_notebook(..., run_notebook=true)` |
-| `--open` | Local: OS browser to `welcome_url` (extra human handoff) |
 
 Cold start timeout defaults to 180s (`STYX_START_TIMEOUT`).

@@ -21,7 +21,7 @@ If neither is present, the launcher exits with `styx_identity_unavailable` (no s
 2. Confirm **pluto** MCP is connected (`plugin-styx-pluto`). If `styx_identity_unavailable`, Reload Window and re-enable **pluto** so the child inherits `VSCODE_IPC_HOOK_CLI`.
 3. `pluto_session_status`. Read `pluto_url` / `pluto_port` / `mcp_port` from the result — ports are dynamic.
 4. If stopped → **`start_pluto_session`** (bound MCP stdio on the SSH host owns the stack). Do **not** fall back to `PlutoMCP.serve()` or fixed `:1234`/`:2346`.
-5. **Glass URL ladder:** Agents Glass runs on the **laptop**. Resolve client origin via [glass-navigation.md](glass-navigation.md#local-vs-remote-ssh-glass-url): **remember** last-good from `glass-views.json` for this session+port → **else** Glass-probe `http://127.0.0.1:<pluto_port>/` → **ask Ports only if** probe fails. Then open landing (**reuse** omits `position`; **reveal once** with `position: "active"` if first visible open / tabs empty). **Never invent** remaps; never treat remote-shell `curl` as Glass proof.
+5. **Glass URL ladder:** Agents Glass runs on the **laptop**. Resolve client origin via [glass-navigation.md](glass-navigation.md#local-vs-remote-ssh-glass-url): **remember** last-good from `glass-views.json` when its `pluto_port` matches live host `pluto_port` → **else** Glass-probe `http://127.0.0.1:<pluto_port>/` → **ask Ports only if** probe fails. Then open landing (**reuse** omits `position`; **reveal once** with `position: "active"` if first visible open / tabs empty). **Never invent** remaps; never treat remote-shell `curl` as Glass proof.
 6. Local Task children inherit this window's `plugin-styx-pluto` MCP — do not pass ports in prompts.
 
 ## Host vs laptop ports

@@ -308,15 +308,18 @@ def glass_views_path(binding: dict[str, Any] | None = None) -> str | None:
 
 def _empty_glass_views(binding: dict[str, Any]) -> dict[str, Any]:
     pluto_url = binding.get("pluto_url")
+    port = binding.get("pluto_port")
     if not isinstance(pluto_url, str) or not pluto_url:
-        port = binding.get("pluto_port")
         pluto_url = f"http://127.0.0.1:{port}" if isinstance(port, int) else ""
-    return {
+    data: dict[str, Any] = {
         "schema_version": GLASS_VIEW_SCHEMA,
         "session_id": binding.get("session_id"),
         "pluto_url": pluto_url,
         "entries": {},
     }
+    if isinstance(port, int):
+        data["pluto_port"] = port
+    return data
 
 
 def _iso_now() -> str:
@@ -689,6 +692,9 @@ def upsert_glass_view(
                 pass
         if not data.get("pluto_url"):
             data["pluto_url"] = origin_url(url) or url
+        port = b.get("pluto_port")
+        if isinstance(port, int):
+            data["pluto_port"] = port
         entries = data.setdefault("entries", {})
         entries[key] = {"viewId": view_id, "url": url, "updated_at": stamp}
         _atomic_write_json(path, data)
