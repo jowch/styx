@@ -42,7 +42,7 @@ Agents Glass’s browser runs on the **laptop UI**. MCP/`pluto_url` are correct 
 
 Do **not** use `plugin-browse-browser`. Do **not** hardcode `:1234`.
 
-### One host per session (`localhost` ≠ `127.0.0.1`)
+### One host per session (localhost vs 127.0.0.1)
 
 Pluto’s secret cookie is **origin-scoped**. `http://localhost:<port>` and `http://127.0.0.1:<port>` are **different origins** — they do not share cookies. Mixing them yields Pluto’s **“Not yet authenticated”** page (asks for the terminal secret link) even though the other host is already authed.
 
