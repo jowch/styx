@@ -37,7 +37,7 @@ When a parent dispatches Pluto notebook work to a subagent:
 
 1. **Attach** this rubric + checklist (or link `eval/agent-control/`). Do **not** rely on sessionStart “Known Glass views” — Cursor does not put that hook output in the model (parent or child). Agents Glass (`cursor-ide-browser`) is **parent-only**: a Task child’s `browser_tabs` is empty and a cached `viewId` from `glass-views.json` fails “Browser view not found” — that is expected, not a reason to `newTab` / `position: "active"`. The parent **Read**s `$STYX_RUNTIME_DIR/sessions/<session_id>/glass-views.json` (else `$XDG_RUNTIME_DIR/styx-$UID/sessions/<session_id>/glass-views.json`, else `${TMPDIR:-/tmp}/styx-$UID/sessions/<session_id>/glass-views.json`) before Glass work. Dispatch notebook tools (`read_cell` / `edit_cell` / `submit_changes`) to the child via inherited `plugin-styx-pluto`; leave Glass to the parent.
 2. Require the subagent’s final message to include a filled [SCORECARD.template.md](SCORECARD.template.md):
-   - Checklist C1–C14 with **Yes / No / N/A** + evidence
+   - Checklist C1–C15 with **Yes / No / N/A** + evidence
    - Self-scores D1–D7 with one evidence line each
    - **Skill gaps** table (what failed → which file to patch)
 3. **Parent re-grades** from the tool trace (do not trust self-score alone). Prefer evidence:

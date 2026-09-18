@@ -136,6 +136,10 @@ function run_one_scenario(scenario_file::String; strict_trace=false)
             write(io, JSON3.write(report))
         end
         println("[$sid] outcome=$(report["outcome"]["pass"]) trace=$(report["trace"]["pass"]) → $summary_path")
+        if !report["outcome"]["pass"]
+            fails = [string(c["claim"]) for c in report["outcome"]["claims"] if !c["pass"]]
+            println(stderr, "[$sid] outcome claim failures: $(join(fails, "; "))")
+        end
         if !report["trace"]["pass"]
             println(stderr, "[$sid] trace diagnostics: $(join(report["trace"]["diagnostics"], "; "))")
         end
