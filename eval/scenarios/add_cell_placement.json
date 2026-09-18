@@ -38,6 +38,6 @@
         "after_cell_id": "11111111-1111-1111-1111-111111111111"
       }
     },
-    { "tool": "submit_changes", "arguments": { "notebook_id": "$notebook_id" } }
+    { "tool": "submit_changes", "arguments": { "notebook_id": "$notebook_id", "wait_for_completion": true } }
   ]
 }

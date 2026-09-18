@@ -56,5 +56,8 @@ Teaching notebooks use micro-cells and bare echo cells after `@bind`. **Agents d
 | Add control | New `widget_cell` |
 | Multi-step plot/setup | `compute_cell` with `begin`/`end` |
 | Local temps | `let`/`end` |
+| Add section / prose `md` | `add_cell(..., folded=true)` (or `fold_cell` after) so Glass shows output only |
 | `pluto_multi_expression` | [grammar.md](grammar.md) + ex. 8 |
 | Dependency order unclear | `read_notebook_code` |
+
+**Projection:** folding a cell whose code starts with `md` may omit it from default `read_notebook_code`. Use `read_cell` / `include_markdown` when you need that source.

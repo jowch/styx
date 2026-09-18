@@ -13,8 +13,9 @@
 | **Visual order** | `cell_order` | UI layout only |
 | **Execution order** | dependency graph / topological sort | What runs when |
 | **Disabled cells** | `metadata["disabled"]` | Cell + downstream skipped |
+| **Folded cells** | `code_folded` (`fold_cell` / `add_cell(folded=…)`) | UI presentation only — hides code, shows output; no reactive run |
 
-Use `read_notebook_code` for execution/dependency order. Use `get_cell_order` for visual placement (`add_cell` / `move_cell`).
+Use `read_notebook_code` for execution/dependency order. Use `get_cell_order` for visual placement (`add_cell` / `move_cell`). Use `fold_cell` (or `add_cell(folded=true)`) for presentation — same metadata class as move: no `submit_changes`.
 
 ## Multiple definitions
 

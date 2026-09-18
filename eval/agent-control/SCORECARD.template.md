@@ -22,7 +22,8 @@
 | C11 Safe preview honesty |  |  |
 | C12 Lease / sharing |  |  |
 | C13 Cell grammar |  |  |
-| C14 Ground truth |  |  |
+| C14 Presentation fold |  |  |
+| C15 Ground truth |  |  |
 
 Checklist gate: **Pass / Fail**
 

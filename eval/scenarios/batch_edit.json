@@ -41,6 +41,6 @@
         ]
       }
     },
-    { "tool": "submit_changes", "arguments": { "notebook_id": "$notebook_id" } }
+    { "tool": "submit_changes", "arguments": { "notebook_id": "$notebook_id", "wait_for_completion": true } }
   ]
 }

@@ -17,6 +17,7 @@ resolve notebook_id → read_cell (note Safe preview if active)
 |------|------|-------|
 | Read | `read_cell`, `read_notebook_code` | Required before writes (MCP + hooks enforce) |
 | Stage | `edit_cell`, `edit_cells`, `add_cell` | Default `run_after=false` |
+| Fold | `fold_cell`, `add_cell(folded=…)` | Metadata only — no run / no `submit_changes`. Prefer `folded=true` for `md` prose. Verify via `read_cell` → `code_folded` |
 | Validate | `validate_cell` | Optional |
 | Run | `submit_changes` | Once per batch (Pluto Cmd+S); prefer `wait_for_completion=false` |
 | Exit gate | Glass **Run notebook code** or `allow_execution` | When Safe preview is on and live outputs are needed — exit yourself |
