@@ -36,7 +36,7 @@ Agents Glass’s browser runs on the **laptop UI**. MCP/`pluto_url` are correct 
 3. **Else probe** — `browser_navigate` to `http://127.0.0.1:<pluto_port>/` (same number as remote — Cursor often 1:1-forwards). Snapshot: if it looks like Pluto landing (not connection refused / wrong app), **use that origin** and continue. Hooks persist the proven URL into `glass-views.json` after success. **Never** treat remote-shell `curl` / host `pluto_ui_ok` as Glass proof (false positive on the SSH host).
 4. **Else ask once** — only when remember + probe failed:
    > Pluto is on remote port **\<N\>**. What is the **forwarded / local** port in Cursor **Ports** for that remote port? (port number or full URL is fine.)
-   Accept a bare port (`35721`) or a full URL. Normalize to `http://127.0.0.1:<port>/` (keep path if they pasted `/edit?id=…`). Then navigate immediately.
+   Accept a bare port (`35721`) or a full URL. Always normalize to the origin landing `http://127.0.0.1:<port>/` (scheme+host+port+/ only — **strip** any pasted `/edit?id=…` or other path). Then navigate immediately. Path B click into the notebook stays a separate step after landing.
 5. **`browser_navigate`** the resolved URL — **reuse** omits `position`; **reveal** (`position: "active"` **once**) if this is the first visible open and tabs are empty — do not lecture, do not invent remaps.
 
 **Never:** invent client ports; hardcode lore ports; claim host `pluto_url` is always Glass-authoritative on Remote SSH; require an Extension Host companion; skip the probe and ask every time when remember/probe would work.
