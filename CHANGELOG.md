@@ -8,6 +8,14 @@ Each release is a git tag and GitHub Release; the installer targets the latest r
 
 ## [Unreleased]
 
+### Added
+
+- **styx-start / styx-reconnect ([#26](https://github.com/jowch/styx/issues/26) / [#27](https://github.com/jowch/styx/issues/27)):** `/styx-start` boots Pluto via the control bridge (optional `open_notebook`), then the same turn must land Agents Glass and Path B-click a known notebook. `/styx-reconnect` is soft-then-hard on the same Glass URL ladder. Invoke `"${CURSOR_PLUGIN_ROOT}/scripts/styx-start.sh"` from the workspace (not `cd` plugin root). Remote remember uses `glass-views.json` top-level `pluto_port` vs live status — there is no `glass-client.json`.
+
+### Changed
+
+- Agents Glass is the only browser surface. Removed `styx-start --open` / `webbrowser.open` OS-browser handoff.
+
 ## [0.2.3] — 2026-09-15
 
 ### Added

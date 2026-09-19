@@ -62,7 +62,7 @@ Design Mode (**⌘⇧D**) → click a cell → describe edits.
 
 ## Remote SSH
 
-Cursor forwards ports when Pluto listens on the host. Install Julia **on the SSH machine**, enable Styx, then ask to work on notebooks — the agent starts Pluto **there**. MCP uses host `pluto_url`; Agents Glass asks once per session for the Ports forwarded/local port. Details: `skills/pluto-session/reference/remote-ssh.md`.
+Cursor forwards ports when Pluto listens on the host. Install Julia **on the SSH machine**, enable Styx, then ask to work on notebooks — the agent starts Pluto **there**. MCP uses host `pluto_url`; Agents Glass resolves the laptop origin via remember → same-port probe → Ports ask only if needed. Details: `skills/pluto-session/reference/remote-ssh.md`.
 
 ## Update
 

@@ -254,6 +254,18 @@ class GlassViewStoreTests(unittest.TestCase):
         assert views is not None
         self.assertEqual(set(views["entries"]), {NB_A, NB_B})
 
+    def test_upsert_records_host_pluto_port(self) -> None:
+        """Remember uses file pluto_port vs live status — not the Glass URL port."""
+        forwarded = "http://127.0.0.1:35721/"
+        with mock.patch.dict(os.environ, self.env, clear=False):
+            pluto_lib.upsert_glass_view(
+                pluto_lib.LANDING_KEY, "e7ffd6", forwarded, binding=self.binding
+            )
+            views = pluto_lib.load_glass_views(self.binding)
+        assert views is not None
+        self.assertEqual(views["pluto_port"], 1234)
+        self.assertEqual(views["entries"][pluto_lib.LANDING_KEY]["url"], forwarded)
+
 
 class RecordGlassFromHookTests(unittest.TestCase):
     def setUp(self) -> None:

@@ -56,11 +56,11 @@ _PROSE_TAB_RE = re.compile(
 )
 _REMOTE_SSH_CONTEXT = (
     "Remote SSH workspace. This Cursor window owns its own Styx/PlutoMCP/Pluto on "
-    "the SSH host (local XOR remote). MCP uses host pluto_url/pluto_port. Before "
-    "Agents Glass this session: ask the user for the Cursor Ports forwarded/local "
-    "port for that remote Pluto port; open http://127.0.0.1:<forwarded>/ — do not "
-    "invent remaps or probe fixed :1234/:2346. See pluto-session "
-    "glass-navigation.md / remote-ssh.md."
+    "the SSH host (local XOR remote). MCP uses host pluto_url/pluto_port. Agents "
+    "Glass: remember last-good client origin for this session+port from "
+    "glass-views.json → else probe http://127.0.0.1:<pluto_port>/ via Glass → "
+    "ask Ports only if probe fails. Never invent remaps or use remote curl as "
+    "Glass proof. See pluto-session glass-navigation.md / remote-ssh.md."
 )
 
 
@@ -144,6 +144,71 @@ def verified_binding(timeout: float = 2) -> dict[str, Any] | None:
     if not _health_matches(binding, timeout=timeout):
         return None
     return binding
+
+
+def _read_binding_file(path: str) -> dict[str, Any] | None:
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    if data.get("schema_version") != 1:
+        return None
+    if not data.get("session_id") or not data.get("mcp_port"):
+        return None
+    return data
+
+
+def iter_window_bindings() -> list[dict[str, Any]]:
+    """Load schema-valid bindings under runtime windows/ (may be unhealthy)."""
+    windows = os.path.join(runtime_dir(), "windows")
+    if not os.path.isdir(windows):
+        return []
+    out: list[dict[str, Any]] = []
+    try:
+        names = os.listdir(windows)
+    except OSError:
+        return []
+    for name in names:
+        if not name.endswith(".json"):
+            continue
+        data = _read_binding_file(os.path.join(windows, name))
+        if data is not None:
+            out.append(data)
+    return out
+
+
+def healthy_bindings(timeout: float = 2) -> list[dict[str, Any]]:
+    """Bindings whose /health session_id matches the file."""
+    return [b for b in iter_window_bindings() if _health_matches(b, timeout=timeout)]
+
+
+def resolve_bridge_binding(
+    *, session_id: str | None = None, timeout: float = 2
+) -> dict[str, Any] | None:
+    """Resolve a live control bridge for CLI / hooks.
+
+    Order: this window (VSCODE_* key) → STYX_SESSION_ID / session_id →
+    exactly one healthy binding under windows/.
+    """
+    want = session_id or os.environ.get("STYX_SESSION_ID") or None
+    if isinstance(want, str):
+        want = want.strip() or None
+
+    window = verified_binding(timeout=timeout)
+    if window is not None and (want is None or window.get("session_id") == want):
+        return window
+
+    healthy = healthy_bindings(timeout=timeout)
+    if want is not None:
+        matches = [b for b in healthy if b.get("session_id") == want]
+        return matches[0] if len(matches) == 1 else None
+
+    if len(healthy) == 1:
+        return healthy[0]
+    return None
 
 
 def reads_path(binding: dict[str, Any] | None = None) -> str | None:
@@ -243,15 +308,18 @@ def glass_views_path(binding: dict[str, Any] | None = None) -> str | None:
 
 def _empty_glass_views(binding: dict[str, Any]) -> dict[str, Any]:
     pluto_url = binding.get("pluto_url")
+    port = binding.get("pluto_port")
     if not isinstance(pluto_url, str) or not pluto_url:
-        port = binding.get("pluto_port")
         pluto_url = f"http://127.0.0.1:{port}" if isinstance(port, int) else ""
-    return {
+    data: dict[str, Any] = {
         "schema_version": GLASS_VIEW_SCHEMA,
         "session_id": binding.get("session_id"),
         "pluto_url": pluto_url,
         "entries": {},
     }
+    if isinstance(port, int):
+        data["pluto_port"] = port
+    return data
 
 
 def _iso_now() -> str:
@@ -624,6 +692,9 @@ def upsert_glass_view(
                 pass
         if not data.get("pluto_url"):
             data["pluto_url"] = origin_url(url) or url
+        port = b.get("pluto_port")
+        if isinstance(port, int):
+            data["pluto_port"] = port
         entries = data.setdefault("entries", {})
         entries[key] = {"viewId": view_id, "url": url, "updated_at": stamp}
         _atomic_write_json(path, data)
@@ -817,10 +888,21 @@ def write_allowed(tool_name: str, inp: dict[str, Any]) -> bool:
 
 
 def mcp_call(
-    name: str, arguments: dict[str, Any] | None = None, *, timeout: float = 5
+    name: str,
+    arguments: dict[str, Any] | None = None,
+    *,
+    timeout: float = 5,
+    binding: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """POST tools/call to this window's verified PlutoMCP control bridge."""
-    binding = verified_binding(timeout=min(timeout, 2))
+    """POST tools/call to a verified PlutoMCP control bridge.
+
+    When ``binding`` is omitted, uses this window's verified binding.
+    """
+    health_timeout = min(timeout, 2)
+    if binding is None:
+        binding = verified_binding(timeout=health_timeout)
+    elif not _health_matches(binding, timeout=health_timeout):
+        binding = None
     if binding is None:
         raise urllib.error.URLError("styx_binding_unavailable")
     port = int(binding["mcp_port"])

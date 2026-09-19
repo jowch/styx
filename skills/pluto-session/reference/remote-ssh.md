@@ -21,22 +21,24 @@ If neither is present, the launcher exits with `styx_identity_unavailable` (no s
 2. Confirm **pluto** MCP is connected (`plugin-styx-pluto`). If `styx_identity_unavailable`, Reload Window and re-enable **pluto** so the child inherits `VSCODE_IPC_HOOK_CLI`.
 3. `pluto_session_status`. Read `pluto_url` / `pluto_port` / `mcp_port` from the result — ports are dynamic.
 4. If stopped → **`start_pluto_session`** (bound MCP stdio on the SSH host owns the stack). Do **not** fall back to `PlutoMCP.serve()` or fixed `:1234`/`:2346`.
-5. **Glass (required ask):** Agents Glass runs on the **laptop**. Before the first Glass navigate this session, ask the user for the Cursor **Ports** forwarded/local port for the remote Pluto port from status. Accept a port number or full URL; open `http://127.0.0.1:<forwarded>/` (**reuse** omits `position`; **reveal once** with `position: "active"` if this is the first visible open and tabs are empty). Ask every session — remaps differ; do not reuse a prior session’s answer as truth. **Never invent** remaps. Full policy: [glass-navigation.md](glass-navigation.md#local-vs-remote-ssh-glass-url).
+5. **Glass URL ladder:** Agents Glass runs on the **laptop**. Resolve client origin via [glass-navigation.md](glass-navigation.md#local-vs-remote-ssh-glass-url): **remember** last-good from `glass-views.json` when its `pluto_port` matches live host `pluto_port` → **else** Glass-probe `http://127.0.0.1:<pluto_port>/` → **ask Ports only if** probe fails. Then open landing (**reuse** omits `position`; **reveal once** with `position: "active"` if first visible open / tabs empty). **Never invent** remaps; never treat remote-shell `curl` as Glass proof.
 6. Local Task children inherit this window's `plugin-styx-pluto` MCP — do not pass ports in prompts.
 
 ## Host vs laptop ports
 
 - **MCP lifecycle** uses host-local ports from status (`pluto_url`, `mcp_port`). No laptop remap required.
-- **Agents Glass** on Remote SSH needs the **Ports forwarded** laptop port (ask once per session — see above). Local windows keep host `pluto_url` with no ask.
+- **Agents Glass** on Remote SSH needs a laptop-visible origin (remember → same-port probe → Ports ask as last resort). Local windows keep host `pluto_url` with no ask.
 - Never hardcode `:1234` in skills, prompts, or handoff text.
 
 ## Never
 
 - Invent client / forwarded ports (or any fixed lore port).
-- Persist a forwarded port across sessions as authoritative.
+- Treat a prior session’s forwarded port as truth when the remote `pluto_port` changed (re-run the ladder).
+- Use remote-shell `curl` / host health checks as proof of Glass Ports remap.
 - `PlutoMCP.serve()` / `pluto-serve.sh` / curl discovery as an alternate transport.
 - Bind Pluto on `0.0.0.0`.
 - Treat Cloud Agent forwarding as this path.
 - Open the same canonical notebook path in two Styx sessions (`notebook_in_use`).
 - Spam `newTab` / new Glass views when tab list is empty or navigate fails ([issue #4](https://github.com/jowch/styx/issues/4)).
 - Require an Extension Host Ports companion for Glass.
+- Ask Ports every time when remember or same-port Glass probe would succeed.
