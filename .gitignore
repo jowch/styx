@@ -2,6 +2,8 @@
 dist/
 hooks/state/*.json
 hooks/__pycache__/
+scripts/__pycache__/
+**/__pycache__/
 .julia-env-instantiated
 Manifest.toml
 .env.dev
@@ -13,4 +15,3 @@ pluto-click-queue.json
 
 # Pluto notebook backups (editor/browser saves, e.g. "notebook backup 1.jl")
 * backup *.jl
-scripts/__pycache__/
