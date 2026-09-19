@@ -39,7 +39,7 @@ Prints `stale_check=` / `offer_cleanup=` / `offer_file=` first (report-only; see
 
 Command **styx-start** — complete all of this before stopping:
 
-0. **Stale check** — `scripts/styx-check-stale.sh`. If `stale=yes` and `offer_cleanup=yes`: ask once to reclaim → `styx-check-stale.sh --mark-offer` → optional `styx-cleanup.sh --apply`. If declined/ignored or `offer_cleanup=no`, do not re-nag. Styx-managed only — [cleanup.md](cleanup.md).
+0. **Stale check** — `scripts/styx-check-stale.sh`. If `stale=yes` and `offer_cleanup=yes`: ask once **and** `--mark-offer` immediately, then **always continue** steps 1–7 (boot → Glass → Path B) without waiting for an answer. Run `styx-cleanup.sh --apply` only if the user already accepted in this turn; decline/ignore → finish Glass, no re-nag, no `--kill-orphans` unless the user explicitly asks. **Never block Glass on the cleanup offer.** Styx-managed only — [cleanup.md](cleanup.md).
 1. **Boot** — run the script when possible (else MCP `start_pluto_session` + optional `open_notebook` by name).
 2. Read `welcome_url=` / `pluto_port=` / `session_id=` / optional `notebook_id=` + `path=` from stdout or status (also `stale_check=` lines if the script emitted them).
 3. **Resolve Glass URL** — [Local vs Remote SSH](glass-navigation.md#local-vs-remote-ssh-glass-url):

@@ -14,7 +14,7 @@ One Cursor window = one Styx/PlutoMCP/Pluto. Parent + local Task children share 
 | `open_notebook` | Load a `.jl` file (Path B); may return `notebook_in_use` |
 | `allow_execution` | Exit Safe preview (agent should call this or Glass **Run notebook code** when outputs need to be live); optional `run_notebook` (default true, non-blocking) |
 
-**After stop / Reload leftovers:** run `scripts/styx-check-stale.sh`; if stale and `offer_cleanup=yes`, offer cleanup once — [cleanup.md](cleanup.md). Do not confuse with Glass reconnect. Never treat unmanaged user Pluto as Styx debris.
+**After stop / Reload leftovers:** run `scripts/styx-check-stale.sh`; if stale and `offer_cleanup=yes`, offer cleanup once (`--mark-offer`, never block Glass) — [cleanup.md](cleanup.md). Do not confuse with Glass reconnect. Never treat unmanaged user Pluto as Styx debris.
 
 ## MCP tool picker quirk
 

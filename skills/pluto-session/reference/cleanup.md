@@ -14,8 +14,8 @@ Glass/auth/WS recovery → **styx-reconnect**. Fresh boot + Glass ready → **st
 ```bash
 scripts/styx-check-stale.sh                 # report; parse stale= / offer_cleanup=
 scripts/styx-check-stale.sh --mark-offer    # record one-offer bit (no-nag this window)
-scripts/styx-cleanup.sh --apply             # reclaim stale Styx crumbs
-scripts/styx-cleanup.sh --apply --kill-orphans   # also SIGTERM dead Styx binding owner_pid
+scripts/styx-cleanup.sh --apply             # reclaim stale Styx crumbs (default agent path)
+# --kill-orphans: advanced only — never on boot; only if the user explicitly asks
 ```
 
 Shared logic: `scripts/lib/styx_stale.py`.
@@ -26,7 +26,7 @@ Shared logic: `scripts/lib/styx_stale.py`.
 |--|--------------|------------------|
 | How it appears | `windows/<key>.json` binding (`schema_version: 1`, `session_id`, `mcp_port`) under `$STYX_RUNTIME_DIR` | `Pluto.run()` / browser UI with **no** Styx binding |
 | Check/cleanup | May report STALE and reclaim | **Never** inventoried, never killed, never “cleaned” |
-| Orphan Julia | Only `owner_pid` from a **failed-health Styx binding** with `--kill-orphans` | Untouched |
+| Orphan Julia | Untouched by default `--apply`. `--kill-orphans` (user-asked only) may SIGTERM a failed-health binding’s `owner_pid` after cmdline check | Untouched |
 
 Check **does not** port-scan `:1234` or guess Pluto processes. If there is no Styx binding file, there is no Styx debris.
 
@@ -45,16 +45,18 @@ Check **does not** port-scan `:1234` or guess Pluto processes. If there is no St
 Agents run **check** as part of **styx-start** / boot ([styx-start.md](styx-start.md)):
 
 1. `scripts/styx-check-stale.sh` — read `stale=` and `offer_cleanup=`.
-2. If `stale=yes` and `offer_cleanup=yes` → **ask the user once** this turn whether to run cleanup.
-3. Immediately `scripts/styx-check-stale.sh --mark-offer` (records the offer **before** waiting on the answer).
-4. If user accepts → `scripts/styx-cleanup.sh --apply` (optional `--kill-orphans` only when clearly Styx orphan).
-5. If user declines or ignores → **do not ask again** this Cursor window — continue boot.
+2. If `stale=yes` and `offer_cleanup=yes` → **ask once** this turn **and** immediately `scripts/styx-check-stale.sh --mark-offer`.
+3. **Always continue** boot → same-turn Glass → Path B — **never wait** for cleanup consent before Glass. Same-turn Glass ready wins over the offer.
+4. Run `scripts/styx-cleanup.sh --apply` only if the user **already accepted** in this turn. Do **not** pass `--kill-orphans` unless the user explicitly asks (not part of boot).
+5. If they decline or ignore → finish Glass; **do not re-ask** this Cursor window; reclaim later via `/styx-cleanup` if they want.
 6. If `offer_cleanup=no` (bit already set) → skip the ask; continue boot even if still stale.
+
+**Glass never blocks on the offer.**
 
 ### Where the bit lives
 
 `$STYX_RUNTIME_DIR/windows/<window_key>.cleanup-offer.json`  
-(fallback if no window key: `$STYX_RUNTIME_DIR/cleanup-offer.json`). Path is printed as `offer_file=`.
+(fallback if no window key: `$STYX_RUNTIME_DIR/cleanup-offer.json` — host-global; one window’s mark can suppress others until cleared). Path is printed as `offer_file=`.
 
 Schema: `{ "schema_version": 1, "offered_at", "stale_count", "summary", "window_key" }`. Scoped to the **Cursor window key** (`VSCODE_PID` / IPC hook hash) so a Reload that mints a new key can offer again; the same window does not re-nag.
 
@@ -78,14 +80,24 @@ Runtime root: `$STYX_RUNTIME_DIR` → `$XDG_RUNTIME_DIR/styx-$UID` → `${TMPDIR
 
 1. **Check** — `styx-check-stale.sh` (or doctor + status).
 2. **Stop managed** — if this window still owns a live managed Pluto and you intend a full reclaim of *its* dead peers only, `stop_pluto_session` first when appropriate; never stop another window’s live session.
-3. **Cleanup** — `styx-cleanup.sh --apply` after user consent (or explicit `/styx-cleanup`).
-4. **Optional kill** — `--kill-orphans` only for Styx binding `owner_pid` after failed health.
+3. **Cleanup** — `styx-cleanup.sh --apply` after user consent (or explicit `/styx-cleanup`). Default reclaim deletes Styx crumbs only — no SIGTERM.
+4. **`--kill-orphans`** — **not** on boot / default agent path. Only when the user explicitly asks (advanced `/styx-cleanup`). Still requires a failed-health Styx binding `owner_pid` plus a cmdline Julia/Styx marker.
 5. **Resume** — **styx-start** / reconnect as needed.
 
 ## Rules
 
 - Soft reconnect before cleanup for auth / Loading cells.
 - Never treat unmanaged user Pluto as Styx debris.
-- Conservative kills — Styx binding proof required; no `pkill julia`.
-- Offer once per window — mark offer before the user’s answer; never re-nag.
+- Conservative kills — default `--apply` never SIGTERM; `--kill-orphans` only on explicit user ask + Styx binding proof; no `pkill julia`.
+- Offer once per window — mark offer immediately; **never block Glass**; never re-nag.
 - One host per session — [glass-navigation.md](glass-navigation.md#one-host-per-session-localhost-vs-127001).
+
+## Tests
+
+Thin unit coverage (temp runtime + fake `/health`):
+
+```bash
+python3 -m unittest eval.test_styx_stale -v
+```
+
+Also wired into `scripts/validate-pluto-lifecycle.sh`. GHA `eval-reference.yml` is path-filtered to `eval/**` / `Project.toml` — cleanup script edits alone do not run the Julia gate; run the unittest locally (or touch `eval/` when you want CI).

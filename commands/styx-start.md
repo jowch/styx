@@ -17,9 +17,11 @@ scripts/styx-check-stale.sh
 Parse `stale=` / `offer_cleanup=` / `offer_file=`.
 
 - `stale=no` → continue boot.
-- `stale=yes` and `offer_cleanup=yes` → **offer cleanup once** this turn; run `scripts/styx-check-stale.sh --mark-offer` immediately; if the user accepts, `scripts/styx-cleanup.sh --apply`; if they decline or ignore, continue boot and **do not re-ask** later.
+- `stale=yes` and `offer_cleanup=yes` → ask once this turn **and** run `scripts/styx-check-stale.sh --mark-offer` immediately. Then **always continue** boot → Glass → Path B in this turn — **never wait** on cleanup consent before Glass. Run `scripts/styx-cleanup.sh --apply` only if the user **already accepted** in this turn; if they decline or ignore, finish Glass and **do not re-ask**. Do **not** pass `--kill-orphans` unless the user explicitly asks.
 - `offer_cleanup=no` (already offered this window) → continue boot without nagging.
 - Exit `2` → brief warn; continue boot.
+
+**Glass never blocks on the offer.** Same-turn Glass ready (#30) wins over waiting for cleanup yes/no.
 
 Styx-managed crumbs only — never treat the user’s own unmanaged Pluto as debris. Details: [cleanup.md](../skills/pluto-session/reference/cleanup.md).
 

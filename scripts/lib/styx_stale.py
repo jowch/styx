@@ -71,6 +71,31 @@ def pid_alive(pid: Any) -> bool:
     return True
 
 
+def pid_cmdline(pid: int) -> str:
+    """Best-effort /proc cmdline (nul → space). Empty when unavailable."""
+    try:
+        raw = Path(f"/proc/{pid}/cmdline").read_bytes()
+    except OSError:
+        return ""
+    return raw.replace(b"\x00", b" ").decode("utf-8", errors="replace").strip()
+
+
+def pid_looks_like_styx_owner(pid: Any) -> bool:
+    """True when pid is alive and cmdline looks like Julia / PlutoMCP / Styx MCP.
+
+    Cheap PID-reuse guard for optional --kill-orphans. Never used on the default
+    --apply path.
+    """
+    if not pid_alive(pid):
+        return False
+    assert isinstance(pid, int)
+    cmd = pid_cmdline(pid).lower()
+    if not cmd:
+        return False
+    markers = ("julia", "plutomcp", "pluto_mcp", "styx")
+    return any(m in cmd for m in markers)
+
+
 def window_key() -> str | None:
     """Numeric Cursor window key, or None when identity is unavailable."""
     env = os.environ.get("STYX_WINDOW_KEY")

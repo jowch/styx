@@ -32,7 +32,7 @@ def main() -> int:
     ap.add_argument(
         "--json",
         action="store_true",
-        help="Print full inventory JSON on stdout (still prints key=value lines on stderr)",
+        help="Print full inventory JSON on stderr (key=value trailer stays on stdout)",
     )
     args = ap.parse_args()
 

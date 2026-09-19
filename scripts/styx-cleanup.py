@@ -2,7 +2,8 @@
 """Reclaim stale Styx-managed runtime crumbs (bindings / sessions / leases).
 
 Re-validates health before every delete. Never touches unmanaged user Pluto.
-Optional --kill-orphans only signals owner_pid from health-failed Styx bindings.
+Optional --kill-orphans (user-asked advanced only) may SIGTERM owner_pid from
+health-failed Styx bindings after a cmdline Julia/Styx marker check.
 """
 from __future__ import annotations
 
@@ -29,7 +30,11 @@ def main() -> int:
     ap.add_argument(
         "--kill-orphans",
         action="store_true",
-        help="With --apply: SIGTERM owner_pid of stale Styx bindings that fail health",
+        help=(
+            "Advanced only (not default agent path): with --apply, SIGTERM "
+            "owner_pid of stale Styx bindings that fail health, if cmdline "
+            "looks like Julia/PlutoMCP/Styx"
+        ),
     )
     args = ap.parse_args()
 
@@ -77,14 +82,19 @@ def main() -> int:
             port, sid = b["mcp_port"], b["session_id"]
             if port and sid and styx_stale.health_matches(port, sid):
                 print(f"  skip kill {pid}: health became live")
-            elif pid and styx_stale.pid_alive(pid):
+            elif not pid or not styx_stale.pid_alive(pid):
+                print(f"  skip kill: owner_pid={pid} not alive")
+            elif not styx_stale.pid_looks_like_styx_owner(pid):
+                print(
+                    f"  skip kill {pid}: cmdline not Julia/PlutoMCP/Styx "
+                    f"(pid reuse guard)"
+                )
+            else:
                 try:
                     os.kill(pid, signal.SIGTERM)
                     print(f"  SIGTERM owner_pid={pid} (Styx binding owner only)")
                 except OSError as e:
                     print(f"  skip kill {pid}: {e}")
-            else:
-                print(f"  skip kill: owner_pid={pid} not alive")
 
     for s in stale_sessions:
         if s["session_id"] in live_sids:
