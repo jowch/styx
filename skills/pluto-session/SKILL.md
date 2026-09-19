@@ -58,12 +58,8 @@ Do **not** ask "which notebook?" on Path A — Pluto's UI is the picker.
 | Jump to `stop`/`start_pluto_session` for auth or Loading cells | Soft reconnect first — **styx-reconnect** / [reconnect.md](reference/reconnect.md) |
 | Print welcome URL and ask user to open it after **styx-start** | Same turn: Glass navigate + Path B click — [styx-start.md](reference/styx-start.md) |
 | Task child `newTab` after empty tabs / view-not-found | Expected isolation — notebook tools via inherited MCP; parent owns Glass |
-<<<<<<< HEAD
 | User runs `pluto-serve.sh` | Use `start_pluto_session` or **styx-start** |
-=======
-| User runs `pluto-serve.sh` | Use `start_pluto_session` |
 | Jump to `pkill julia` / wipe runtime for auth alone | Soft reconnect; cleanup only for dead bindings — [cleanup.md](reference/cleanup.md) |
->>>>>>> 17d1473 (feat: styx-cleanup playbook for stale session crumbs)
 
 ## Additional resources
 
